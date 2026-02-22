@@ -66,7 +66,16 @@ const Result = () => {
       navigate('/')
       }
   }, [user])
+
   // Fetch project every 10 seconds
+  useEffect(()=>{
+    if(user && isGenerating){
+      const interval = setInterval(()=> {
+        fetchProjectData()
+        },10000);
+        return ()=> clearInterval(interval)
+      }
+      }, [user, isGenerating])
   
   return loading ? (
     <div className="h-screen w-full flex items-center justify-center">
