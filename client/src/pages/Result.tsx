@@ -1,26 +1,35 @@
 import { useEffect, useState } from "react";
 import type { Project } from "../Types";
-import { dummyGenerations } from "../assets/assets";
 import { ImageIcon, Loader2Icon, RefreshCwIcon, SparkleIcon, VideoIcon } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { GhostButton, PrimaryButton } from "../components/Buttons";
 import { useAuth } from "@clerk/clerk-react";
+import api from "../configs/axios";
 
 const Result = () => {
 
   const {projectId} = useParams()
   const {getToken} = useAuth()
   const {user, isLoaded} = useParams()
+  const navigate = useNavigate()
 
   const [project, setProjectData] = useState<Project>({} as Project)
   const [loading, setLoading] = useState(true)
   const [isGenerating, setIsGenerating] = useState(false)
   
   const fetchProjectData = async ()=>{
-    setTimeout (()=>{
-      setProjectData(dummyGenerations[0])
-      setLoading(false)
-    },2000)
+   try {
+    const token = await getToken()
+    const {data} = await api.get(`/api/user/projects/${projectId}`, {
+      headers: { Authorization: `Bearer ${token}`}
+    })
+    setProjectData(data.project)
+    setIsGenerating(data.project.isGenerating)
+    setLoading(false)
+
+   } catch (error) {
+
+   }
   }
   const handleGenerateVideo = async ()=>{
     setIsGenerating(true)
