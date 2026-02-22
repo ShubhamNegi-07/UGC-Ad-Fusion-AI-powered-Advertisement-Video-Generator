@@ -20,7 +20,7 @@ const Result = () => {
   
   const fetchProjectData = async ()=>{
    try {
-    const token = await getToken()
+    const token = await getToken();
     const {data} = await api.get(`/api/user/projects/${projectId}`, {
       headers: { Authorization: `Bearer ${token}`}
     })
@@ -37,8 +37,25 @@ const Result = () => {
   }
   const handleGenerateVideo = async ()=>{
     setIsGenerating(true)
-  }
+    try {
+      const token = await getToken();
+      const {data} = await api.post('/api/project/video`${projectId}', {projectId}, {
+      headers: { Authorization: `Bearer ${token}`}
+      })
 
+      setProjectData(prev => ({...prev, generatedVideo: data.videoUrl,
+        isGenerating: false}))
+
+        toast.success(data.message)
+        setIsGenerating(false);
+
+    } // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+
+    }
+  }
 
   useEffect(()=>{
     fetchProjectData()  
