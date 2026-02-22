@@ -2,10 +2,16 @@ import { useEffect, useState } from "react";
 import type { Project } from "../Types";
 import { dummyGenerations } from "../assets/assets";
 import { ImageIcon, Loader2Icon, RefreshCwIcon, SparkleIcon, VideoIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { GhostButton, PrimaryButton } from "../components/Buttons";
+import { useAuth } from "@clerk/clerk-react";
 
 const Result = () => {
+
+  const {projectId} = useParams()
+  const {getToken} = useAuth()
+  const {user, isLoaded} = useParams()
+
   const [project, setProjectData] = useState<Project>({} as Project)
   const [loading, setLoading] = useState(true)
   const [isGenerating, setIsGenerating] = useState(false)
