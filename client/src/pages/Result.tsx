@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { GhostButton, PrimaryButton } from "../components/Buttons";
 import { useAuth } from "@clerk/clerk-react";
 import api from "../configs/axios";
+import toast from "react-hot-toast";
 
 const Result = () => {
 
@@ -27,7 +28,10 @@ const Result = () => {
     setIsGenerating(data.project.isGenerating)
     setLoading(false)
 
-   } catch (error) {
+   } // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
 
    }
   }
