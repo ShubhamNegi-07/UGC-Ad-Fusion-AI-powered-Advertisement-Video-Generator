@@ -3,7 +3,7 @@ import type { Project } from "../Types";
 import { ImageIcon, Loader2Icon, RefreshCwIcon, SparkleIcon, VideoIcon } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { GhostButton, PrimaryButton } from "../components/Buttons";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import api from "../configs/axios";
 import toast from "react-hot-toast";
 
@@ -11,7 +11,7 @@ const Result = () => {
 
   const {projectId} = useParams()
   const {getToken} = useAuth()
-  const {user, isLoaded} = useParams()
+  const {user, isLoaded} = useUser()
   const navigate = useNavigate()
 
   const [project, setProjectData] = useState<Project>({} as Project)
@@ -39,7 +39,7 @@ const Result = () => {
     setIsGenerating(true)
     try {
       const token = await getToken();
-      const {data} = await api.post('/api/project/video`${projectId}', {projectId}, {
+      const {data} = await api.post(`/api/project/video/${projectId}`, { projectId }, {
       headers: { Authorization: `Bearer ${token}`}
       })
 
@@ -57,9 +57,17 @@ const Result = () => {
     }
   }
 
-  useEffect(()=>{
-    fetchProjectData()  
-  }, [])
+
+    useEffect(()=>{
+    if(user && !project.id){
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchProjectData()
+    }else if(isLoaded && !user){
+      navigate('/')
+      }
+  }, [user])
+  // Fetch project every 10 seconds
+  
   return loading ? (
     <div className="h-screen w-full flex items-center justify-center">
      <Loader2Icon className='animate-spin text-indigo-500 size-9'/>
@@ -81,7 +89,7 @@ const Result = () => {
         {/* Main Result Display */}
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-panel inline-block p-2 rounded-2xl">
-            <div className={`${project?. aspectRatio === '9:16' ? 'aspect-9/16' :
+            <div className={`${project?.aspectRatio === '9:16' ? 'aspect-9/16' :
               'aspect-video'} sm:max-h-200 rounded-xl bg-gray-900 overflow-hidden
               relative`}>
                 {project?.generatedVideo ?(
