@@ -11,4 +11,4 @@ projectRouter.post('/video', protect, createVideo)
 projectRouter.get('/published', getAllPublishedProjects)
 projectRouter.delete('/:projectId', protect, deleteProject)
 
-export default projectRouter
+export default projectRoute
