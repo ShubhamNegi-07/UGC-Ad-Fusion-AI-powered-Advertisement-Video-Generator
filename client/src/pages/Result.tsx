@@ -89,7 +89,7 @@ const Result = () => {
         <Link to="/generate" className="btn-secondary text-sm flex items-center 
         gap-2">
           <RefreshCwIcon className="w-4  h-4"/>
-          <p className="max-sm:hidden">New Generation</p>
+          <p className="max-sm:hidden">New Generatio</p>
           </Link>
         </header>
 
