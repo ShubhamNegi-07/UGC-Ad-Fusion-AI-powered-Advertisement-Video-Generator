@@ -8,7 +8,7 @@ import path from 'path';
 import ai from '../configs/ai.js';
 import axios from 'axios';
 
-const loadImage = (path: string, mimeType: strin)=>{
+const loadImage = (path: string, mimeType: string)=>{
     return {
         inlineData: {
             data: fs.readFileSync(path).toString('base64'),
