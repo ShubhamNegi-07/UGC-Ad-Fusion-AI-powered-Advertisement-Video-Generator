@@ -73,7 +73,7 @@ const Result = () => {
       const interval = setInterval(()=> {
         fetchProjectData()
         },10000);
-        return ()=> clearInterval(interval
+        return ()=> clearInterval(interval)
       }
       }, [user, isGenerating])
   
