@@ -70,7 +70,7 @@ const Result = () => {
   // Fetch project every 10 seconds
   useEffect(()=>{
     if(user && isGenerating){
-      const interval = setInterval(()=> {
+      const interval = setInterval(()=> 
         fetchProjectData()
         },10000);
         return ()=> clearInterval(interval)
