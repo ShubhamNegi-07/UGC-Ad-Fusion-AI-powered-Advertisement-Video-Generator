@@ -169,10 +169,10 @@ export const createProject = async (req:Request, res: Response) => {
         }
         Sentry.captureException(error);
         res.status(500).json({ message: error.message });
-    
+    }
 }
 
-export const createVideo = async (req:Request, res: Response) => {
+export const createVideo = async (req:Request, res: Response => {
     const {userId} = req.auth()
     const { projectId } = req.body;
     let isCreditDeducted = false;
