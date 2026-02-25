@@ -93,7 +93,7 @@ const Generator = () => {
             <div className="mb-4 text-gray-300">
               <label htmlFor="name" className="block text-sm mb-4">
                 Project Name
-              </label
+              </label>
               <input
                 type="text"
                 id="name"
@@ -126,7 +126,7 @@ const Generator = () => {
                 className="block text-sm mb-4"
               >
                 Product Description{" "}
-                <span className="text-xs text-violet-400">(optional)</span>
+                <span className="text-xs text-violet-400">(optional)<span>
               </label>
               <textarea
                 id="Product Description"
