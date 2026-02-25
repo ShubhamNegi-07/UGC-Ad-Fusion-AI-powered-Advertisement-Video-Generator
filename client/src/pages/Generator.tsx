@@ -78,7 +78,7 @@ const Generator = () => {
             <UploadZone
               label="Product Image"
               file={productImage}
-              onClear={() => setProductImage(null)
+              onClear={() => setProductImage(null)}
               onChange={(e) => handleFileChange(e, "product")}
             />
             <UploadZone
@@ -93,7 +93,7 @@ const Generator = () => {
             <div className="mb-4 text-gray-300">
               <label htmlFor="name" className="block text-sm mb-4">
                 Project Name
-              </label>
+              </label
               <input
                 type="text"
                 id="name"
