@@ -78,7 +78,7 @@ const Generator = () => {
             <UploadZone
               label="Product Image"
               file={productImage}
-              onClear={() => setProductImage(null)}
+              onClear={() => setProductImage(null)
               onChange={(e) => handleFileChange(e, "product")}
             />
             <UploadZone
