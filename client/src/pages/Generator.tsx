@@ -126,7 +126,7 @@ const Generator = () => {
                 className="block text-sm mb-4"
               >
                 Product Description{" "}
-                <span className="text-xs text-violet-400">(optional)<span>
+                <span className="text-xs text-violet-400">(optional)</span>
               </label>
               <textarea
                 id="Product Description"
@@ -148,7 +148,7 @@ const Generator = () => {
                       aspectRatio === "9:16"
                         ? "ring-violet-500/50 bg-white/10"
                         : ""
-                    }`}
+                    }}
                 />
                 <RectangleHorizontalIcon
                   onClick={() => setAspectRatio("16:9")}
