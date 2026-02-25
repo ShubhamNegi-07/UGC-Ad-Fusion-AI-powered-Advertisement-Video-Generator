@@ -148,7 +148,7 @@ const Generator = () => {
                       aspectRatio === "9:16"
                         ? "ring-violet-500/50 bg-white/10"
                         : ""
-                    }}
+                    }`}
                 />
                 <RectangleHorizontalIcon
                   onClick={() => setAspectRatio("16:9")}
@@ -163,7 +163,7 @@ const Generator = () => {
             </div>
             <div className="mb-4 text-gray-300">
               <label htmlFor="userprompt" className="block text-sm mb-4">
-                User Prompt{" "}
+                User Prompt{""}
                 <span className="text-xs text-violet-400">(optional)</span>
               </label>
               <textarea
