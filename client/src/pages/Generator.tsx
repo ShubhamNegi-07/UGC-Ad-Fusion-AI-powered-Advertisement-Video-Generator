@@ -178,7 +178,7 @@ const Generator = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-center mt-10">
+        <div className="flex justify-center mt-10"
           <PrimaryButton
             disabled={isGenerating}
             className="px-10 py-3 rounded-md disabled:opacity-70 disabled:cursor-not-allowed"
@@ -197,7 +197,7 @@ const Generator = () => {
         </div>
       </form>
     </div>
-  ;
+  );
 };
 
 export default Generator;
