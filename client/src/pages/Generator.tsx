@@ -196,8 +196,8 @@ const Generator = () => {
           </PrimaryButton>
         </div>
       </form>
-    </div
-  );
+    </div>
+  ;
 };
 
 export default Generator;
