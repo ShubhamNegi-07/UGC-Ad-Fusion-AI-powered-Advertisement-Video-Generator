@@ -193,10 +193,10 @@ const Generator = () => {
                 Generate Image
               </>
             )}
-          </PrimaryButton
+          </PrimaryButton>
         </div>
       </form>
-    </div>
+    </div
   );
 };
 
