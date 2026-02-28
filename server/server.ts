@@ -20,8 +20,8 @@ app.post('/api/clerk', express.raw({ type: 'application/json'}), clerkWebhooks)
 app.use(express.json())
 app.use(clerkMiddleware())
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Server is Live!';
+app.get('/', (req: Request, res: Response) => 
+    res.send('Server is Live!');
 });
 
 app.get("/debug-sentry", function mainHandler(req, res) {
