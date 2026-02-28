@@ -139,7 +139,7 @@ export const createProject = async (req:Request, res: Response) => {
         const base64Image = `data:image/png;base64,${finalBuffer.toString
             ('base64')}`
 
-        const uploadResult = await cloudinary. uploader.upload(base64Image,
+        const uploadResult = await cloudinary.uploader.upload(base64Image,
             {resource_type: 'image'});
 
             await prisma.project.update({
@@ -172,8 +172,8 @@ export const createProject = async (req:Request, res: Response) => {
     }
 }
 
-  export const createVideo = async (req:Request, res: Response) => {
-    const {userId} = req.auth;
+export const createVideo = async (req:Request, res: Response) => {
+    const {userId} = req.auth()
     const { projectId } = req.body;
     let isCreditDeducted = false;
 

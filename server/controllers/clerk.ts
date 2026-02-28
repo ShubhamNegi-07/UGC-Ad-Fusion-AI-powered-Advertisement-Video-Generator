@@ -54,7 +54,7 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
                     [0]?.plan?.slug;
 
                     if(planId !== "pro" && planId !== "premium"){
-                        return res.status(400). json({message: "Invalid plan"})
+                        return res.status(400).json({message: "Invalid plan"})
                     }
                     console.log(planId)
 

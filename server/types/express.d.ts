@@ -5,7 +5,7 @@ declare global{
         interface Request {
             auth: ()=> {userId: string ; has: (permission: any)=>
                 boolean};
-                plan ?: string;
+                plan?: string;
                 file: any;
         }
     }
