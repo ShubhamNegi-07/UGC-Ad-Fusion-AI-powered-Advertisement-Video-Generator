@@ -166,9 +166,8 @@ export const createProject = async (req:Request, res: Response) => {
                 where: {id: userId},
                 data: {credits: {increment: 5}}
             })
-            Sentry.captureException(error);
         }
-        
+        Sentry.captureException(error);
         res.status(500).json({ message: error.message });
     }
 }
@@ -306,7 +305,7 @@ export const getAllPublishedProjects = async (req:Request, res: Response) => {
 
     } catch (error:any) {
         Sentry.captureException(error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message };
     }
 }
 
