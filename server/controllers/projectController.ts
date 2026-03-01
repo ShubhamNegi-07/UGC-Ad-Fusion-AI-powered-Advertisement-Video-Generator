@@ -8,6 +8,8 @@ import path from 'path';
 import ai from '../configs/ai.js';
 import axios from 'axios';
 
+cloudinary.config({ cloudinary_url: process.env.CLOUDINARY_URL });
+
 const loadImage = (path: string, mimeType: string)=>{
     return {
         inlineData: {
@@ -322,7 +324,7 @@ export const deleteProject = async (req:Request, res: Response) => {
             return res.status(404).json({ message: 'Project not found' });
         }
         await prisma.project.delete({
-            where: {id: projectId
+            where: {id: projectId}
         })
         res.json({ message: 'Project deleted' });
 
