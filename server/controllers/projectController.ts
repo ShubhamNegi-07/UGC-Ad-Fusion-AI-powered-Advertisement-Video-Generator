@@ -8,6 +8,8 @@ import path from 'path';
 import ai from '../configs/ai.js';
 import axios from 'axios';
 
+cloudinary.config({ cloudinary_url: process.env.CLOUDINARY_URL });
+
 const loadImage = (path: string, mimeType: string)=>{
     return {
         inlineData: {
