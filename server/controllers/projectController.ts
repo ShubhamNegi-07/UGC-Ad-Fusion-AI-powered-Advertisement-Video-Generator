@@ -10,7 +10,7 @@ import axios from 'axios';
 
 cloudinary.config({ cloudinary_url: process.env.CLOUDINARY_URL });
 
-const loadImage = (path: string, mimeType: string)=>{
+const loadImage = (path: string, mimeType: string)=> {
     return {
         inlineData: {
             data: fs.readFileSync(path).toString('base64'),
