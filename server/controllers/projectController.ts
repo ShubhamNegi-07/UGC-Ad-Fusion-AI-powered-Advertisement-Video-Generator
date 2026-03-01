@@ -315,14 +315,14 @@ export const deleteProject = async (req:Request, res: Response) => {
         const { userId } = req.auth();
         const { projectId } = req.params;
         
-        const project = await prisma.project.findUnique
+        const project = await prisma.project.findUnique({
             where: {id: projectId, userId}
         })
         if (!project){
             return res.status(404).json({ message: 'Project not found' });
         }
         await prisma.project.delete({
-            where: {id: projectId}
+            where: {id: projectId
         })
         res.json({ message: 'Project deleted' });
 
