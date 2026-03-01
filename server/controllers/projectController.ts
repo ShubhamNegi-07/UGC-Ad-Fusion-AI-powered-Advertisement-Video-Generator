@@ -305,7 +305,7 @@ export const getAllPublishedProjects = async (req:Request, res: Response) => {
 
     } catch (error:any) {
         Sentry.captureException(error);
-        res.status(500).json({ message: error.message };
+        res.status(500).json({ message: error.message });
     }
 }
 
@@ -315,7 +315,7 @@ export const deleteProject = async (req:Request, res: Response) => {
         const { userId } = req.auth();
         const { projectId } = req.params;
         
-        const project = await prisma.project.findUnique({
+        const project = await prisma.project.findUnique
             where: {id: projectId, userId}
         })
         if (!project){
