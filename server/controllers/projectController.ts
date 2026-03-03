@@ -8,11 +8,10 @@ import path from 'path';
 import ai from '../configs/ai.js';
 import axios from 'axios';
 
-const cloudinaryUrl = new URL(process.env.CLOUDINARY_URL!);
 cloudinary.config({
-    cloud_name: cloudinaryUrl.hostname,
-    api_key: cloudinaryUrl.username,
-    api_secret: cloudinaryUrl.password,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true
 });
 
@@ -76,7 +75,7 @@ export const createProject = async (req:Request, res: Response) => {
         })
 
         tempProjectId = project.id;
-        const model = "gemini-3-pro-image-preview"
+        const model = "gemini-1.5-flash"
         const generationConfig: GenerateContentConfig = {
             maxOutputTokens: 32768,
             temperature: 1,
@@ -121,7 +120,12 @@ export const createProject = async (req:Request, res: Response) => {
         // Generate the image using the ai model
         const response: any = await ai.models.generateContent({
             model,
-            contents: [img1base64, img2base64, prompt],
+             contents: [
+                {
+                    role: 'user',
+                    parts: [img1base64, img2base64, prompt]
+                }
+            ],
             config: generationConfig,
         })
 
@@ -175,6 +179,7 @@ export const createProject = async (req:Request, res: Response) => {
                 data: {credits: {increment: 5}}
             })
         }
+        console.error('[createProject Error]', error?.message || error);
         Sentry.captureException(error);
         res.status(500).json({ message: error.message });
     }
