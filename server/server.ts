@@ -8,7 +8,7 @@ import * as Sentry from "@sentry/node"
 import userRouter from "./routes/userRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
 
-const app = express();
+const app = express(
 
 const PORT = process.env.PORT || 5000;
 
@@ -26,7 +26,7 @@ app.use(express.json())
 app.use(clerkMiddleware())
 
 app.get('/', (req: Request, res: Response) => {
-    res.send'Server is Live!');
+    res.send('Server is Live!');
 });
 
 app.get("/debug-sentry", function mainHandler(req, res) {
