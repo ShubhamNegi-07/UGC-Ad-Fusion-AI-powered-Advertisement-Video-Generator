@@ -1,5 +1,5 @@
 import "./configs/instrument.mjs"
-import express, { Request, Response } from 'express';
+import express, { Request, Response  from 'express';
 import cors from'cors'
 import 'dotenv/config'
 import { clerkMiddleware } from '@clerk/express'
@@ -8,7 +8,7 @@ import * as Sentry from "@sentry/node"
 import userRouter from "./routes/userRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
 
-const app = express(
+const app = express();
 
 const PORT = process.env.PORT || 5000;
 
