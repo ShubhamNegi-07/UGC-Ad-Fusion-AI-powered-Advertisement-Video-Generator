@@ -20,7 +20,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.post('/api/clerk', express.raw type: 'application/json'}), clerkWebhooks)
+app.post('/api/clerk', express.raw({ type: 'application/json'), clerkWebhooks)
 
 app.use(express.json())
 app.use(clerkMiddleware())
