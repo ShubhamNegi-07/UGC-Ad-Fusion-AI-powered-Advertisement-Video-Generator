@@ -1,5 +1,5 @@
 import "./configs/instrument.mjs"
-import express, { Request, Response  from 'express';
+import express, { Request, Response } from 'express';
 import cors from'cors'
 import 'dotenv/config'
 import { clerkMiddleware } from '@clerk/express'
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.post('/api/clerk', express.raw({ type: 'application/json'}), clerkWebhooks)
+app.post('/api/clerk', express.raw type: 'application/json'}), clerkWebhooks)
 
 app.use(express.json())
 app.use(clerkMiddleware())
