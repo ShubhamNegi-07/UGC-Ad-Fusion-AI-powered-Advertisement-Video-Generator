@@ -39,6 +39,6 @@ app.use('/api/project', projectRouter)
 // The error handler must be registered before any other error middleware and after all controllers
 Sentry.setupExpressErrorHandler(app);
 
-app.listen(PORT, ()  {
+app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
