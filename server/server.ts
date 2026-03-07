@@ -8,9 +8,9 @@ import * as Sentry from "@sentry/node"
 import userRouter from "./routes/userRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
 
-const app = express;
+const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT | 5000;
 
 //Middleware
 app.use(cors())
