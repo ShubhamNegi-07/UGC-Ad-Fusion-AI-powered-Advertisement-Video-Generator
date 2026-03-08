@@ -8,7 +8,9 @@ import path from 'path';
 import ai from '../configs/ai.js';
 import axios from 'axios';
 
-cloudinary.configocess.env.CLOUDINARY_API_KEY,
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true
 });
@@ -18,7 +20,7 @@ const loadImage = (path: string, mimeType: string)=> {
         inlineData: {
             data: fs.readFileSync(path).toString('base64'),
             mimeType
-        }
+        
     }
 }
 
