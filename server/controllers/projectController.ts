@@ -20,7 +20,7 @@ const loadImage = (path: string, mimeType: string)=> {
         inlineData: {
             data: fs.readFileSync(path).toString('base64'),
             mimeType
-        
+        }
     }
 }
 
