@@ -8,10 +8,7 @@ import path from 'path';
 import ai from '../configs/ai.js';
 import axios from 'axios';
 
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+cloudit: process.env.CLOUDINARY_API_SECRET,
     secure: true
 });
 
@@ -84,7 +81,7 @@ export const createProject = async (req:Request, res: Response) => {
             imageConfig: {
                 aspectRatio: aspectRatio || '9:16',
                 imageSize: '1K'
-            
+            },
             safetySettings: [
                 {
                     category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
