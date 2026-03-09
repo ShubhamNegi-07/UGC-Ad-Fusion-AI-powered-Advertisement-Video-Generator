@@ -41,7 +41,7 @@ export const createProject = async (req:Request, res: Response) => {
         where: {id: userId}
     })
 
-    if(!user || user.credits < 5
+    if(!user || user.credits < 5){
         return res.status(401).json({message: 'Insufficient credits'})
     }else{
         // deduct credits for image generation
@@ -54,7 +54,7 @@ export const createProject = async (req:Request, res: Response) => {
     try {
 
         let uploadedImages = await Promise.all(
-            images.map(async(item: any)=>{
+            images.map(async(item: any)=
                 let result = await cloudinary.uploader.upload(item.path,
                 {resource_type: 'image'});
                 return result.secure_url
