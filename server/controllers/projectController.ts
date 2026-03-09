@@ -139,7 +139,7 @@ export const createProject = async (req:Request, res: Response) => {
         let finalBuffer: Buffer | null = null
 
         for(const part of parts){
-            if(part.inlineData
+            if(part.inlineData){
                 finalBuffer = Buffer.from(part.inlineData.data, 'base64')
             }
         }
