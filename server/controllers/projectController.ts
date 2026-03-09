@@ -26,7 +26,7 @@ const loadImage = (path: string, mimeType: string)=> {
 
 export const createProject = async (req:Request, res: Response) => {
     let tempProjectId: string;
-    const { userId  = req.auth();
+    const { userId } = req.auth();
     let isCreditDeducted = false;
 
     const {name = 'New Project', aspectRatio, userPrompt, productName,
@@ -41,7 +41,7 @@ export const createProject = async (req:Request, res: Response) => {
         where: {id: userId}
     })
 
-    if(!user || user.credits < 5){
+    if(!user || user.credits < 5
         return res.status(401).json({message: 'Insufficient credits'})
     }else{
         // deduct credits for image generation
