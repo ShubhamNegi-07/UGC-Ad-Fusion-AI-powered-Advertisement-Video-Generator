@@ -26,7 +26,7 @@ const loadImage = (path: string, mimeType: string)=> {
 
 export const createProject = async (req:Request, res: Response) => {
     let tempProjectId: string;
-    const { userId } = req.auth();
+    const { userId  = req.auth();
     let isCreditDeducted = false;
 
     const {name = 'New Project', aspectRatio, userPrompt, productName,
