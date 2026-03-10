@@ -154,7 +154,7 @@ export const createProject = async (req:Request, res: Response) => {
         const uploadResult = await cloudinary.uploader.upload(base64Image,
             {resource_type: 'image'});
 
-            await prisma.project.update
+            await prisma.project.update({
                 where: {id: project.id},
                 data: {
                     generatedImage: uploadResult.secure_url,
@@ -193,7 +193,7 @@ export const createVideo = async (req:Request, res: Response) => {
     const user = await prisma.user.findUnique({
         where: {id: userId}
     })
-    if(!user || user.credits < 10){
+    if(!user  user.credits < 10){
         return res.status(401).json({ message: 'Insufficient credits' });
     }
 
