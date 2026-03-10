@@ -136,7 +136,7 @@ export const createProject = async (req:Request, res: Response) => {
 
         const parts = response.candidates[0].content.parts;
 
-        let finalBuffer: Buffer  null = null
+        let finalBuffer: Buffer | null = null
 
         for(const part of parts){
             if(part.inlineData){
@@ -144,7 +144,7 @@ export const createProject = async (req:Request, res: Response) => {
             }
         }
 
-        if(!finalBuffer){
+        if(!finalBuffer
             throw new Error('Failed to generate image');
         }
 
