@@ -144,12 +144,12 @@ export const createProject = async (req:Request, res: Response) => {
             }
         }
 
-        if(!finalBuffer
+        if(!finalBuffer){
             throw new Error('Failed to generate image');
         }
 
         const base64Image = `data:image/png;base64,${finalBuffer.toString
-            ('base64')}`
+            ('base64')
 
         const uploadResult = await cloudinary.uploader.upload(base64Image,
             {resource_type: 'image'});
