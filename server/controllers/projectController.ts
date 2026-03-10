@@ -149,12 +149,12 @@ export const createProject = async (req:Request, res: Response) => {
         }
 
         const base64Image = `data:image/png;base64,${finalBuffer.toString
-            ('base64')
+            ('base64')}`
 
         const uploadResult = await cloudinary.uploader.upload(base64Image,
             {resource_type: 'image'});
 
-            await prisma.project.update({
+            await prisma.project.update
                 where: {id: project.id},
                 data: {
                     generatedImage: uploadResult.secure_url,
