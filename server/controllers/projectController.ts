@@ -225,7 +225,7 @@ export const createVideo = async (req:Request, res: Response) => {
         {project.productDescription}`}`
 
         const model = 'veo-3.1-generate-preview'
-        ifproject.generatedImage){
+        if(!project.generatedImage){
             throw new Error('Generated image not found');
         }
         const image = await axios.get(project.generatedImage, {responseType:
@@ -246,7 +246,7 @@ export const createVideo = async (req:Request, res: Response) => {
             }
         })
 
-        while (!operation.done){
+        while (!operation.done
             console.log('Waiting for video generation to complete ... ');
             await new Promise((resolve)=>setTimeout(resolve, 10000));
             operation = await ai. operations.getVideosOperation({
