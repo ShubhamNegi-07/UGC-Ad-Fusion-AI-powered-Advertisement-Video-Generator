@@ -201,7 +201,7 @@ export const createVideo = async (req:Request, res: Response) => {
     await prisma.user.update({
         where: {id: userId},
         data: {credits: {decrement: 10}}
-    }).then(() isCreditDeducted = true} );
+    }).then(()=>{ isCreditDeducted = true} );
 
     try {
 
@@ -225,7 +225,7 @@ export const createVideo = async (req:Request, res: Response) => {
         {project.productDescription}`}`
 
         const model = 'veo-3.1-generate-preview'
-        if(!project.generatedImage){
+        ifproject.generatedImage){
             throw new Error('Generated image not found');
         }
         const image = await axios.get(project.generatedImage, {responseType:
