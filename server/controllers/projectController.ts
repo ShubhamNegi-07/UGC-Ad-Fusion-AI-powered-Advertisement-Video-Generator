@@ -308,13 +308,13 @@ export const createVideo = async (req:Request, res: Response) => {
     }
 }
 
-export const getAllPublishedProjects = async (req:Request, res: Response) =
+export const getAllPublishedProjects = async (req:Request, res: Response) => {
     try {
 
         const projects = await prisma.project.findMany({
             where: {isPublished: true}
         })
-        res.json({projects})
+        res.jsonprojects})
 
     } catch (error:any) {
         Sentry.captureException(error);
