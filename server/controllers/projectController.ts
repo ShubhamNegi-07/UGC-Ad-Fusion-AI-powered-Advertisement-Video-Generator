@@ -314,7 +314,7 @@ export const getAllPublishedProjects = async (req:Request, res: Response) => {
         const projects = await prisma.project.findMany({
             where: {isPublished: true}
         })
-        res.jsonprojects})
+        res.json({projects})
 
     } catch (error:any) {
         Sentry.captureException(error);
@@ -330,15 +330,7 @@ export const deleteProject = async (req:Request, res: Response) => {
         
         const project = await prisma.project.findUnique({
             where: {id: projectId, userId}
-        })
-        if (!project){
-            return res.status(404).json({ message: 'Project not found' });
-        }
-        await prisma.project.delete({
-            where: {id: projectId}
-        })
-        res.json({ message: 'Project deleted' });
-
+        
     } catch (error:any) {
         Sentry.captureException(error);
         res.status(500).json({ message: error.message });
