@@ -304,11 +304,11 @@ export const createVideo = async (req:Request, res: Response) => {
         }
 
         Sentry.captureException(error);
-        res.status(500).json({ message: error.message 
+        res.status(500).json({ message: error.message });
     }
 }
 
-export const getAllPublishedProjects = async (req:Request, res: Response) => {
+export const getAllPublishedProjects = async (req:Request, res: Response) =
     try {
 
         const projects = await prisma.project.findMany({
