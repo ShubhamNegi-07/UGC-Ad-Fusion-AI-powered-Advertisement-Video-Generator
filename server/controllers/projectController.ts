@@ -299,12 +299,12 @@ export const createVideo = async (req:Request, res: Response) => {
             // add credits back
             await prisma.user.update({
                 where: {id: userId},
-                data: {credits: {increment: 10
+                data: {credits: {increment: 10}}
             })
         }
 
         Sentry.captureException(error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message 
     }
 }
 
