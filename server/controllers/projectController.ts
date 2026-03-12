@@ -295,11 +295,11 @@ export const createVideo = async (req:Request, res: Response) => {
                 data: {isGenerating: false, error: error.message}
             })
 
-        if(isCreditDeducted
+        if(isCreditDeducted){
             // add credits back
             await prisma.user.update({
                 where: {id: userId},
-                data: {credits: {increment: 10}}
+                data: {credits: {increment: 10
             })
         }
 
