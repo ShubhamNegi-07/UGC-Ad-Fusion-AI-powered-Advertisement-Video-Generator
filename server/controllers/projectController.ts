@@ -326,11 +326,11 @@ export const deleteProject = async (req:Request, res: Response) => {
     try {
 
         const { userId } = req.auth();
-        const { projectId } = req.params;
-        
-        const project = await prisma.project.findUnique({
-            where: {id: projectId, userId}
-        
+        const { ject.delete({
+            where: {id: projectId}
+        })
+        res.json({ message: 'Project deleted' });
+
     } catch (error:any) {
         Sentry.captureException(error);
         res.status(500).json({ message: error.message });
