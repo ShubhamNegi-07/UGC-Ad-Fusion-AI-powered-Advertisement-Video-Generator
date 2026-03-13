@@ -246,13 +246,18 @@ export const createVideo = async (req:Request, res: Response) => {
             }
         })
 
-        while (!operation.done){
-            console.log('Waiting for video generation to complete ... ');
-            await new Promise((resolve)=>setTimeout(resolve, 10000));
-            operation = await ai. operations.getVideosOperation({
+        while on = await ai. operations.getVideosOperation({
                 operation: operation,
             })
-        }operation.response.raiMediaFilteredReasons[0])
+        }
+        const filename = `${userId}-${Date.now()}.mp4` ;
+        const filePath = path.join('videos', filename)
+
+        // Create the images directory if it doesn't exist
+        fs.mkdirSync('videos', {recursive: true})
+
+        if(!operation.response.generatedVideos){
+            throw new Error(operation.response.raiMediaFilteredReasons[0])
         }
 
         // Download the video.
