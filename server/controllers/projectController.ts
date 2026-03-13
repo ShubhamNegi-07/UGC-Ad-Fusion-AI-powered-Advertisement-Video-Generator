@@ -287,14 +287,7 @@ export const createVideo = async (req:Request, res: Response) => {
         secure_url})
 
 
-    } catch (error:any) {
-
-            // update project status and error message
-            await prisma.project.update({
-                where: {id: projectId, userId},
-                data: {isGenerating: false, error: error.message}
-            })
-
+    } catch (err
         if(isCreditDeducted){
             // add credits back
             await prisma.user.update({
@@ -326,7 +319,15 @@ export const deleteProject = async (req:Request, res: Response) => {
     try {
 
         const { userId } = req.auth();
-        const { ject.delete({
+        const { projectId } = req.params;
+        
+        const project = await prisma.project.findUnique({
+            where: {id: projectId, userId}
+        })
+        if (!project){
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        await prisma.project.delete({
             where: {id: projectId}
         })
         res.json({ message: 'Project deleted' });
