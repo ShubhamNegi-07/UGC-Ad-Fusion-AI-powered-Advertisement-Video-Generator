@@ -228,12 +228,7 @@ export const createVideo = async (req:Request, res: Response) => {
         if(!project.generatedImage){
             throw new Error('Generated image not found');
         }
-        const image = await axios.get(project.generatedImage, {responseType:
-        'arraybuffer',})
-        const imageBytes: any = Buffer.from(image.data)
-
-        let operation: any = await ai.models.generateVideos({
-            model,
+        constl,
             prompt,
             image: {
                 imageBytes: imageBytes.toString('base64'),
@@ -246,7 +241,10 @@ export const createVideo = async (req:Request, res: Response) => {
             }
         })
 
-        while on = await ai. operations.getVideosOperation({
+        while (!operation.done){
+            console.log('Waiting for video generation to complete ... ');
+            await new Promise((resolve)=>setTimeout(resolve, 10000));
+            operation = await ai. operations.getVideosOperation({
                 operation: operation,
             })
         }
