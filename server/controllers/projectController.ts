@@ -252,15 +252,7 @@ export const createVideo = async (req:Request, res: Response) => {
             operation = await ai. operations.getVideosOperation({
                 operation: operation,
             })
-        }
-        const filename = `${userId}-${Date.now()}.mp4` ;
-        const filePath = path.join('videos', filename)
-
-        // Create the images directory if it doesn't exist
-        fs.mkdirSync('videos', {recursive: true})
-
-        if(!operation.response.generatedVideos){
-            throw new Error(operation.response.raiMediaFilteredReasons[0])
+        }operation.response.raiMediaFilteredReasons[0])
         }
 
         // Download the video.
@@ -272,7 +264,11 @@ export const createVideo = async (req:Request, res: Response) => {
         const uploadResult = await cloudinary.uploader.upload(filePath, {
         resource_type: 'video' });
             
-        aw  isGenerating: false
+        await prisma.project.update({
+            where: {id: project.id},
+            data: {
+                generatedVideo: uploadResult.secure_url,
+                isGenerating: false
             }
         })
 
