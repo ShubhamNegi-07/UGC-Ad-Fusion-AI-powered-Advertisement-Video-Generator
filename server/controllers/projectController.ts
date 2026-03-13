@@ -272,11 +272,7 @@ export const createVideo = async (req:Request, res: Response) => {
         const uploadResult = await cloudinary.uploader.upload(filePath, {
         resource_type: 'video' });
             
-        await prisma.project.update({
-            where: {id: project.id},
-            data: {
-                generatedVideo: uploadResult.secure_url,
-                isGenerating: false
+        aw  isGenerating: false
             }
         })
 
@@ -287,7 +283,14 @@ export const createVideo = async (req:Request, res: Response) => {
         secure_url})
 
 
-    } catch (err
+    } catch (error:any) {
+
+            // update project status and error message
+            await prisma.project.update({
+                where: {id: projectId, userId},
+                data: {isGenerating: false, error: error.message}
+            })
+
         if(isCreditDeducted){
             // add credits back
             await prisma.user.update({
