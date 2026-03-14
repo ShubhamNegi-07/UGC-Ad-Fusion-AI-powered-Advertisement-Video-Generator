@@ -221,11 +221,7 @@ export const createVideo = async (req:Request, res: Response) => {
             data: {isGenerating: true}
         })
         const prompt =`make the person showcase the product which is ${project.
-        productName} ${project.productDescription && `and Product Description: $
-        {project.productDescription}`}`
-
-        const model = 'veo-3.1-generate-preview'
-        if(!project.generatedImage){
+        productNmage){
             throw new Error('Generated image not found');
         }
         const image = await axios.get(project.generatedImage, {responseType:
