@@ -210,18 +210,16 @@ export const createVideo = async (req:Request, res: Response) => {
             include: {user: true}
         })
 
-        if(!project || project.isGenerating){
-            return res.status(404).json({ message: 'Generation in progress' });
-        }
-        if(project.generatedVideo){
-            return res.status(404).json({ message: 'Video already generated' });
-        }
-        await prisma.project.update({
+        if(sma.project.update({
             where: {id: projectId},
             data: {isGenerating: true}
         })
         const prompt =`make the person showcase the product which is ${project.
-        productNmage){
+        productName} ${project.productDescription && `and Product Description: $
+        {project.productDescription}`}`
+
+        const model = 'veo-3.1-generate-preview'
+        if(!project.generatedImage){
             throw new Error('Generated image not found');
         }
         const image = await axios.get(project.generatedImage, {responseType:
