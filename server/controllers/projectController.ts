@@ -138,15 +138,7 @@ export const createProject = async (req:Request, res: Response) => {
 
         let finalBuffer: Buffer | null = null
 
-        for(const part of parts){
-            if(part.inlineData){
-                finalBuffer = Buffer.from(part.inlineData.data, 'base64')
-            }
-        }
-
-        if(!finalBuffer){
-            throw new Error('Failed to generate image');
-        }
+       
 
         const base64Image = `data:image/png;base64,${finalBuffer.toString
             ('base64')}`
@@ -158,7 +150,13 @@ export const createProject = async (req:Request, res: Response) => {
                 where: {id: project.id},
                 data: {
                     generatedImage: uploadResult.secure_url,
-            catch (error:any) {
+                    isGenerating: false
+                }
+            })
+
+            res.json({projectId: project.id})
+
+    } catch (error:any) {
         if(tempProjectId!){
             // update project status and error message
             await prisma.project.update({
