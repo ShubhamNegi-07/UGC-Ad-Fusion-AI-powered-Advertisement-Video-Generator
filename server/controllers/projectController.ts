@@ -176,13 +176,7 @@ export const createProject = async (req:Request, res: Response) => {
             // add credits back
             await prisma.user.update({
                 where: {id: userId},
-                data: {credits: {increment: 5}}
-            })
-        }
-        console.error('[createProject Error]', error?.message || error);
-        Sentry.captureException(error);
-        res.status(500).json({ message: error.message });
-    }
+            }
 }
 
 export const createVideo = async (req:Request, res: Response) => {
