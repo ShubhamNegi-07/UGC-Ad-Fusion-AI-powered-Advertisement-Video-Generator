@@ -35,7 +35,12 @@ export const createProject = async (req:Request, res: Response) => {
 
     if(images.length < 2 || !productName){
         return res.status(400).json({message: 'Please upload at least 2 images' })
-  
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {id: userId}
+    })
+
     if(!user || user.credits < 5){
         return res.status(401).json({message: 'Insufficient credits'})
     }else{
@@ -43,10 +48,7 @@ export const createProject = async (req:Request, res: Response) => {
         await prisma.user.update({
             where: {id: userId},
             data: {credits: {decrement: 5}}
-            }).then(()=>{isCreditDeducted = true});
-    }
-
-    try {
+            }
 
         let uploadedImages = await Promise.all(
             images.map(async(item: any)=>{
