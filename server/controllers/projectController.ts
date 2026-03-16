@@ -8,17 +8,14 @@ import path from 'path';
 import ai from '../configs/ai.js';
 import axios from 'axios';
 
-cloud true
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true
 });
 
-const loadImage = (path: string, mimeType: string)=> {
-    return {
-        inlineData: {
-            data: fs.readFileSync(path).toString('base64'),
-            mimeType
-        }
-    }
-}
+const 
 
 export const createProject = async (req:Request, res: Response) => {
     let tempProjectId: string;
