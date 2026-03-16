@@ -58,7 +58,11 @@ export const createProject = async (req:Request, res: Response) => {
                 let result = await cloudinary.uploader.upload(item.path,
                 {resource_type: 'image'});
                 return result.secure_url
-          ta: {
+            })
+        )
+
+        const project = await prisma.project.create({ 
+            data: {
                 name,
                 userId,
                 productName,
