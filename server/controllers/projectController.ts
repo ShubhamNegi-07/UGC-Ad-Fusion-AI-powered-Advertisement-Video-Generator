@@ -26,17 +26,16 @@ const loadImage = (path: string, mimeType: string)=> {
 
 export const createProject = async (req:Request, res: Response) => {
     let tempProjectId: string;
-    const {cription, targetLength = 5} = req.body;
+    const { userId } = req.auth();
+    let isCreditDeducted = false;
+
+    const {name = 'New Project', aspectRatio, userPrompt, productName,
+    productDescription, targetLength = 5} = req.body;
     const images: any = req.files;
 
     if(images.length < 2 || !productName){
         return res.status(400).json({message: 'Please upload at least 2 images' })
-    }
-
-    const user = await prisma.user.findUnique({
-        where: {id: userId}
-    })
-
+  
     if(!user || user.credits < 5){
         return res.status(401).json({message: 'Insufficient credits'})
     }else{
