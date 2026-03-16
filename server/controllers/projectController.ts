@@ -15,15 +15,18 @@ cloudinary.config({
     secure: true
 });
 
-const 
+const loadImage = (path: string, mimeType: string)=> {
+    return {
+        inlineData: {
+            data: fs.readFileSync(path).toString('base64'),
+            mimeType
+        }
+    }
+}
 
 export const createProject = async (req:Request, res: Response) => {
     let tempProjectId: string;
-    const { userId } = req.auth();
-    let isCreditDeducted = false;
-
-    const {name = 'New Project', aspectRatio, userPrompt, productName,
-    productDescription, targetLength = 5} = req.body;
+    const {cription, targetLength = 5} = req.body;
     const images: any = req.files;
 
     if(images.length < 2 || !productName){
