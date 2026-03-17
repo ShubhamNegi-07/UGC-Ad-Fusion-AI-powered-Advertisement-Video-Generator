@@ -136,16 +136,15 @@ export const createProject = async (req:Request, res: Response) => {
 
         const parts = response.candidates[0].content.parts;
 
-        lfinalBuffer = Buffer.from(part.inlineData.data, 'base64')
+        let finalBuffer: Buffer | null = null
+
+        for(const part of parts){
+            if(part.inlineData){
+                finalBuffer = Buffer.from(part.inlineData.data, 'base64')
             }
         }
 
-        if(!finalBuffer){
-            throw new Error('Failed to generate image');
-        }
-
-        const base64Image = `data:image/png;base64,${finalBuffer.toString
-            ('base64')}`
+        if(
 
         const uploadResult = await cloudinary.uploader.upload(base64Image,
             {resource_type: 'image'});
