@@ -136,11 +136,7 @@ export const createProject = async (req:Request, res: Response) => {
 
         const parts = response.candidates[0].content.parts;
 
-        let finalBuffer: Buffer | null = null
-
-        for(const part of parts){
-            if(part.inlineData){
-                finalBuffer = Buffer.from(part.inlineData.data, 'base64')
+        lfinalBuffer = Buffer.from(part.inlineData.data, 'base64')
             }
         }
 
