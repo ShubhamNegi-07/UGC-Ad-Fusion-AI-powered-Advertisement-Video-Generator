@@ -159,7 +159,15 @@ export const createProject = async (req:Request, res: Response) => {
                 data: {
                     generatedImage: uploadResult.secure_url,
                     isGenerating: false
-                } await prisma.project.update({
+                }
+            })
+
+            res.json({projectId: project.id})
+
+    } catch (error:any) {
+        if(tempProjectId!){
+            // update project status and error message
+            await prisma.project.update({
                 where: {id: tempProjectId},
                 data: {isGenerating: false, error: error.message}
             })
@@ -181,16 +189,7 @@ export const createVideo = async (req:Request, res: Response) => {
     const {userId} = req.auth()
     const { projectId } = req.body;
     let isCreditDeducted = false;
-
-    const user = await prisma.user.findUnique({
-        where: {id: userId}
-    })
-    if(!user || user.credits < 10){
-        return res.status(401).json({ message: 'Insufficient credits' });
-    }
-
-    //deduct credits for video generation
-    await prisma.user.update({
+risma.user.update({
         where: {id: userId},
         data: {credits: {decrement: 10}}
     }).then(()=>{ isCreditDeducted = true} );
