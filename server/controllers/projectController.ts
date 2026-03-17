@@ -144,7 +144,12 @@ export const createProject = async (req:Request, res: Response) => {
             }
         }
 
-        if(
+        if(!finalBuffer){
+            throw new Error('Failed to generate image');
+        }
+
+        const base64Image = `data:image/png;base64,${finalBuffer.toString
+            ('base64')}`
 
         const uploadResult = await cloudinary.uploader.upload(base64Image,
             {resource_type: 'image'});
@@ -154,15 +159,7 @@ export const createProject = async (req:Request, res: Response) => {
                 data: {
                     generatedImage: uploadResult.secure_url,
                     isGenerating: false
-                }
-            })
-
-            res.json({projectId: project.id})
-
-    } catch (error:any) {
-        if(tempProjectId!){
-            // update project status and error message
-            await prisma.project.update({
+                } await prisma.project.update({
                 where: {id: tempProjectId},
                 data: {isGenerating: false, error: error.message}
             })
