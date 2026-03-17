@@ -202,7 +202,19 @@ export const createVideo = async (req:Request, res: Response) => {
         where: {id: userId},
         data: {credits: {decrement: 10}}
     }).then(()=>{ isCreditDeducted = true} );
-rn res.status(404).json({ message: 'Video already generated' });
+
+    try {
+
+        const project = await prisma.project.findUnique({
+            where: {id: projectId, userId},
+            include: {user: true}
+        })
+
+        if(!project || project.isGenerating){
+            return res.status(404).json({ message: 'Generation in progress' });
+        }
+        if(project.generatedVideo){
+            return res.status(404).json({ message: 'Video already generated' });
         }
         await prisma.project.update({
             where: {id: projectId},
