@@ -295,20 +295,17 @@ export const createVideo = async (req:Request, res: Response) => {
                 data: {isGenerating: false, error: error.message}
             })
 
-        if(isCreditDeducted){
-            // add credits back
-            await prisma.user.update({
-                where: {id: userId},
-                data: {credits: {increment: 10}}
-            })
-        }
+        
+export const getAllPublishedProjects = async (req:Request, res: Response) => {
+    try {
 
+        const projects = await prisma.project.findMany({
+            where: {isPublished: true}
+        })
+        res.json({projects})
+
+    } catch (error:any) {
         Sentry.captureException(error);
-        res.status(500).json({ message: error.message });
-    }
-}
-
-expo Sentry.captureException(error);
         res.status(500).json({ message: error.message });
     }
 }
