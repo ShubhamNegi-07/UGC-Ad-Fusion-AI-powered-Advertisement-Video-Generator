@@ -337,10 +337,4 @@ export const deleteProject = async (req:Request, res: Response) => {
         await prisma.project.delete({
             where: {id: projectId}
         })
-        res.json({ message: 'Project deleted' });
-
-    } catch (error:any) {
-        Sentry.captureException(error);
-        res.status(500).json({ message: error.message });
-    }
-}
+   
