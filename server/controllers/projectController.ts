@@ -273,29 +273,26 @@ export const createVideo = async (req:Request, res: Response) => {
         resource_type: 'video' });
             
         await prisma.project.update({
-            where: {id: project.id},
-            data: {
-                generatedVideo: uploadResult.secure_url,
-                isGenerating: false
-            }
-        })
-
-        // remove video file from disk after upload
-        fs.unlinkSync(filePath);
         
-        res. json({message: 'Video generation completed', videoUrl: uploadResult.
-        secure_url})
-
-
-    } catch (error:any) {
-
             // update project status and error message
             await prisma.project.update({
                 where: {id: projectId, userId},
                 data: {isGenerating: false, error: error.message}
             })
 
-        
+        if(isCreditDeducted){
+            // add credits back
+            await prisma.user.update({
+                where: {id: userId},
+                data: {credits: {increment: 10}}
+            })
+        }
+
+        Sentry.captureException(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
 export const getAllPublishedProjects = async (req:Request, res: Response) => {
     try {
 
