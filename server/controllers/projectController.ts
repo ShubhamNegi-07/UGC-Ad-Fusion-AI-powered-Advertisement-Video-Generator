@@ -11,17 +11,24 @@ import axios from 'axios';
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-me = 'New Project', aspectRatio, userPrompt, productName,
-    productDescription, targetLength = 5} = req.body;
-    const images: any = req.files;
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true
+});
 
-    if(images.length < 2 || !productName){
-        return res.status(400).json({message: 'Please upload at least 2 images' })
+const loadImage = (path: string, mimeType: string)=> {
+    return {
+        inlineData: {
+            data: fs.readFileSync(path).toString('base64'),
+            mimeType
+        }
     }
+}
 
-    const user = await prisma.user.findUnique({
-        where: {id: userId}
-    })
+export const createProject = async (req:Request, res: Response) => {
+    let tempProjectId: string;
+    const { userId } = req.auth();
+    let isCreditDeducted = false;
+
 
     if(!user || user.credits < 5){
         return res.status(401).json({message: 'Insufficient credits'})
