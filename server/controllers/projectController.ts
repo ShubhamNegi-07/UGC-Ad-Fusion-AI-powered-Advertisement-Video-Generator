@@ -11,25 +11,7 @@ import axios from 'axios';
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true
-});
-
-const loadImage = (path: string, mimeType: string)=> {
-    return {
-        inlineData: {
-            data: fs.readFileSync(path).toString('base64'),
-            mimeType
-        }
-    }
-}
-
-export const createProject = async (req:Request, res: Response) => {
-    let tempProjectId: string;
-    const { userId } = req.auth();
-    let isCreditDeducted = false;
-
-    const {name = 'New Project', aspectRatio, userPrompt, productName,
+me = 'New Project', aspectRatio, userPrompt, productName,
     productDescription, targetLength = 5} = req.body;
     const images: any = req.files;
 
