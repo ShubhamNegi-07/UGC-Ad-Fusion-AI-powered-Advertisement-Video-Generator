@@ -39,7 +39,9 @@ export const createProject = async (req:Request, res: Response) => {
 
     const user = await prisma.user.findUnique({
         where: {id: userId}
-    | user.credits < 5){
+    })
+
+    if(!user || user.credits < 5){
         return res.status(401).json({message: 'Insufficient credits'})
     }else{
         // deduct credits for image generation
@@ -67,10 +69,7 @@ export const createProject = async (req:Request, res: Response) => {
                 productDescription,
                 userPrompt,aspectRatio,
                 targetLength: parseInt(targetLength),
-                uploadedImages,
-                isGenerating: true
-            }
-        })
+           
 
         tempProjectId = project.id;
         const model = "gemini-1.5-flash"
