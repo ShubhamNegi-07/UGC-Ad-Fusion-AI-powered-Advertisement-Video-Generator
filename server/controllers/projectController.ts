@@ -3,7 +3,9 @@ import * as Sentry from "@sentry/node";
 import { prisma } from '../configs/prisma.js';
 import { v2 as cloudinary } from 'cloudinary'
 import { GenerateContentConfig, HarmBlockThreshold, HarmCategory} from '@google/genai';
-impor from '../configs/ai.js';
+import fs from 'fs';
+import path from 'path';
+import ai from '../configs/ai.js';
 import axios from 'axios';
 
 cloudinary.config({
@@ -18,10 +20,7 @@ const loadImage = (path: string, mimeType: string)=> {
         inlineData: {
             data: fs.readFileSync(path).toString('base64'),
             mimeType
-        }
-    }
-}
-
+   
 export const createProject = async (req:Request, res: Response) => {
     let tempProjectId: string;
     const { userId } = req.auth();
