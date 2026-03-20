@@ -69,7 +69,10 @@ export const createProject = async (req:Request, res: Response) => {
                 productDescription,
                 userPrompt,aspectRatio,
                 targetLength: parseInt(targetLength),
-           
+                uploadedImages,
+                isGenerating: true
+            }
+        })
 
         tempProjectId = project.id;
         const model = "gemini-1.5-flash"
@@ -80,18 +83,7 @@ export const createProject = async (req:Request, res: Response) => {
             responseModalities: ['IMAGE'],
             imageConfig: {
                 aspectRatio: aspectRatio || '9:16',
-                imageSize: '1K'
-            },
-            safetySettings: [
-                {
-                    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                    threshold: HarmBlockThreshold.OFF,
-                },
-                {
-                    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                    threshold: HarmBlockThreshold.OFF,
-                },
-                 {
+           
                     category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
                     threshold: HarmBlockThreshold.OFF,
                 },
