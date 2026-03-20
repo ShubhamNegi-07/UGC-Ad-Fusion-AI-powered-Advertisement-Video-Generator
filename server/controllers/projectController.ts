@@ -3,9 +3,7 @@ import * as Sentry from "@sentry/node";
 import { prisma } from '../configs/prisma.js';
 import { v2 as cloudinary } from 'cloudinary'
 import { GenerateContentConfig, HarmBlockThreshold, HarmCategory} from '@google/genai';
-import fs from 'fs';
-import path from 'path';
-import ai from '../configs/ai.js';
+impor from '../configs/ai.js';
 import axios from 'axios';
 
 cloudinary.config({
