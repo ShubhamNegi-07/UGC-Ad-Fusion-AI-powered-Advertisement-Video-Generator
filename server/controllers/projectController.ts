@@ -112,7 +112,15 @@ export const createProject = async (req:Request, res: Response) => {
             text: `Combine the person and product into a realistic photo.
             Make the person naturally hold or use the product.
             Match lighting, shadows, scale and perspective.
-            
+            Make the person stand in professional studio lighting.
+            Output e-commerce-quality photo realistic imagery.
+            ${userPrompt}`
+        }
+
+        // Generate the image using the ai model
+        const response: any = await ai.models.generateContent({
+            model,
+             contents: [
                 {
                     role: 'user',
                     parts: [img1base64, img2base64, prompt]
@@ -121,9 +129,7 @@ export const createProject = async (req:Request, res: Response) => {
             config: generationConfig,
         })
 
-        // Check if the response is valid
-        if(!response?.candidates?.[0]?.content?.parts) {
-            throw new Error('Unexpected response')
+        // Check if nexpected response')
         }
 
         const parts = response.candidates[0].content.parts;
