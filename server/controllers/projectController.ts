@@ -129,7 +129,9 @@ export const createProject = async (req:Request, res: Response) => {
             config: generationConfig,
         })
 
-        // Check if nexpected response')
+        // Check if the response is valid
+        if(!response?.candidates?.[0]?.content?.parts) {
+            throw new Error('Unexpected response')
         }
 
         const parts = response.candidates[0].content.parts;
@@ -137,8 +139,7 @@ export const createProject = async (req:Request, res: Response) => {
         let finalBuffer: Buffer | null = null
 
         for(const part of parts){
-            if(part.inlineData){
-                finalBuffer = Buffer.from(part.inlineData.data, 'base64')
+            if(part.inlineData)se64')
             }
         }
 
