@@ -98,7 +98,7 @@ export const createProject = async (req:Request, res: Response) => {
                     category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
                     threshold: HarmBlockThreshold.OFF,
                 },
-                 {
+                {
                     category: HarmCategory.HARM_CATEGORY_HARASSMENT,
                     threshold: HarmBlockThreshold.OFF,
                 },
