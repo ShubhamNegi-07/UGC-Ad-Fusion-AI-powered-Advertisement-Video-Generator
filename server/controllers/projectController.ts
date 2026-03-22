@@ -162,7 +162,10 @@ export const createProject = async (req:Request, res: Response) => {
                 }
             })
 
-            res.json(
+            res.json({projectId: project.id})
+
+    } catch (error:any) {
+        if(tempProjectId!){
             // update project status and error message
             await prisma.project.update({
                 where: {id: tempProjectId},
@@ -183,7 +186,7 @@ export const createProject = async (req:Request, res: Response) => {
 }
 
 export const createVideo = async (req:Request, res: Response) => {
-    const {userId} = req.auth()
+    const {userId} = req.a)uth(
     const { projectId } = req.body;
     let isCreditDeducted = false;
 
