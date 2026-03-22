@@ -152,7 +152,9 @@ export const createProject = async (req:Request, res: Response) => {
             ('base64')}`
 
         const uploadResult = await cloudinary.uploader.upload(base64Image,
-            {resource_type: 'image'}
+            {resource_type: 'image'});
+
+            await prisma.project.update({
                 where: {id: project.id},
                 data: {
                     generatedImage: uploadResult.secure_url,
@@ -160,10 +162,7 @@ export const createProject = async (req:Request, res: Response) => {
                 }
             })
 
-            res.json({projectId: project.id})
-
-    } catch (error:any) {
-        if(tempProjectId!){
+            res.json(
             // update project status and error message
             await prisma.project.update({
                 where: {id: tempProjectId},
