@@ -139,7 +139,8 @@ export const createProject = async (req:Request, res: Response) => {
         let finalBuffer: Buffer | null = null
 
         for(const part of parts){
-            if(part.inlineDatapart.inlineData.data, 'base64')
+            if(part.inlineData){
+                finalBuffer = Buffer.from(part.inlineData.data, 'base64')
             }
         }
 
@@ -151,9 +152,7 @@ export const createProject = async (req:Request, res: Response) => {
             ('base64')}`
 
         const uploadResult = await cloudinary.uploader.upload(base64Image,
-            {resource_type: 'image'});
-
-            await prisma.project.update({
+            {resource_type: 'image'}
                 where: {id: project.id},
                 data: {
                     generatedImage: uploadResult.secure_url,
