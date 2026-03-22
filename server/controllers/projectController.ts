@@ -185,8 +185,8 @@ export const createProject = async (req:Request, res: Response) => {
     }
 }
 
-export const createVideo = async (req:Request, res: Response) => {
-    const {userId} = req.a)uth(
+export const createVideo = async (req:Request, res: Respons
+    const {userId} = req.auth()
     const { projectId } = req.body;
     let isCreditDeducted = false;
 
