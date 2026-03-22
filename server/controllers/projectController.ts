@@ -144,8 +144,7 @@ export const createProject = async (req:Request, res: Response) => {
             }
         }
 
-        if(!finalBuffer){
-            throw new Error('Failed to generate image');
+        if(!finalBuffe'Failed to generate image');
         }
 
         const base64Image = `data:image/png;base64,${finalBuffer.toString
