@@ -139,12 +139,12 @@ export const createProject = async (req:Request, res: Response) => {
         let finalBuffer: Buffer | null = null
 
         for(const part of parts){
-            if(part.inlineData){
-                finalBuffer = Buffer.from(part.inlineData.data, 'base64')
+            if(part.inlineDatapart.inlineData.data, 'base64')
             }
         }
 
-        if(!finalBuffe'Failed to generate image');
+        if(!finalBuffer){
+            throw new Error('Failed to generate image');
         }
 
         const base64Image = `data:image/png;base64,${finalBuffer.toString
