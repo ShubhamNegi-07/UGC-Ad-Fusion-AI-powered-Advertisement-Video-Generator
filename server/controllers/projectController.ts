@@ -177,15 +177,15 @@ export const createProject = async (req:Request, res: Response) => {
             await prisma.user.update({
                 where: {id: userId},
                 data: {credits: {increment: 5}}
-            })
-        }
+            
         console.error('[createProject Error]', error?.message || error);
         Sentry.captureException(error);
         res.status(500).json({ message: error.message });
     }
 }
 
-euserId} = req.auth()
+export const createVideo = async (req:Request, res: Response) => {
+    const {userId} = req.auth()
     const { projectId } = req.body;
     let isCreditDeducted = false;
 
