@@ -48,7 +48,7 @@ export const createProject = async (req:Request, res: Response) => {
         await prisma.user.update({
             where: {id: userId},
             data: {credits: {decrement: 5}}
-           sCreditDeducted = true});
+            }).then(()=>{isCreditDeducted = true});
     }
 
     try {
@@ -330,13 +330,7 @@ export const deleteProject = async (req:Request, res: Response) => {
         
         const project = await prisma.project.findUnique({
             where: {id: projectId, userId}
-        })
-        if (!project){
-            return res.status(404).json({ message: 'Project not found' });
         }
-        await prisma.project.delete({
-            where: {id: projectId}
-        })
         res.json({ message: 'Project deleted' });
 
     } catch (error:any) {
