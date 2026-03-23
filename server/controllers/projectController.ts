@@ -138,8 +138,7 @@ export const createProject = async (req:Request, res: Response) => {
 
         let finalBuffer: Buffer | null = null
 
-        for(const part of parts){
-            if(part.inlineData){
+        fopart.inlineData){
                 finalBuffer = Buffer.from(part.inlineData.data, 'base64')
             }
         }
@@ -177,7 +176,8 @@ export const createProject = async (req:Request, res: Response) => {
             await prisma.user.update({
                 where: {id: userId},
                 data: {credits: {increment: 5}}
-            
+            })
+        }
         console.error('[createProject Error]', error?.message || error);
         Sentry.captureException(error);
         res.status(500).json({ message: error.message });
