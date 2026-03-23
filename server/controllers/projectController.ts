@@ -48,10 +48,13 @@ export const createProject = async (req:Request, res: Response) => {
         await prisma.user.update({
             where: {id: userId},
             data: {credits: {decrement: 5}}
-            }).then(()=>{isCreditDeducted = true});
+           sCreditDeducted = true});
     }
 
-    trysync(item: any)=>{
+    try {
+
+        let uploadedImages = await Promise.all(
+            images.map(async(item: any)=>{
                 let result = await cloudinary.uploader.upload(item.path,
                 {resource_type: 'image'});
                 return result.secure_url
