@@ -41,9 +41,6 @@ export const createProject = async (req:Request, res: Response) => {
         where: {id: userId}
     })
 
-    if(!user || user.credits < 5){
-        return res.status(401).json({message: 'Insufficient credits'})
-    }else{
         // deduct credits for image generation
         await prisma.user.update({
             where: {id: userId},
@@ -138,7 +135,8 @@ export const createProject = async (req:Request, res: Response) => {
 
         let finalBuffer: Buffer | null = null
 
-        fopart.inlineData){
+        for(const part of parts){
+            if(part.inlineData){
                 finalBuffer = Buffer.from(part.inlineData.data, 'base64')
             }
         }
