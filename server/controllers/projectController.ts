@@ -192,8 +192,7 @@ export const createVideo = async (req:Request, res: Response) => {
 
     const user = await prisma.user.findUnique({
         where: {id: userId}
-    })
-    if(!user || user.credits < 10){
+    user || user.credits < 10){
         return res.status(401).json({ message: 'Insufficient credits' });
     }
 
