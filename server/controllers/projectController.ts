@@ -240,7 +240,7 @@ export const createVideo = async (req:Request, res: Response) => {
                 mimeType: 'image/png',
             },
             config: {
-                aspectRatio: project?.aspectRatio || '9:16',
+                aspectRatio: project?.aspectRatio | '9:16',
                 numberOfVideos: 1,
                 resolution: '720p',
             }
@@ -253,7 +253,11 @@ export const createVideo = async (req:Request, res: Response) => {
                 operation: operation,
             })
         }
-       ('videos', {recursive: true})
+        const filename = `${userId}-${Date.now()}.mp4` ;
+        const filePath = path.join('videos', filename)
+
+        // Create the images directory if it doesn't exist
+        fs.mkdirSync('videos', {recursive: true})
 
         if(!operation.response.generatedVideos){
             throw new Error(operation.response.raiMediaFilteredReasons[0])
