@@ -253,11 +253,7 @@ export const createVideo = async (req:Request, res: Response) => {
                 operation: operation,
             })
         }
-        const filename = `${userId}-${Date.now()}.mp4` ;
-        const filePath = path.join('videos', filename)
-
-        // Create the images directory if it doesn't exist
-        fs.mkdirSync('videos', {recursive: true})
+       ('videos', {recursive: true})
 
         if(!operation.response.generatedVideos){
             throw new Error(operation.response.raiMediaFilteredReasons[0])
@@ -304,7 +300,21 @@ export const createVideo = async (req:Request, res: Response) => {
         }
 
         Sentry.captureException(error);
-   s.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getAllPublishedProjects = async (req:Request, res: Response) => {
+    try {
+
+        const projects = await prisma.project.findMany({
+            where: {isPublished: true}
+        })
+        res.json({projects})
+
+    } catch (error:any) {
+        Sentry.captureException(error);
+        res.status(500).json({ message: error.message });
     }
 }
 
