@@ -137,9 +137,7 @@ const Generator = () => {
                 className="w-full bg-white/3 rounded-lg border-2 p-4 text-sm border-violet-200/10 
                 focus:border-violet-500/50 outline-none resize-none transition-none transition-all"
               />
-            </div>
-            <div className="mb-4 text-gray-300">
-              <label className="block text-sm mb-4">Aspect Ratio</label>
+           abel className="block text-sm mb-4">Aspect Ratio</label>
               <div className="flex gap-3">
                 <RectangleVerticalIcon
                   onClick={() => setAspectRatio("9:16")}
@@ -148,7 +146,11 @@ const Generator = () => {
                       aspectRatio === "9:16"
                         ? "ring-violet-500/50 bg-white/10"
                         : ""
-               Name={`"p-2.5 size-13 bg-white/6 rounded transition-all ring-2 
+                    }`}
+                />
+                <RectangleHorizontalIcon
+                  onClick={() => setAspectRatio("16:9")}
+                  className={`"p-2.5 size-13 bg-white/6 rounded transition-all ring-2 
                     ring-transparent cursor-pointer ${
                       aspectRatio === "16:9"
                         ? "ring-violet-500/50 bg-white/10"
