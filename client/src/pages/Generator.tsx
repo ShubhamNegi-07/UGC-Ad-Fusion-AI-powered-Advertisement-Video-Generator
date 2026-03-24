@@ -148,11 +148,7 @@ const Generator = () => {
                       aspectRatio === "9:16"
                         ? "ring-violet-500/50 bg-white/10"
                         : ""
-                    }`}
-                />
-                <RectangleHorizontalIcon
-                  onClick={() => setAspectRatio("16:9")}
-                  className={`"p-2.5 size-13 bg-white/6 rounded transition-all ring-2 
+               Name={`"p-2.5 size-13 bg-white/6 rounded transition-all ring-2 
                     ring-transparent cursor-pointer ${
                       aspectRatio === "16:9"
                         ? "ring-violet-500/50 bg-white/10"
