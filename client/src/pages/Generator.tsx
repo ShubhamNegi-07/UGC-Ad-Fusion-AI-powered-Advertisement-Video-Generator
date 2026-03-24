@@ -107,7 +107,11 @@ const Generator = () => {
             </div>
             <div className="mb-4 text-gray-300">
               <label htmlFor="productName" className="block text-sm mb-4">
-               "productName"
+                Product Name
+              </label>
+              <input
+                type="text"
+                id="productName"
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
                 placeholder="Enter the name of the project"
