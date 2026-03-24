@@ -240,7 +240,7 @@ export const createVideo = async (req:Request, res: Response) => {
                 mimeType: 'image/png',
             },
             config: {
-                aspectRatio: project?.aspectRatio | '9:16',
+                aspectRatio: project?.aspectRatio || '9:16',
                 numberOfVideos: 1,
                 resolution: '720p',
             }
