@@ -110,15 +110,7 @@ const Generator = () => {
                 Product Name
               </label>
               <input
-                type="text"
-                id="productName"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
-                placeholder="Enter the name of the project"
-                required
-                className="w-full bg-white/3 rounede-lg border-2 p-4 text-sm border-violet-200/10 focus:border-violet-500/50 
-                outline-none transition-all"
-              />
+                
             </div>
             <div className="mb-4 text-gray-300">
               <label
