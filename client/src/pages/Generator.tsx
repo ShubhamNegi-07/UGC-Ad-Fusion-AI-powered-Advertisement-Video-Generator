@@ -184,7 +184,15 @@ const Generator = () => {
             className="px-10 py-3 rounded-md disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isGenerating ? (
-          
+              <>
+                <Loader2Icon className="size-5 animate-spin" /> Generating...
+              </>
+            ) : (
+              <>
+                <Wand2Icon className="size-5" />
+                Generate Image
+              </>
+            )}
           </PrimaryButton>
         </div>
       </form>
@@ -193,3 +201,10 @@ const Generator = () => {
 };
 
 export default Generator;
+
+
+</div>
+        </div>
+        <div className="flex justify-center mt-10">
+          <PrimaryButton
+            disabled=
