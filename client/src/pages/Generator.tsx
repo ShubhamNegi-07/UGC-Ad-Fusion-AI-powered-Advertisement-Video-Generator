@@ -135,7 +135,17 @@ const Generator = () => {
                 onChange={(e) => setProductDescription(e.target.value)}
                 placeholder="Enter the description of the product"
                 className="w-full bg-white/3 rounded-lg border-2 p-4 text-sm border-violet-200/10 
-         io === "9:16"
+                focus:border-violet-500/50 outline-none resize-none transition-none transition-all"
+              />
+            </div>
+            <div className="mb-4 text-gray-300">
+              <label className="block text-sm mb-4">Aspect Ratio</label>
+              <div className="flex gap-3">
+                <RectangleVerticalIcon
+                  onClick={() => setAspectRatio("9:16")}
+                  className={`"p-2.5 size-13 bg-white/6 rounded transition-all ring-2 
+                    ring-transparent cursor-pointer ${
+                      aspectRatio === "9:16"
                         ? "ring-violet-500/50 bg-white/10"
                         : ""
                     }`}
@@ -186,8 +196,4 @@ const Generator = () => {
           </PrimaryButton>
         </div>
       </form>
-    </div>
-  );
-};
-
-export default Generator;
+  Generator;
