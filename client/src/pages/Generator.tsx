@@ -10,12 +10,7 @@ import api from "../configs/axios";
 
 const Generator = () => {
 
-  const {user} = useUser()
-  const {getToken} = useAuth()
-  const navigate = useNavigate()  
-
-  const [name, setName] = useState("");
-  const [productName, setProductName] = useState("");
+  coame, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [aspectRatio, setAspectRatio] = useState("9:16");
   const [productImage, setProductImage] = useState<File | null>(null);
