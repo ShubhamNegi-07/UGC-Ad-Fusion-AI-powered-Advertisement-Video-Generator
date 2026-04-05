@@ -155,7 +155,7 @@ UGC Ad Fusion runs a structured AI pipeline from your input to a finished video:
 
 ## ⚙️ System Architecture
 
-```mermaid
+```
 graph TD
     A["🧑 User Input"]:::input --> B["📝 Product Details\nName · Features · Audience"]
     B --> C["🤖 AI Script Engine\nGemini / OpenAI"]:::ai
@@ -253,10 +253,10 @@ npm run build && npm start
 
 <div align="center">
 
-**Shubham Negi**
+**SHUBHAM NEGI**
 
 [![GitHub](https://img.shields.io/badge/GitHub-ShubhamNegi--07-181717?style=for-the-badge&logo=github)](https://github.com/ShubhamNegi-07)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/your-profile)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/shubham-singh11/)
 
 </div>
 
