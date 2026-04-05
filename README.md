@@ -1,28 +1,17 @@
-<div align="center">
+```
+██╗   ██╗ ██████╗  ██████╗      █████╗ ██████╗     ███████╗██╗   ██╗███████╗██╗ ██████╗ ███╗   ██╗
+██║   ██║██╔════╝ ██╔════╝     ██╔══██╗██╔══██╗    ██╔════╝██║   ██║██╔════╝██║██╔═══██╗████╗  ██║
+██║   ██║██║  ███╗██║          ███████║██║  ██║    █████╗  ██║   ██║███████╗██║██║   ██║██╔██╗ ██║
+██║   ██║██║   ██║██║          ██╔══██║██║  ██║    ██╔══╝  ██║   ██║╚════██║██║██║   ██║██║╚██╗██║
+╚██████╔╝╚██████╔╝╚██████╗     ██║  ██║██████╔╝    ██║     ╚██████╔╝███████║██║╚██████╔╝██║ ╚████║
+ ╚═════╝  ╚═════╝  ╚═════╝     ╚═╝  ╚═╝╚═════╝     ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+```
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 160" width="900">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0f0c29"/>
-      <stop offset="50%" style="stop-color:#302b63"/>
-      <stop offset="100%" style="stop-color:#24243e"/>
-    </linearGradient>
-    <linearGradient id="text1" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#e94560"/>
-      <stop offset="100%" style="stop-color:#f5a623"/>
-    </linearGradient>
-    <linearGradient id="text2" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#56ccf2"/>
-      <stop offset="100%" style="stop-color:#2f80ed"/>
-    </linearGradient>
-  </defs>
-  <rect width="900" height="160" fill="url(#bg)" rx="12"/>
-  <text x="450" y="72" font-family="'Courier New', monospace" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#text1)">UGC AD FUSION</text>
-  <text x="450" y="108" font-family="'Courier New', monospace" font-size="16" text-anchor="middle" fill="url(#text2)">⚡ AI-Powered Advertisement Video Generator ⚡</text>
-  <text x="450" y="138" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff88">Transform any product into a scroll-stopping video ad — in minutes</text>
-</svg>
+### 🎬 AI-Powered Advertisement Video Generator
 
-<br/>
+> *UGC Ad Fusion harnesses cutting-edge AI to auto-generate authentic, influencer-style video ads — eliminating expensive production teams, manual editing, and slow creative cycles for modern marketers.*
+
+**Transform any product into a scroll-stopping, high-converting UGC-style video ad — in minutes.**
 
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
@@ -32,13 +21,11 @@
 [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
-<br/>
 
 [![GitHub stars](https://img.shields.io/github/stars/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator?style=social)](https://github.com/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator)
 [![GitHub forks](https://img.shields.io/github/forks/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator?style=social)](https://github.com/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<br/>
 
 *UGC Ad Fusion harnesses cutting-edge AI to auto-generate authentic, influencer-style video ads — eliminating expensive production teams, manual editing, and slow creative cycles for modern marketers.*
 
@@ -140,7 +127,7 @@ UGC Ad Fusion runs a structured AI pipeline from your input to a finished video:
 
 ## 🏗️ Tech Stack
 
-<div align="center">
+<div align="left">
 
 **🖥️ Frontend**
 
