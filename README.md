@@ -10,13 +10,15 @@
 ### 🎬 AI-Powered Advertisement Video Generator
 
 > *UGC Ad Fusion harnesses cutting-edge AI to auto-generate authentic, influencer-style video ads — eliminating expensive production teams, manual editing, and slow creative cycles for modern marketers.*
-<br/>
+
 **Transform any product into a scroll-stopping, high-converting UGC-style video ad — in minutes.**
 
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Neon](https://img.shields.io/badge/Neon-00E599?style=for-the-badge&logo=neon&logoColor=black)](https://neon.tech/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
 [![Gemini](https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
@@ -29,7 +31,6 @@
 
 *UGC Ad Fusion harnesses cutting-edge AI to auto-generate authentic, influencer-style video ads — eliminating expensive production teams, manual editing, and slow creative cycles for modern marketers.*
 
-<br/>
 
 > 📽️ *Demo GIF / hosted video coming soon — check back or contribute one!*
 
@@ -133,22 +134,30 @@ UGC Ad Fusion runs a structured AI pipeline from your input to a finished video:
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-<br/>
+
 **⚙️ BACKEND**
-<br/>
+
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-<br/>
+
 **🤖 AI & INTEGRATIONS**
-<br/>
+
 [![Gemini](https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
-<br/>
-**🚀 DEPLOYMENT**
-<br/>
-[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
-[![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/)
 
+**🗄️ DATABASE & STORAGE**
+
+[![Neon](https://img.shields.io/badge/Neon-00E599?style=for-the-badge&logo=neon&logoColor=black)](https://neon.tech/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
+
+**🔐 AUTH & MONITORING**
+
+[![Clerk](https://img.shields.io/badge/Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)](https://clerk.com/)
+[![Sentry](https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)](https://sentry.io/)
+
+**🚀 DEPLOYMENT**
+
+[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 </div>
 
 ---
@@ -156,7 +165,7 @@ UGC Ad Fusion runs a structured AI pipeline from your input to a finished video:
 ## ⚙️ System Architecture
 
 ```mermaid
-
+graph TD
     A["🧑 User Input"]:::input --> B["📝 Product Details\nName · Features · Audience"]
     B --> C["🤖 AI Script Engine\nGemini / OpenAI"]:::ai
     C --> D["📜 Ad Script\nConversion-Optimized"]
@@ -203,10 +212,15 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here
-VIDEO_SERVICE_API_KEY=your_video_api_key_here
-PORT=3000
+DATABASE_URL=your_database_url_here
+
+CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
+CLERK_SECRET_KEY=your_clerk_secret_key_here
+CLERK_WEBHOOK_SIGNING_SECRET=your_clerk_webhook_signin_secret_here
+
+CLOUDINARY_URL=your_cloudinary_url_here
+
+GOOGLE_CLOUD_API_KEY=your_google_cloud_api_key_here
 ```
 
 ### Run
