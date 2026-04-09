@@ -214,7 +214,7 @@ Create a `.env` file in the root directory:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
-VIDEO_SERVICE_API_KEY=your_video_api_key_here
+CLOUDINARY_URL=your_cloudnary_url_here
 PORT=3000
 ```
 
