@@ -220,7 +220,7 @@ CLERK_WEBHOOK_SIGNING_SECRET=your_clerk_webhook_signin_secret_here
 
 CLOUDINARY_URL=your_cloudinary_url_here
 
-GOOGLE_cloud_API_KEY=your_google_cloud_api_key_here
+GOOGLE_CLOUD_API_KEY=your_google_cloud_api_key_here
 ```
 
 ### Run
