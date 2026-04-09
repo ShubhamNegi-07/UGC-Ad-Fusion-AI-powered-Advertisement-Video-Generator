@@ -212,6 +212,7 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
+DATABASE_URL=your_database_url_here
 GEMINI_API_KEY=your_gemini_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 CLOUDINARY_URL=your_cloudnary_url_here
