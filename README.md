@@ -213,10 +213,12 @@ Create a `.env` file in the root directory:
 
 ```env
 DATABASE_URL=your_database_url_here
+
 CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
 CLERK_SECRET_KEY=your_clerk_secret_key_here
+CLERK_WEBHOOK_SIGNING_SECRET=your_clerk_webhook_signin_secret_here
+
 CLOUDINARY_URL=your_cloudinary_url_here
-PORT=3000
 ```
 
 ### Run
