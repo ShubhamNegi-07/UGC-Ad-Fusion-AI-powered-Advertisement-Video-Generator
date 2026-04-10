@@ -158,8 +158,6 @@ UGC Ad Fusion runs a structured AI pipeline from your input to a finished video:
 **🚀 DEPLOYMENT**
 
 [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
-[![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/)
-
 </div>
 
 ---
