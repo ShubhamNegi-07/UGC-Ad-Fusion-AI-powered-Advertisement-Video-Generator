@@ -16,7 +16,7 @@ const homeFaq = [
   {
     question: "How are credits consumed?",
     answer:
-      "Still images cost 5 credits and talking videos cost 10, enforced in the API. Failed image runs refund 5 credits; failed video runs attempt to refund 10 credits in projectController.",
+      "Still images cost 5 credits and talking videos cost 10. If a run fails, we refund the credits for that step when possible.",
   },
   {
     question: "What files can I upload?",
@@ -25,7 +25,7 @@ const homeFaq = [
   {
     question: "How do I change or cancel a paid plan?",
     answer:
-      "The Plans page links to Generator today — there is no in-app checkout or cancel flow. Paid credit top-ups are handled via Clerk paymentAttempt.updated webhooks (pro / premium slugs).",
+      "Paid packs and self-serve checkout are not live yet. The free tier and Plans page reflect what you can use in the app today.",
   },
 ];
 
@@ -37,7 +37,7 @@ export default function HomeFaq() {
           marketing
           title="FAQ"
           heading="Frequently asked questions"
-          description="Verified behavior from the app and API — no marketing stats."
+          description="Straight answers about credits, files, and ownership."
         />
         <AccordionPrimitive.Root type="single" collapsible className="space-y-3">
           {homeFaq.map((faq, i) => (

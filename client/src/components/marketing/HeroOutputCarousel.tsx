@@ -10,7 +10,9 @@ import { assets, generatedImageMeta } from "@/assets/assets";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import HeroVideo from "@/components/marketing/HeroVideo";
+import { StudioMediaFrame } from "@/components/studio/StudioMediaFill";
 
+/** No back-to-back duplicate stills (video posters already show those frames). */
 const tiles = [
   {
     type: "video" as const,
@@ -21,22 +23,9 @@ const tiles = [
   },
   {
     type: "image" as const,
-    src: assets.generated1,
-    label: "Sample fused still — product and model",
-    metaKey: "generated1" as const,
-  },
-  {
-    type: "image" as const,
     src: assets.generated2,
     label: "Sample fused still output",
     metaKey: "generated2" as const,
-  },
-  {
-    type: "video" as const,
-    src: assets.generatedVideo2,
-    poster: assets.generated3,
-    label: "Sample talking ad, alternate aspect",
-    metaKey: null,
   },
   {
     type: "image" as const,
@@ -49,6 +38,19 @@ const tiles = [
     src: assets.generated4,
     label: "Sample fused still output",
     metaKey: "generated4" as const,
+  },
+  {
+    type: "video" as const,
+    src: assets.generatedVideo2,
+    poster: assets.generated2,
+    label: "Sample talking ad, alternate aspect",
+    metaKey: null,
+  },
+  {
+    type: "image" as const,
+    src: assets.generated1,
+    label: "Sample fused still — product and model",
+    metaKey: "generated1" as const,
   },
 ];
 
@@ -64,7 +66,7 @@ function getReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export default function HeroOutputCarousel({ featuredPulse = true }: { featuredPulse?: boolean }) {
+export default function HeroOutputCarousel(_props?: { featuredPulse?: boolean }) {
   const scroller = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
   const reduceMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false);
@@ -72,7 +74,11 @@ export default function HeroOutputCarousel({ featuredPulse = true }: { featuredP
   const hoverRef = useRef(false);
 
   const scrollBy = useCallback((dir: -1 | 1) => {
-    scroller.current?.scrollBy({ left: dir * 280, behavior: reduceMotion ? "auto" : "smooth" });
+    const el = scroller.current;
+    if (!el) return;
+    const tile = el.querySelector<HTMLElement>(".hero-carousel-tile");
+    const step = tile ? tile.offsetWidth + 20 : 300;
+    el.scrollBy({ left: dir * step, behavior: reduceMotion ? "auto" : "smooth" });
   }, [reduceMotion]);
 
   useEffect(() => {
@@ -116,6 +122,7 @@ export default function HeroOutputCarousel({ featuredPulse = true }: { featuredP
           {!reduceMotion && (
             <Button
               type="button"
+              framer={false}
               variant="ghost"
               size="icon-sm"
               className="border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -128,6 +135,7 @@ export default function HeroOutputCarousel({ featuredPulse = true }: { featuredP
           )}
           <Button
             type="button"
+            framer={false}
             variant="ghost"
             size="icon-sm"
             className="border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -138,6 +146,7 @@ export default function HeroOutputCarousel({ featuredPulse = true }: { featuredP
           </Button>
           <Button
             type="button"
+            framer={false}
             variant="ghost"
             size="icon-sm"
             className="border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -148,53 +157,63 @@ export default function HeroOutputCarousel({ featuredPulse = true }: { featuredP
           </Button>
         </div>
       </div>
-      <div
-        id="hero-output-carousel"
-        ref={scroller}
-        role="region"
-        aria-roledescription="carousel"
-        aria-labelledby="hero-carousel-label"
-        tabIndex={0}
-        className="hero-carousel flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {tiles.map((tile, i) => {
-          const meta = tile.metaKey ? generatedImageMeta[tile.metaKey] : null;
-          const w = meta?.width ?? 768;
-          const h = meta?.height ?? 1376;
-          return (
-            <figure
-              key={`${tile.label}-${i}`}
-              className={`hero-carousel-tile relative w-[9.5rem] shrink-0 snap-center overflow-hidden rounded-2xl border border-white/10 bg-black/40 shadow-lg sm:w-[11rem] md:w-[12.5rem] ${
-                featuredPulse && i === 0 ? "hero-video-ring" : ""
-              }`}
-            >
-              <div className="aspect-[9/16]">
-                {tile.type === "video" ? (
-                  <HeroVideo
-                    src={tile.src}
-                    poster={tile.poster!}
-                    className="h-full w-full object-cover"
-                    priority={i === 0}
-                  />
-                ) : (
-                  <img
-                    src={tile.src}
-                    alt={tile.label}
-                    width={w}
-                    height={h}
-                    className="h-full w-full object-cover"
-                    loading={i <= 1 ? "eager" : "lazy"}
-                    fetchPriority={i === 1 ? "high" : "auto"}
-                    decoding="async"
-                  />
-                )}
-              </div>
-              <figcaption className="absolute inset-x-0 top-0 flex justify-between gap-1 p-2">
-                <Badge className="border-0 bg-black/50 text-[9px] text-white backdrop-blur-sm">Generated</Badge>
-              </figcaption>
-            </figure>
-          );
-        })}
+      <div className="hero-carousel-fade relative -mx-1 px-1">
+        <div
+          id="hero-output-carousel"
+          ref={scroller}
+          role="region"
+          aria-roledescription="carousel"
+          aria-labelledby="hero-carousel-label"
+          tabIndex={0}
+          className="hero-carousel flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 md:gap-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {tiles.map((tile, i) => {
+            const meta = tile.metaKey ? generatedImageMeta[tile.metaKey] : null;
+            const w = meta?.width ?? 768;
+            const h = meta?.height ?? 1376;
+            const backdrop = tile.type === "video" ? tile.poster! : tile.src;
+            return (
+              <figure
+                key={`${tile.type}-${tile.src}`}
+                className="hero-carousel-tile group relative w-[10.5rem] shrink-0 snap-center overflow-hidden rounded-2xl border border-white/12 bg-[#020617] shadow-lg ring-1 ring-white/5 transition-[border-color,box-shadow] hover:border-white/20 sm:w-[12rem] md:w-[13rem]"
+              >
+                <StudioMediaFrame aspectRatio="9:16" backdropSrc={backdrop}>
+                  {tile.type === "video" ? (
+                    <HeroVideo
+                      src={tile.src}
+                      poster={tile.poster!}
+                      className="max-h-full max-w-full object-contain"
+                      priority={i === 0}
+                    />
+                  ) : (
+                    <img
+                      src={tile.src}
+                      alt={tile.label}
+                      width={w}
+                      height={h}
+                      className="max-h-full max-w-full object-contain"
+                      loading={i <= 2 ? "eager" : "lazy"}
+                      fetchPriority={i <= 1 ? "high" : "auto"}
+                      decoding="async"
+                    />
+                  )}
+                </StudioMediaFrame>
+                <figcaption className="absolute inset-x-0 top-0 flex justify-between gap-1 p-2">
+                  <Badge className="gap-0.5 border-0 bg-black/55 text-[9px] text-white backdrop-blur-sm">
+                    {tile.type === "video" ? (
+                      <>
+                        <HugeiconsIcon icon={PlayIcon} size={10} strokeWidth={2} aria-hidden />
+                        Video
+                      </>
+                    ) : (
+                      "Generated"
+                    )}
+                  </Badge>
+                </figcaption>
+              </figure>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

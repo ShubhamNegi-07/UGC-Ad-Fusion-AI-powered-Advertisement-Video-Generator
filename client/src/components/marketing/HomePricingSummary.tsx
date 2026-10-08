@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Image02Icon, Video02Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { Image02Icon, Video02Icon } from "@hugeicons/core-free-icons";
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
 
@@ -12,7 +12,7 @@ export default function HomePricingSummary() {
           marketing
           title="Pricing"
           heading="Credits you can verify"
-          description="Every new account starts with 20 free credits in our database. Generation costs are enforced in the API."
+          description="Every new account starts with 20 free credits. Stills and videos deduct credits only when you generate."
         />
         <ul className="mx-auto grid max-w-md gap-3 text-left sm:grid-cols-2">
           <li className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-border bg-card p-4 shadow-sm">
@@ -35,17 +35,14 @@ export default function HomePricingSummary() {
           </li>
         </ul>
         <p className="mx-auto mt-6 max-w-lg text-sm text-muted-foreground">
-          Paid tiers and checkout are not wired from the Plans page yet — see full plan copy on{" "}
+          Paid credit packs are coming soon. See what&apos;s included today on{" "}
           <Link to="/plans" className="font-medium text-brand underline-offset-4 hover:underline">
             Plans
           </Link>
-          . TODO: self-serve billing UI when Clerk checkout is connected.
+          .
         </p>
-        <Button asChild variant="outline" className="mt-6 rounded-full">
-          <Link to="/plans">
-            View plans
-            <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={2} />
-          </Link>
+        <Button asChild variant="outline" className="mt-6 w-auto">
+          <Link to="/plans">View plans</Link>
         </Button>
       </div>
     </section>

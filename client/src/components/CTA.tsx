@@ -19,7 +19,7 @@ export default function CTA() {
         <motion.h2 variants={fadeUp} className="relative text-balance text-3xl font-semibold tracking-tight text-zinc-50 md:text-4xl">
           Ready to make your first ad?
         </motion.h2>
-        <motion.p variants={fadeUp} className="relative mx-auto mt-4 max-w-lg text-pretty text-[15px] text-zinc-400">
+        <motion.p variants={fadeUp} className="relative mx-auto mt-4 max-w-lg text-pretty text-[15px] text-muted-foreground">
           Sign up, get 20 free credits and ship a talking UGC clip in minutes. No credit card required.
         </motion.p>
         <motion.div variants={fadeUp} className="relative mt-8">

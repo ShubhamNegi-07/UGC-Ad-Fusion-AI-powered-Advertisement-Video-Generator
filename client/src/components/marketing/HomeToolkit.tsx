@@ -2,16 +2,11 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "@/components/ui/motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowRight01Icon,
-  Coins01Icon,
-  FolderOpenIcon,
-  ImageUpload01Icon,
-  SmartPhone01Icon,
-  UserGroupIcon,
-} from "@hugeicons/core-free-icons";
-import { assets, marketingAssets } from "@/assets/assets";
+import { Coins01Icon, ImageUpload01Icon, SmartPhone01Icon } from "@hugeicons/core-free-icons";
+import { assets } from "@/assets/assets";
+import GeneratorMarketingPreview from "@/components/marketing/GeneratorMarketingPreview";
 import Title from "@/components/Title";
+import { Button } from "@/components/ui/button";
 import { fadeUp, viewportOnce } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
 
@@ -52,19 +47,12 @@ export default function HomeToolkit() {
           <BentoTile className="md:col-span-4 md:row-span-2 md:p-0">
             <div className="flex h-full flex-col">
               <div className="border-b border-border px-5 py-4">
-                <p className="text-sm font-semibold text-foreground">Generator layout</p>
+                <p className="text-sm font-semibold text-foreground">Create layout</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Upload zones, aspect ratio chips, and credit-aware actions match production UI.
+                  Upload zones, aspect ratio chips, and credit-aware actions — same as the live app.
                 </p>
               </div>
-              <img
-                src={marketingAssets.generatorUi}
-                alt="Full-width Generator interface screenshot"
-                width={marketingAssets.generatorUiWidth}
-                height={marketingAssets.generatorUiHeight}
-                className="h-full w-full object-cover object-top"
-                loading="lazy"
-              />
+              <GeneratorMarketingPreview layout="bento" className="rounded-none border-0 shadow-none" />
             </div>
           </BentoTile>
 
@@ -76,9 +64,9 @@ export default function HomeToolkit() {
             <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
               Product and model files validated client-side (JPG, PNG, WEBP, 10 MB cap).
             </p>
-            <Link to="/generate" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
-              Upload in Generator <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-            </Link>
+            <Button asChild variant="outline" size="sm" className="mt-4 w-auto self-start">
+              <Link to="/generate">Open Create</Link>
+            </Button>
           </BentoTile>
 
           <BentoTile className="md:col-span-2">
@@ -112,7 +100,7 @@ export default function HomeToolkit() {
             </div>
             <p className="mt-4 text-lg font-semibold text-foreground">Sample outputs</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Marketing carousel uses the same WebP stills served from public/generated.
+              Same sample stills as the hero carousel — real outputs from our demo pipeline.
             </p>
           </BentoTile>
 
@@ -124,26 +112,17 @@ export default function HomeToolkit() {
               <div>
                 <p className="text-lg font-semibold text-foreground">Credits in the nav</p>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Signed-in users see live balance from the credits API. Still
-                  = 5 · Video = 10 · New users start at 20.
+                  Signed-in users see a live balance in the nav. Still = 5 credits · Video = 10 · New accounts start with 20.
                 </p>
               </div>
             </div>
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <Link
-                to="/my-generations"
-                className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-3 text-sm font-medium hover:bg-muted"
-              >
-                <HugeiconsIcon icon={FolderOpenIcon} size={18} />
-                My generations
-              </Link>
-              <Link
-                to="/community"
-                className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-3 text-sm font-medium hover:bg-muted"
-              >
-                <HugeiconsIcon icon={UserGroupIcon} size={18} />
-                Community
-              </Link>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Button asChild variant="outline" size="sm" className="w-auto">
+                <Link to="/my-generations">My generations</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className="w-auto">
+                <Link to="/community">Community</Link>
+              </Button>
             </div>
           </BentoTile>
         </div>

@@ -11,6 +11,8 @@ interface TitleProps {
   as?: "h1" | "h2";
   marketing?: boolean;
   studio?: boolean;
+  /** White type on hero-dark-band (Plans, etc.). */
+  darkHero?: boolean;
 }
 
 export default function Title({
@@ -22,11 +24,13 @@ export default function Title({
   as = "h2",
   marketing = false,
   studio = false,
+  darkHero = false,
 }: TitleProps) {
   const Heading = motion[as];
   const isPageTitle = as === "h1";
-  const enter = studio ? studioReveal : fadeUp;
-  const container = studio ? studioStagger(0, 0.06) : stagger(0, 0.08);
+  const onDark = studio || darkHero;
+  const enter = studio || marketing || darkHero ? studioReveal : fadeUp;
+  const container = studio || darkHero ? studioStagger(0, 0.06) : stagger(0, 0.08);
   return (
     <motion.div
       variants={container}
@@ -40,12 +44,12 @@ export default function Title({
         <motion.p
           variants={enter}
           className={
-            marketing
+            marketing && !darkHero
               ? "mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground"
               : "mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300"
           }
         >
-          <span className={marketing ? "size-1.5 rounded-full bg-brand" : "size-1.5 rounded-full bg-zinc-200"} />
+          <span className={marketing && !darkHero ? "size-1.5 rounded-full bg-brand" : "size-1.5 rounded-full bg-zinc-200"} />
           {title}
         </motion.p>
       )}
@@ -53,8 +57,10 @@ export default function Title({
         <Heading
           variants={enter}
           className={cn(
-            marketing ? "text-balance font-bold tracking-tight text-foreground" : "text-balance font-semibold tracking-tight text-zinc-50",
-            studio && "studio-page-title",
+            marketing && !onDark
+              ? "marketing-display text-balance font-semibold tracking-tight text-foreground"
+              : "text-balance font-semibold tracking-tight text-zinc-50",
+            (studio || darkHero) && "studio-page-title",
             isPageTitle
               ? "text-2xl leading-tight md:text-3xl lg:text-[2rem]"
               : "text-3xl md:text-4xl lg:text-[2.75rem] lg:leading-[1.1]",
@@ -67,7 +73,7 @@ export default function Title({
         <motion.p
           variants={enter}
           className={cn(
-            marketing
+            marketing && !onDark
               ? "mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-muted-foreground"
               : "mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-zinc-400",
             align === "center" && "mx-auto",

@@ -1,11 +1,7 @@
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowRight01Icon,
-  ImageUpload01Icon,
-  SparklesIcon,
-  Video02Icon,
-} from "@hugeicons/core-free-icons";
+import { ImageUpload01Icon, SparklesIcon, Video02Icon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui/button";
 import { assets } from "@/assets/assets";
 import HeroOutputCarousel from "@/components/marketing/HeroOutputCarousel";
 
@@ -19,20 +15,21 @@ export default function Hero() {
   return (
     <section id="home" className="hero-dark-band relative overflow-hidden pb-16 pt-nav md:pb-24">
       <div className="hero-dark-band-bg pointer-events-none absolute inset-0" aria-hidden />
+      <div className="monex-backdrop-grid pointer-events-none absolute inset-0 opacity-50" aria-hidden />
       <div className="container-marketing relative z-[1]">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="hero-display text-balance font-medium text-white">
             Turn one product photo into a UGC-style ad
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/90 md:text-lg">
+          <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-[1.65] text-white/90 md:mt-8 md:text-lg md:leading-relaxed">
             Upload a product and a model. We fuse them into a photoreal still, then animate it into a short clip where
             the creator talks to camera and shows the product.
           </p>
-          <p className="mt-3 text-sm text-white/75">
+          <p className="mt-4 text-sm leading-relaxed text-white/75 md:mt-5">
             Image first, then optional talking video — the same flow as in Generator.
           </p>
 
-          <ol className="mx-auto mt-8 flex max-w-lg justify-center gap-2 overflow-x-auto pb-1">
+          <ol className="mx-auto mt-10 flex max-w-lg justify-center gap-3 overflow-x-auto pb-1 md:mt-12">
             {workflow.map((w, i) => (
               <li
                 key={w.step}
@@ -50,18 +47,15 @@ export default function Hero() {
             ))}
           </ol>
 
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <Link
-              to="/generate"
-              className="hero-split-cta group inline-flex overflow-hidden rounded-lg shadow-lg transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          <div className="mt-10 flex flex-col items-center gap-4 md:mt-12">
+            <Button
+              asChild
+              variant="gradient"
+              size="lg"
+              className="w-full max-w-md font-sans uppercase tracking-[0.08em] sm:w-auto"
             >
-              <span className="flex items-center justify-center bg-brand px-4 py-3.5 text-brand-foreground">
-                <HugeiconsIcon icon={ArrowRight01Icon} size={20} strokeWidth={2.5} />
-              </span>
-              <span className="flex min-h-[52px] items-center bg-black px-8 text-xs font-semibold uppercase tracking-[0.14em] text-white md:text-sm">
-                Start generating free
-              </span>
-            </Link>
+              <Link to="/generate">Start generating free</Link>
+            </Button>
             <p className="text-xs text-white/50">No credit card required</p>
           </div>
 
@@ -96,7 +90,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <HeroOutputCarousel featuredPulse />
+        <HeroOutputCarousel />
       </div>
     </section>
   );

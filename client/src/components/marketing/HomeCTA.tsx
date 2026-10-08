@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "@/components/ui/motion";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui/button";
 import { fadeUp, viewportOnce } from "@/components/ui/motion";
 
 export default function HomeCTA() {
@@ -23,17 +22,9 @@ export default function HomeCTA() {
             Sign up, get 20 free credits, and run your first still — then add a talking video when you are happy with
             the frame. No credit card required.
           </p>
-          <Link
-            to="/generate"
-            className="hero-split-cta group mt-8 inline-flex overflow-hidden rounded-lg shadow-lg transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <span className="flex items-center justify-center bg-brand px-4 py-3.5 text-brand-foreground">
-              <HugeiconsIcon icon={ArrowRight01Icon} size={20} strokeWidth={2.5} />
-            </span>
-            <span className="flex min-h-[52px] items-center bg-black px-8 text-xs font-semibold uppercase tracking-[0.14em] text-white md:text-sm">
-              Start creating now
-            </span>
-          </Link>
+          <Button asChild variant="gradient" size="lg" className="mt-8 uppercase tracking-[0.12em]">
+            <Link to="/generate">Start creating now</Link>
+          </Button>
         </motion.div>
       </div>
     </section>
