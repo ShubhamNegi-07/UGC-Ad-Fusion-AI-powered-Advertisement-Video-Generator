@@ -17,6 +17,7 @@ const MyGenerations = lazy(() => import("@/pages/MyGenerations"));
 const Community = lazy(() => import("@/pages/Community"));
 const Plans = lazy(() => import("@/pages/Plans"));
 const DevStyleguide = import.meta.env.DEV ? lazy(() => import("@/pages/Styleguide")) : null;
+const DevStudioStates = import.meta.env.DEV ? lazy(() => import("@/pages/dev/StudioStates")) : null;
 
 const studioRoutes = ["/generate", "/result", "/my-generations", "/community"];
 
@@ -34,7 +35,9 @@ function LazyPage({ children }: { children: ReactNode }) {
 
 export default function App() {
   const location = useLocation();
-  const hideFooter = studioRoutes.some((path) => location.pathname.startsWith(path));
+  const hideFooter =
+    studioRoutes.some((path) => location.pathname.startsWith(path)) ||
+    (import.meta.env.DEV && location.pathname.startsWith("/dev/studio-states"));
 
   return (
     <ScrollRoot>
@@ -92,6 +95,16 @@ export default function App() {
                   element={
                     <LazyPage>
                       <DevStyleguide />
+                    </LazyPage>
+                  }
+                />
+              )}
+              {import.meta.env.DEV && DevStudioStates && (
+                <Route
+                  path="/dev/studio-states"
+                  element={
+                    <LazyPage>
+                      <DevStudioStates />
                     </LazyPage>
                   }
                 />

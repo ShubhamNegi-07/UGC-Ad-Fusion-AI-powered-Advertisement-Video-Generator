@@ -6,6 +6,8 @@ export interface UploadZoneProps {
   onClear: () => void;
   onFile: (file: File | null) => void;
   disabled?: boolean;
+  /** Matte studio styling (Generator). */
+  studio?: boolean;
 }
 
 export interface User {

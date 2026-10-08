@@ -56,6 +56,23 @@ export const stagger = (delayChildren = 0.06, staggerChildren = 0.07): Variants 
 
 export const viewportOnce = { once: true, amount: 0.2 } as const;
 
+/** Studio pages: transform-only entrance (opacity stays 1 for first paint). */
+export const studioReveal: Variants = {
+  hidden: { opacity: 1, y: 10 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 380, damping: 34, mass: 0.85 },
+  },
+};
+
+export const studioStagger = (delayChildren = 0.06, staggerChildren = 0.06): Variants => ({
+  hidden: {},
+  show: {
+    transition: { delayChildren, staggerChildren },
+  },
+});
+
 /** Enter: visible immediately (FCP). Exit-only fade for route changes. */
 export const pageVariants: Variants = {
   initial: { opacity: 1, y: 0 },

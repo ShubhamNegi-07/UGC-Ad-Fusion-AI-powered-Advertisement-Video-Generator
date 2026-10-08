@@ -118,6 +118,7 @@
   --nav-offset: clamp(5.5rem, 4rem + 3vw, 8.5rem);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --keyboard-inset: 0px;
 
   color-scheme: light dark;
 }
@@ -316,6 +317,28 @@ html[data-surface="studio"] {
 
   .studio-shell {
     @apply mx-auto max-w-6xl px-4 sm:px-6;
+  }
+
+  .studio-shell-bottom {
+    padding-bottom: calc(5.75rem + var(--safe-bottom) + var(--keyboard-inset));
+  }
+
+  @media (min-width: 1024px) {
+    .studio-shell-bottom {
+      padding-bottom: 4rem;
+    }
+  }
+
+  .studio-sticky-bottom {
+    padding-bottom: max(0.75rem, calc(var(--safe-bottom) + var(--keyboard-inset)));
+  }
+
+  .studio-scroll-pad {
+    scroll-padding-bottom: calc(6.5rem + var(--safe-bottom) + var(--keyboard-inset));
+  }
+
+  .studio-page-title {
+    font-family: var(--font-display), ui-sans-serif, sans-serif;
   }
 
   .container-marketing {
