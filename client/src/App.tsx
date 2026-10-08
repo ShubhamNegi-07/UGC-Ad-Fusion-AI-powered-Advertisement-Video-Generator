@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
@@ -14,8 +15,8 @@ import MyGenerations from "@/pages/MyGenerations";
 import Community from "@/pages/Community";
 import Plans from "@/pages/Plans";
 import Loading from "@/pages/Loading";
-
-const studioRoutes = ["/generate", "/result", "/my-generations"];
+const DevStyleguide = import.meta.env.DEV ? lazy(() => import("@/pages/Styleguide")) : null;
+const studioRoutes = ["/generate", "/result", "/my-generations", "/community"];
 
 export default function App() {
   const location = useLocation();
@@ -30,33 +31,33 @@ export default function App() {
           toastOptions={{
             duration: 5000,
             style: {
-              background: "#0c0c0e",
-              color: "#fafafa",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "14px",
+              background: "var(--card)",
+              color: "var(--foreground)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius-lg)",
               padding: "12px 16px",
               maxWidth: "420px",
-              boxShadow: "0 18px 50px -18px rgba(0,0,0,0.8)",
+              boxShadow: "var(--shadow-md)",
               fontSize: "13px",
               lineHeight: "1.45",
             },
             success: {
-              iconTheme: { primary: "#34d399", secondary: "#0c0c0e" },
+              iconTheme: { primary: "var(--success)", secondary: "var(--card)" },
             },
             error: {
               style: {
-                background: "#1c1012",
-                color: "#fecaca",
-                border: "1px solid rgba(248,113,113,0.35)",
+                background: "var(--card)",
+                color: "var(--destructive)",
+                border: "1px solid color-mix(in srgb, var(--destructive) 35%, transparent)",
               },
-              iconTheme: { primary: "#f87171", secondary: "#1c1012" },
+              iconTheme: { primary: "var(--destructive)", secondary: "var(--card)" },
             },
           }}
         />
         <SoftBackdrop />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:text-primary-foreground"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-[var(--radius-md)] focus:bg-brand focus:px-3 focus:py-2 focus:text-sm focus:text-brand-foreground"
         >
           Skip to content
         </a>
@@ -71,6 +72,18 @@ export default function App() {
               <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
               <Route path="/plans" element={<PageTransition><Plans /></PageTransition>} />
               <Route path="/loading" element={<PageTransition><Loading /></PageTransition>} />
+              {import.meta.env.DEV && DevStyleguide && (
+                <Route
+                  path="/dev/styleguide"
+                  element={
+                    <PageTransition>
+                      <Suspense fallback={null}>
+                        <DevStyleguide />
+                      </Suspense>
+                    </PageTransition>
+                  }
+                />
+              )}
             </Routes>
           </AnimatePresence>
         </main>

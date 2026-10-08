@@ -36,7 +36,7 @@ export default function Footer() {
       initial="hidden"
       whileInView="show"
       viewport={viewportOnce}
-      className="relative z-10 mt-24 border-t border-white/[0.06] bg-gradient-to-b from-transparent to-black/40"
+      className="relative z-10 mt-24 border-t border-border bg-background"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-10 py-14 md:grid-cols-[1.3fr_1fr]">
@@ -54,7 +54,7 @@ export default function Footer() {
                   aria-label={s.label}
                   target={s.url.startsWith("http") ? "_blank" : undefined}
                   rel="noreferrer"
-                  className="flex size-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-muted-foreground transition-colors hover:border-white/20 hover:bg-white/[0.07] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70"
+                  className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-[var(--radius-md)] border border-border bg-card text-muted-foreground transition-colors hover:border-ring/30 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <HugeiconsIcon icon={s.icon} size={16} strokeWidth={1.8} />
                 </a>
@@ -80,7 +80,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] py-6 text-xs text-muted-foreground sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-border py-6 text-xs text-muted-foreground sm:flex-row">
           <p>© {new Date().getFullYear()} UGC Ad Fusion. All rights reserved.</p>
           <p className="font-mono">Built with React, Tailwind and Veo.</p>
         </div>

@@ -44,5 +44,3 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     </ReactLenis>
   );
 }
-
-export { useLenis };

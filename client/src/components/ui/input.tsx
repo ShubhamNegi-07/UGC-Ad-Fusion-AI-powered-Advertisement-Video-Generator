@@ -2,24 +2,18 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const fieldBase = [
-  "w-full min-w-0 rounded-xl border border-white/10 bg-zinc-950/60 px-4 text-sm text-zinc-100",
-  "placeholder:text-zinc-500 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)]",
-  "transition-[border-color,box-shadow,background-color] duration-200",
-  "hover:border-white/16 hover:bg-zinc-900/70",
-  "focus-visible:outline-none focus-visible:border-zinc-400/40 focus-visible:ring-4 focus-visible:ring-zinc-400/10 focus-visible:bg-zinc-900/80",
+  "w-full min-w-0 rounded-[var(--radius-md)] border border-input bg-background px-4 text-sm text-foreground",
+  "placeholder:text-muted-foreground shadow-sm",
+  "transition-[border-color,box-shadow,background-color] duration-[var(--motion-duration)]",
+  "hover:border-ring/40",
+  "focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/25",
   "disabled:cursor-not-allowed disabled:opacity-50",
-  "aria-invalid:border-red-500/60 aria-invalid:ring-4 aria-invalid:ring-red-500/15",
+  "aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20",
 ];
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => (
-    <input
-      ref={ref}
-      type={type}
-      data-slot="input"
-      className={cn(fieldBase, "h-11", className)}
-      {...props}
-    />
+    <input ref={ref} type={type} data-slot="input" className={cn(fieldBase, "h-11 min-h-[44px]", className)} {...props} />
   ),
 );
 Input.displayName = "Input";

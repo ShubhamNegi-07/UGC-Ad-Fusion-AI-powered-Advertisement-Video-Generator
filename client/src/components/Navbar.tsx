@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLenis } from "@/components/lenis";
+import { useLenis } from "@/components/lenis-hooks";
 import { useAuth, useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -19,6 +19,7 @@ import { assets } from "@/assets/assets";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, errorMessage } from "@/lib/utils";
+import { getSurfaceMode } from "@/lib/surface";
 import { spring } from "@/components/ui/motion";
 
 const navLinks = [
@@ -35,33 +36,43 @@ export default function Navbar() {
   const { getToken } = useAuth();
   const { openSignIn, openSignUp } = useClerk();
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menu, setMenu] = useState<{ open: boolean; at: string }>({ open: false, at: "" });
+  const menuOpen = menu.open && menu.at === pathname;
+  const setMenuOpen = useCallback(
+    (open: boolean) => setMenu(open ? { open: true, at: pathname } : { open: false, at: pathname }),
+    [pathname],
+  );
+
   const [credits, setCredits] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const lenis = useLenis();
+  const marketing = getSurfaceMode(pathname) === "marketing";
 
   useLenis((instance) => {
     setScrolled(instance.scroll > 24);
   });
 
-  const loadCredits = useCallback(async () => {
-    try {
-      const token = await getToken();
-      const { data } = await api.get("/api/user/credits", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCredits(Number(data.credits) || 0);
-    } catch (error) {
-      toast.error(errorMessage(error, "Could not load credits"));
-    }
-  }, [getToken]);
+  const displayCredits = user ? credits : null;
 
   useEffect(() => {
-    if (user) void loadCredits();
-  }, [user, pathname, loadCredits]);
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const token = await getToken();
+        const { data } = await api.get("/api/user/credits", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!cancelled) setCredits(Number(data.credits) || 0);
+      } catch (error) {
+        if (!cancelled) toast.error(errorMessage(error, "Could not load credits"));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, pathname, getToken]);
 
-  // Close the sheet on route change and stop Lenis while the menu is open.
-  useEffect(() => setMenuOpen(false), [pathname]);
   useEffect(() => {
     if (!lenis) return;
     if (menuOpen) lenis.stop();
@@ -70,12 +81,13 @@ export default function Navbar() {
       lenis.start();
     };
   }, [menuOpen, lenis]);
+
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
+  }, [menuOpen, pathname, setMenuOpen]);
 
   return (
     <>
@@ -85,121 +97,134 @@ export default function Navbar() {
         transition={spring}
         className="fixed inset-x-0 top-0 z-50"
       >
+        {!marketing && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-[5.75rem] bg-gradient-to-b from-background via-background/90 to-transparent"
+          />
+        )}
         <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[5.75rem] bg-gradient-to-b from-[#09090b] via-[#09090b]/90 to-transparent"
-        />
-        <div className="relative px-3 pt-3 sm:px-4 sm:pt-4">
+          className={cn(
+            "relative",
+            marketing
+              ? "pt-[max(0px,var(--safe-top))]"
+              : "px-3 pt-[max(0.75rem,var(--safe-top))] sm:px-4 sm:pt-4",
+          )}
+        >
           <nav
             aria-label="Primary"
             className={cn(
-              "glass-strong mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 rounded-2xl border px-3 pl-4 transition-shadow duration-300",
-              scrolled && "shadow-[0_12px_40px_-20px_rgb(0_0_0/0.85)]",
+              "nav-chrome nav-chrome-inner surface-panel flex w-full items-center justify-between gap-3 transition-shadow duration-[var(--motion-duration)]",
+              marketing ? "h-16" : "mx-auto h-14 max-w-6xl rounded-[var(--radius-lg)] px-3 pl-4",
+              !marketing && scrolled && "shadow-lg",
+              marketing && scrolled && "shadow-sm",
             )}
           >
-          <Link to="/" className="flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70" aria-label="UGC Ad Fusion home">
-            <img src={assets.logo} alt="" className="h-7 w-auto" />
-          </Link>
+            <Link
+              to="/"
+              className="flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="UGC Ad Fusion home"
+            >
+              <img src={assets.logo} alt="" className="h-7 w-auto" />
+            </Link>
 
-          <ul className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => (
-              <li key={link.to}>
-                <NavLink
-                  to={link.to}
-                  end={link.to === "/"}
-                  className={({ isActive }) =>
-                    cn(
-                      "relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70",
-                      isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-                    )
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      {isActive && (
-                        <motion.span
-                          layoutId="nav-pill"
-                          transition={spring}
-                          className="absolute inset-0 -z-10 rounded-lg bg-white/[0.07]"
-                        />
-                      )}
-                      {link.name}
-                    </>
-                  )}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+            <ul className="hidden items-center gap-1 md:flex">
+              {navLinks.map((link) => (
+                <li key={link.to}>
+                  <NavLink
+                    to={link.to}
+                    end={link.to === "/"}
+                    className={({ isActive }) =>
+                      cn(
+                        "relative rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                      )
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        {isActive && (
+                          <motion.span
+                            layoutId="nav-pill"
+                            transition={spring}
+                            className="absolute inset-0 -z-10 rounded-[var(--radius-sm)] bg-muted"
+                          />
+                        )}
+                        {link.name}
+                      </>
+                    )}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
 
-          <div className="flex items-center gap-2">
-            {!isLoaded ? (
-              <Skeleton className="h-9 w-24 rounded-full" />
-            ) : user ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/plans")}
-                  className="h-9 gap-1.5 rounded-full pl-2.5 pr-3 font-mono text-xs tabular-nums"
-                  aria-label={`Credits: ${credits ?? 0}. Open plans`}
+            <div className="flex items-center gap-2">
+              {!isLoaded ? (
+                <Skeleton className="h-9 w-24 rounded-full" />
+              ) : user ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate("/plans")}
+                    className="h-9 gap-1.5 rounded-full pl-2.5 pr-3 font-mono text-xs tabular-nums"
+                  aria-label={`Credits: ${displayCredits ?? 0}. Open plans`}
                 >
-                  <span className="flex size-5 items-center justify-center rounded-full bg-white/[0.08] text-zinc-200">
+                  <span className="flex size-5 items-center justify-center rounded-full bg-muted text-foreground">
                     <HugeiconsIcon icon={Coins01Icon} size={13} strokeWidth={2} />
                   </span>
-                  {credits === null ? <Skeleton className="h-3 w-6 rounded" /> : credits}
-                </Button>
-                <div className="flex size-9 items-center justify-center">
-                  <UserButton
-                    appearance={{ elements: { avatarBox: "size-8 ring-2 ring-white/10" } }}
-                  >
-                    <UserButton.MenuItems>
-                      <UserButton.Action
-                        label="Generate"
-                        labelIcon={<HugeiconsIcon icon={SparklesIcon} size={14} />}
-                        onClick={() => navigate("/generate")}
-                      />
-                      <UserButton.Action
-                        label="My generations"
-                        labelIcon={<HugeiconsIcon icon={FolderOpenIcon} size={14} />}
-                        onClick={() => navigate("/my-generations")}
-                      />
-                      <UserButton.Action
-                        label="Community"
-                        labelIcon={<HugeiconsIcon icon={UserGroupIcon} size={14} />}
-                        onClick={() => navigate("/community")}
-                      />
-                      <UserButton.Action
-                        label="Plans"
-                        labelIcon={<HugeiconsIcon icon={CreditCardIcon} size={14} />}
-                        onClick={() => navigate("/plans")}
-                      />
-                    </UserButton.MenuItems>
-                  </UserButton>
+                  {displayCredits === null ? <Skeleton className="h-3 w-6 rounded" /> : displayCredits}
+                  </Button>
+                  <div className="flex size-9 items-center justify-center">
+                    <UserButton appearance={{ elements: { avatarBox: "size-8 ring-2 ring-border" } }}>
+                      <UserButton.MenuItems>
+                        <UserButton.Action
+                          label="Generate"
+                          labelIcon={<HugeiconsIcon icon={SparklesIcon} size={14} />}
+                          onClick={() => navigate("/generate")}
+                        />
+                        <UserButton.Action
+                          label="My generations"
+                          labelIcon={<HugeiconsIcon icon={FolderOpenIcon} size={14} />}
+                          onClick={() => navigate("/my-generations")}
+                        />
+                        <UserButton.Action
+                          label="Community"
+                          labelIcon={<HugeiconsIcon icon={UserGroupIcon} size={14} />}
+                          onClick={() => navigate("/community")}
+                        />
+                        <UserButton.Action
+                          label="Plans"
+                          labelIcon={<HugeiconsIcon icon={CreditCardIcon} size={14} />}
+                          onClick={() => navigate("/plans")}
+                        />
+                      </UserButton.MenuItems>
+                    </UserButton>
+                  </div>
+                </>
+              ) : (
+                <div className="hidden items-center gap-1.5 md:flex">
+                  <Button variant="ghost" size="sm" className="h-9" onClick={() => openSignIn()}>
+                    Sign in
+                  </Button>
+                  <Button variant="default" size="sm" className="h-9 rounded-full px-4" onClick={() => openSignUp()}>
+                    Get started
+                  </Button>
                 </div>
-              </>
-            ) : (
-              <div className="hidden items-center gap-1.5 md:flex">
-                <Button variant="ghost" size="sm" className="h-9" onClick={() => openSignIn()}>
-                  Sign in
-                </Button>
-                <Button variant="gradient" size="sm" className="h-9 rounded-full px-4" onClick={() => openSignUp()}>
-                  Get started
-                </Button>
-              </div>
-            )}
+              )}
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-9 md:hidden"
-              aria-expanded={menuOpen}
-              aria-controls="mobile-menu"
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              <HugeiconsIcon icon={menuOpen ? Cancel01Icon : Menu01Icon} size={20} strokeWidth={2} />
-            </Button>
-          </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-9 md:hidden"
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                <HugeiconsIcon icon={menuOpen ? Cancel01Icon : Menu01Icon} size={20} strokeWidth={2} />
+              </Button>
+            </div>
           </nav>
         </div>
       </motion.header>
@@ -220,7 +245,7 @@ export default function Navbar() {
           >
             <button
               aria-label="Close menu"
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/50"
               onClick={() => setMenuOpen(false)}
             />
             <motion.div
@@ -228,7 +253,7 @@ export default function Navbar() {
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: -12, opacity: 0, scale: 0.98 }}
               transition={spring}
-              className="glass-strong absolute inset-x-3 top-20 rounded-2xl p-2"
+              className="surface-panel absolute inset-x-3 top-20 rounded-[var(--radius-lg)] p-2"
             >
               <ul className="flex flex-col">
                 {navLinks.map((link, i) => (
@@ -241,10 +266,11 @@ export default function Navbar() {
                     <NavLink
                       to={link.to}
                       end={link.to === "/"}
+                      onClick={() => setMenuOpen(false)}
                       className={({ isActive }) =>
                         cn(
-                          "flex items-center justify-between rounded-xl px-4 py-3 text-[15px] font-medium transition-colors",
-                          isActive ? "bg-white/[0.08] text-foreground" : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground",
+                          "flex min-h-[44px] items-center justify-between rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-medium transition-colors",
+                          isActive ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
                         )
                       }
                     >
@@ -260,10 +286,11 @@ export default function Navbar() {
                   >
                     <NavLink
                       to="/my-generations"
+                      onClick={() => setMenuOpen(false)}
                       className={({ isActive }) =>
                         cn(
-                          "flex items-center justify-between rounded-xl px-4 py-3 text-[15px] font-medium transition-colors",
-                          isActive ? "bg-white/[0.08] text-foreground" : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground",
+                          "flex min-h-[44px] items-center justify-between rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-medium transition-colors",
+                          isActive ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
                         )
                       }
                     >
@@ -273,11 +300,11 @@ export default function Navbar() {
                 )}
               </ul>
               {!user && (
-                <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/10 p-2 pt-4">
+                <div className="mt-2 grid grid-cols-2 gap-2 border-t border-border p-2 pt-4">
                   <Button variant="outline" onClick={() => { setMenuOpen(false); openSignIn(); }}>
                     Sign in
                   </Button>
-                  <Button variant="gradient" onClick={() => { setMenuOpen(false); openSignUp(); }}>
+                  <Button variant="default" onClick={() => { setMenuOpen(false); openSignUp(); }}>
                     Get started
                   </Button>
                 </div>

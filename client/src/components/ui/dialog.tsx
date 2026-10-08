@@ -14,7 +14,7 @@ function DialogOverlay({ className, ...props }: React.ComponentProps<typeof Dial
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm",
+        "fixed inset-0 z-[90] bg-black/50",
         "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
         className,
       )}
@@ -36,8 +36,8 @@ function DialogContent({
         data-slot="dialog-content"
         data-lenis-prevent
         className={cn(
-          "glass-strong fixed left-1/2 top-1/2 z-[100] grid w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-5 rounded-2xl p-6 text-foreground",
-          "duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95",
+          "fixed left-1/2 top-1/2 z-[100] grid w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-5 rounded-[var(--radius-lg)] border border-border bg-popover p-6 text-popover-foreground shadow-lg",
+          "duration-[var(--motion-duration)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95",
           className,
         )}
         {...props}
@@ -45,7 +45,7 @@ function DialogContent({
         {children}
         {!hideClose && (
           <DialogPrimitive.Close
-            className="absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70"
+            className="absolute right-4 top-4 inline-flex size-9 min-h-[36px] min-w-[36px] items-center justify-center rounded-[var(--radius-sm)] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Close"
           >
             <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={2} />
@@ -61,15 +61,13 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />
-  );
+  return <div className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />;
 }
 
 function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
-      className={cn("text-lg font-semibold leading-tight tracking-tight", className)}
+      className={cn("text-lg font-semibold leading-tight tracking-tight text-foreground", className)}
       {...props}
     />
   );
@@ -80,10 +78,7 @@ function DialogDescription({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
-    <DialogPrimitive.Description
-      className={cn("text-sm leading-relaxed text-muted-foreground", className)}
-      {...props}
-    />
+    <DialogPrimitive.Description className={cn("text-sm text-muted-foreground", className)} {...props} />
   );
 }
 
@@ -92,7 +87,6 @@ export {
   DialogTrigger,
   DialogPortal,
   DialogClose,
-  DialogOverlay,
   DialogContent,
   DialogHeader,
   DialogFooter,
