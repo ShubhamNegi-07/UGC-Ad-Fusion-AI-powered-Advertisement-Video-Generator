@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
+import { motion } from "@/components/ui/motion";
 import { useAuth, useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -95,9 +96,8 @@ export default function Navbar() {
   return (
     <>
       <motion.header
-        initial={{ y: -24, opacity: 0 }}
+        initial={{ y: 0, opacity: 1 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={spring}
         className="fixed inset-x-0 top-0 z-50"
       >
         {!marketing && (

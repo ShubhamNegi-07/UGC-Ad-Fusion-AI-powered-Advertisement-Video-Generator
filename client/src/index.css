@@ -2,8 +2,8 @@
 @import "tw-animate-css";
 @font-face {
   font-family: "Geist";
-  src: url("./assets/fonts/Geist-Variable.woff2") format("woff2");
-  font-weight: 100 900;
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 400 600;
   font-style: normal;
   font-display: swap;
 }
@@ -18,7 +18,7 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("./assets/fonts/PlusJakartaSans-Variable.woff2") format("woff2");
+  src: url("/fonts/PlusJakartaSans-Variable.woff2") format("woff2");
   font-weight: 500 600;
   font-style: normal;
   font-display: swap;
@@ -350,11 +350,9 @@ html[data-surface="studio"] {
 
   @keyframes workflow-enter {
     from {
-      opacity: 0;
       transform: translateY(6px);
     }
     to {
-      opacity: 1;
       transform: translateY(0);
     }
   }

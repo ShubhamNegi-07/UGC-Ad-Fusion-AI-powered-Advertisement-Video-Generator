@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion } from "@/components/ui/motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowRight01Icon,

@@ -1,4 +1,17 @@
-import type { Transition, Variants } from "framer-motion";
+/* eslint-disable react-refresh/only-export-components -- shared motion primitives */
+import type { ReactNode } from "react";
+import { LazyMotion, domAnimation, m, type Transition, type Variants } from "framer-motion";
+
+/** Use with LazyMotion — lighter than full `motion` bundle. */
+export const motion = m;
+
+export function MotionProvider({ children }: { children: ReactNode }) {
+  return (
+    <LazyMotion features={domAnimation} strict={false}>
+      {children}
+    </LazyMotion>
+  );
+}
 
 export const spring: Transition = {
   type: "spring",
@@ -43,14 +56,10 @@ export const stagger = (delayChildren = 0.06, staggerChildren = 0.07): Variants 
 
 export const viewportOnce = { once: true, amount: 0.2 } as const;
 
+/** Enter: visible immediately (FCP). Exit-only fade for route changes. */
 export const pageVariants: Variants = {
-  initial: { opacity: 0, y: 12, filter: "blur(6px)" },
-  animate: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] },
-  },
+  initial: { opacity: 1, y: 0 },
+  animate: { opacity: 1, y: 0 },
   exit: {
     opacity: 0,
     y: -8,

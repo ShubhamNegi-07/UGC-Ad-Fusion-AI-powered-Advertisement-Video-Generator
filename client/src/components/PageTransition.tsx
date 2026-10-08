@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion } from "@/components/ui/motion";
 import { pageVariants } from "@/components/ui/motion";
 
 export default function PageTransition({ children }: { children: ReactNode }) {

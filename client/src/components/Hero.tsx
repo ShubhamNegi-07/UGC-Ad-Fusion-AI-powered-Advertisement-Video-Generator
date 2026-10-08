@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowRight01Icon,
@@ -9,7 +8,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { assets } from "@/assets/assets";
 import HeroOutputCarousel from "@/components/marketing/HeroOutputCarousel";
-import { fadeUp, stagger } from "@/components/ui/motion";
 
 const workflow = [
   { step: "Upload", desc: "Product + model", icon: ImageUpload01Icon },
@@ -22,30 +20,19 @@ export default function Hero() {
     <section id="home" className="hero-dark-band relative overflow-hidden pb-16 pt-nav md:pb-24">
       <div className="hero-dark-band-bg pointer-events-none absolute inset-0" aria-hidden />
       <div className="container-marketing relative z-[1]">
-        <motion.div
-          className="mx-auto max-w-4xl text-center"
-          variants={stagger(0.04, 0.08)}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.h1 variants={fadeUp} className="hero-display text-balance font-medium text-white">
+        <div className="mx-auto max-w-4xl text-center">
+          <h1 className="hero-display text-balance font-medium text-white">
             Turn one product photo into a UGC-style ad
-          </motion.h1>
-          <motion.p
-            variants={fadeUp}
-            className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/90 md:text-lg"
-          >
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/90 md:text-lg">
             Upload a product and a model. We fuse them into a photoreal still, then animate it into a short clip where
             the creator talks to camera and shows the product.
-          </motion.p>
-          <motion.p variants={fadeUp} className="mt-3 text-sm text-white/75">
+          </p>
+          <p className="mt-3 text-sm text-white/75">
             Image first, then optional talking video — the same flow as in Generator.
-          </motion.p>
+          </p>
 
-          <motion.ol
-            variants={fadeUp}
-            className="mx-auto mt-8 flex max-w-lg justify-center gap-2 overflow-x-auto pb-1"
-          >
+          <ol className="mx-auto mt-8 flex max-w-lg justify-center gap-2 overflow-x-auto pb-1">
             {workflow.map((w, i) => (
               <li
                 key={w.step}
@@ -61,9 +48,9 @@ export default function Hero() {
                 </div>
               </li>
             ))}
-          </motion.ol>
+          </ol>
 
-          <motion.div variants={fadeUp} className="mt-8 flex flex-col items-center gap-3">
+          <div className="mt-8 flex flex-col items-center gap-3">
             <Link
               to="/generate"
               className="hero-split-cta group inline-flex overflow-hidden rounded-lg shadow-lg transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
@@ -76,9 +63,9 @@ export default function Hero() {
               </span>
             </Link>
             <p className="text-xs text-white/50">No credit card required</p>
-          </motion.div>
+          </div>
 
-          <motion.div variants={fadeUp} className="mx-auto mt-8 flex max-w-md items-center justify-center gap-2">
+          <div className="mx-auto mt-8 flex max-w-md items-center justify-center gap-2">
             <figure className="size-14 overflow-hidden rounded-xl border border-white/15 shadow-md">
               <img
                 src={assets.product7}
@@ -106,8 +93,8 @@ export default function Hero() {
               →
             </span>
             <p className="text-[10px] uppercase tracking-wider text-white/50">Sample outputs below</p>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         <HeroOutputCarousel featuredPulse />
       </div>

@@ -1,15 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" data-surface="marketing">
+<html lang="en" data-surface="marketing" style="background-color: #07070a;">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#09090b" />
+    <meta name="theme-color" content="#07070a" />
     <meta name="color-scheme" content="dark" />
     <meta name="description" content="UGC.AI turns a product photo and a model photo into a photoreal image and a short talking video ad, ready for Reels, Shorts and TikTok." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/generated/generated1.webp" as="image" type="image/webp" fetchpriority="high" />
+    <style>
+        html,
+        body {
+            background-color: #07070a;
+            margin: 0;
+        }
+    </style>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="UGC.AI | AI image & video ads" />
     <meta property="og:description" content="Turn a product photo and a model photo into a photoreal image and a talking video ad." />
@@ -19,7 +29,7 @@
     <title>UGC.AI | AI image & video ads</title>
 </head>
 
-<body>
+<body style="background-color: #07070a;">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 </body>

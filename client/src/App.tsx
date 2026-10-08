@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
@@ -9,14 +9,28 @@ import SoftBackdrop from "@/components/SoftBackdrop";
 import ScrollRoot from "@/components/ScrollRoot";
 import PageTransition from "@/components/PageTransition";
 import Home from "@/pages/Home";
-import Generator from "@/pages/Generator";
-import Result from "@/pages/Result";
-import MyGenerations from "@/pages/MyGenerations";
-import Community from "@/pages/Community";
-import Plans from "@/pages/Plans";
 import Loading from "@/pages/Loading";
+
+const Generator = lazy(() => import("@/pages/Generator"));
+const Result = lazy(() => import("@/pages/Result"));
+const MyGenerations = lazy(() => import("@/pages/MyGenerations"));
+const Community = lazy(() => import("@/pages/Community"));
+const Plans = lazy(() => import("@/pages/Plans"));
 const DevStyleguide = import.meta.env.DEV ? lazy(() => import("@/pages/Styleguide")) : null;
+
 const studioRoutes = ["/generate", "/result", "/my-generations", "/community"];
+
+function RouteFallback() {
+  return <div className="min-h-[60vh] pt-nav" aria-busy="true" aria-label="Loading page" />;
+}
+
+function LazyPage({ children }: { children: ReactNode }) {
+  return (
+    <PageTransition>
+      <Suspense fallback={<RouteFallback />}>{children}</Suspense>
+    </PageTransition>
+  );
+}
 
 export default function App() {
   const location = useLocation();
@@ -66,21 +80,19 @@ export default function App() {
           <AnimatePresence mode="wait" initial={false}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-              <Route path="/generate" element={<PageTransition><Generator /></PageTransition>} />
-              <Route path="/result/:projectId" element={<PageTransition><Result /></PageTransition>} />
-              <Route path="/my-generations" element={<PageTransition><MyGenerations /></PageTransition>} />
-              <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
-              <Route path="/plans" element={<PageTransition><Plans /></PageTransition>} />
+              <Route path="/generate" element={<LazyPage><Generator /></LazyPage>} />
+              <Route path="/result/:projectId" element={<LazyPage><Result /></LazyPage>} />
+              <Route path="/my-generations" element={<LazyPage><MyGenerations /></LazyPage>} />
+              <Route path="/community" element={<LazyPage><Community /></LazyPage>} />
+              <Route path="/plans" element={<LazyPage><Plans /></LazyPage>} />
               <Route path="/loading" element={<PageTransition><Loading /></PageTransition>} />
               {import.meta.env.DEV && DevStyleguide && (
                 <Route
                   path="/dev/styleguide"
                   element={
-                    <PageTransition>
-                      <Suspense fallback={null}>
-                        <DevStyleguide />
-                      </Suspense>
-                    </PageTransition>
+                    <LazyPage>
+                      <DevStyleguide />
+                    </LazyPage>
                   }
                 />
               )}

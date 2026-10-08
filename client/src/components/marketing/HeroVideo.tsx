@@ -4,9 +4,10 @@ type HeroVideoProps = {
   src: string;
   poster: string;
   className?: string;
+  priority?: boolean;
 };
 
-export default function HeroVideo({ src, poster, className }: HeroVideoProps) {
+export default function HeroVideo({ src, poster, className, priority = false }: HeroVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
   const [canPlay, setCanPlay] = useState(false);
 
@@ -42,7 +43,7 @@ export default function HeroVideo({ src, poster, className }: HeroVideoProps) {
       muted
       loop
       playsInline
-      preload="none"
+      preload={priority ? "metadata" : "none"}
     />
   );
 }

@@ -170,7 +170,12 @@ export default function HeroOutputCarousel({ featuredPulse = true }: { featuredP
             >
               <div className="aspect-[9/16]">
                 {tile.type === "video" ? (
-                  <HeroVideo src={tile.src} poster={tile.poster!} className="h-full w-full object-cover" />
+                  <HeroVideo
+                    src={tile.src}
+                    poster={tile.poster!}
+                    className="h-full w-full object-cover"
+                    priority={i === 0}
+                  />
                 ) : (
                   <img
                     src={tile.src}
@@ -178,8 +183,8 @@ export default function HeroOutputCarousel({ featuredPulse = true }: { featuredP
                     width={w}
                     height={h}
                     className="h-full w-full object-cover"
-                    loading={i === 0 ? "eager" : "lazy"}
-                    fetchPriority={i === 0 ? "high" : "auto"}
+                    loading={i <= 1 ? "eager" : "lazy"}
+                    fetchPriority={i === 1 ? "high" : "auto"}
                     decoding="async"
                   />
                 )}

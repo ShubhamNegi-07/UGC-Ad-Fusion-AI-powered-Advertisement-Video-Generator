@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion } from "@/components/ui/motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Github01Icon, Linkedin01Icon } from "@hugeicons/core-free-icons";
 import { assets } from "@/assets/assets";
