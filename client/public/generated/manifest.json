@@ -1,0 +1,27 @@
+{
+  "generated1": {
+    "width": 768,
+    "height": 1376,
+    "path": "/generated/generated1.webp"
+  },
+  "generated2": {
+    "width": 768,
+    "height": 1376,
+    "path": "/generated/generated2.webp"
+  },
+  "generated3": {
+    "width": 768,
+    "height": 1376,
+    "path": "/generated/generated3.webp"
+  },
+  "generated4": {
+    "width": 768,
+    "height": 1376,
+    "path": "/generated/generated4.webp"
+  },
+  "generatorUi": {
+    "width": 1440,
+    "height": 1198,
+    "path": "/marketing/generator-ui.webp"
+  }
+}
