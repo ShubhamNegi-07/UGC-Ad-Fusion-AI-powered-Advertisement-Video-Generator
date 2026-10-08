@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@clerk/clerk-react";
@@ -36,20 +36,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fadeUp } from "@/components/ui/motion";
+import { fadeUp, studioReveal } from "@/components/ui/motion";
 import { cn, formatDate } from "@/lib/utils";
 
 interface ProjectCardProps {
   gen: Project;
   setGenerations: Dispatch<SetStateAction<Project[]>>;
   forCommunity?: boolean;
+  studio?: boolean;
+  /** Community feed row layout (studio). */
+  feed?: boolean;
 }
 
-function aspectClass(ratio: string) {
+function aspectClass(ratio: string, studioFrame?: boolean) {
+  if (studioFrame) return "aspect-[4/5]";
   if (ratio === "9:16") return "aspect-[9/16]";
   if (ratio === "1:1") return "aspect-square";
   return "aspect-video";
 }
+
 
 async function shareProject(gen: Project) {
   const url = gen.generatedVideo || gen.generatedImage;
@@ -67,15 +72,33 @@ async function shareProject(gen: Project) {
   }
 }
 
-export default function ProjectCard({ gen, setGenerations, forCommunity = false }: ProjectCardProps) {
+export default function ProjectCard({ gen, setGenerations, forCommunity = false, studio = false, feed = false }: ProjectCardProps) {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [mediaLoaded, setMediaLoaded] = useState(false);
+  const mediaWrapRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const hasMedia = Boolean(gen.generatedImage || gen.generatedVideo);
+
+  useEffect(() => {
+    if (!studio || !gen.generatedVideo) return;
+    const wrap = mediaWrapRef.current;
+    const video = videoRef.current;
+    if (!wrap || !video) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) void video.play().catch(() => undefined);
+        else video.pause();
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(wrap);
+    return () => io.disconnect();
+  }, [studio, gen.generatedVideo]);
 
   const handleDelete = async () => {
     try {
@@ -110,28 +133,69 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false 
     }
   };
 
+  const motionVariants = studio ? studioReveal : fadeUp;
+
   return (
     <motion.article
-      layout
-      variants={fadeUp}
+      layout={!studio}
+      variants={motionVariants}
       initial="hidden"
       animate="show"
-      exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.18 } }}
-      whileHover={{ y: -3 }}
-      transition={{ type: "spring", stiffness: 300, damping: 26 }}
-      className="group glass mb-4 break-inside-avoid overflow-hidden rounded-2xl transition-colors duration-300 hover:border-white/15"
+      exit={studio ? { opacity: 1, y: 0 } : { opacity: 0, scale: 0.96, transition: { duration: 0.18 } }}
+      whileHover={studio ? undefined : { y: -3 }}
+      transition={studio ? undefined : { type: "spring", stiffness: 300, damping: 26 }}
+      className={cn(
+        "group overflow-hidden rounded-[var(--radius-lg)] border border-border transition-colors duration-200",
+        studio ? "surface-panel mb-0 break-inside-auto" : "glass mb-4 break-inside-avoid hover:border-white/15",
+        feed && "flex flex-col sm:flex-row sm:items-stretch",
+      )}
     >
-      <div className={cn("relative overflow-hidden bg-black/40", aspectClass(gen.aspectRatio))}>
-        {!mediaLoaded && hasMedia && <Skeleton className="absolute inset-0 rounded-none" />}
+      <div
+        ref={mediaWrapRef}
+        className={cn(
+          "relative flex shrink-0 items-center justify-center overflow-hidden bg-muted",
+          aspectClass(gen.aspectRatio, studio && !feed),
+          feed ? "w-full sm:w-44 md:w-52" : "w-full",
+        )}
+      >
+        {!mediaLoaded && hasMedia && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
 
-        {gen.generatedImage && (
+        {gen.generatedImage && studio && (
+          <>
+            <img
+              src={gen.generatedImage}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              className="absolute inset-0 h-full w-full scale-105 object-cover opacity-30"
+            />
+            <img
+              src={gen.generatedImage}
+              alt={gen.productName || "Generated image"}
+              loading="lazy"
+              width={768}
+              height={1376}
+              onLoad={() => setMediaLoaded(true)}
+              className={cn(
+                "absolute inset-0 z-[1] h-full w-full object-contain",
+                mediaLoaded ? "opacity-100" : "opacity-0",
+                gen.generatedVideo && "transition-opacity duration-300 group-hover:opacity-0",
+              )}
+            />
+          </>
+        )}
+
+        {gen.generatedImage && !studio && (
           <img
             src={gen.generatedImage}
             alt={gen.productName || "Generated image"}
             loading="lazy"
+            width={768}
+            height={1376}
             onLoad={() => setMediaLoaded(true)}
             className={cn(
-              "absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-500",
+              "absolute inset-0 h-full w-full object-cover",
+              "transition-[opacity,transform] duration-500",
               mediaLoaded ? "opacity-100" : "opacity-0",
               gen.generatedVideo ? "group-hover:opacity-0" : "group-hover:scale-[1.03]",
             )}
@@ -140,28 +204,43 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false 
 
         {gen.generatedVideo && (
           <video
+            ref={videoRef}
             src={gen.generatedVideo}
+            poster={gen.generatedImage}
             muted
             loop
             playsInline
             preload="metadata"
+            width={768}
+            height={1376}
             onLoadedData={() => setMediaLoaded(true)}
-            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-            onMouseEnter={(e) => void e.currentTarget.play().catch(() => undefined)}
-            onMouseLeave={(e) => e.currentTarget.pause()}
+            className={cn(
+              "absolute inset-0 z-[2] h-full w-full",
+              studio ? "object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100" : "object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100",
+            )}
+            onMouseEnter={studio ? undefined : (e) => void e.currentTarget.play().catch(() => undefined)}
+            onMouseLeave={studio ? undefined : (e) => e.currentTarget.pause()}
           />
         )}
 
         {!hasMedia && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-            <span className="animate-pulse-ring flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.05]">
-              <HugeiconsIcon icon={Image02Icon} size={20} />
+            <span
+              className={cn(
+                "animate-pulse-ring flex size-12 items-center justify-center rounded-full border",
+                studio ? "border-border bg-muted" : "border-white/10 bg-white/[0.05]",
+              )}
+            >
+              <HugeiconsIcon icon={Image02Icon} size={20} aria-hidden />
             </span>
             <p className="text-xs">{gen.isGenerating ? "Generating…" : "No media yet"}</p>
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
+        {!studio && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />}
+        {studio && hasMedia && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-border/80 bg-card/90 px-2 py-1 sm:hidden" aria-hidden />
+        )}
 
         <div className="absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
           {gen.isGenerating && (
@@ -192,7 +271,10 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false 
                   variant="secondary"
                   size="icon-sm"
                   aria-label="Project actions"
-                  className="bg-black/50 backdrop-blur-md hover:bg-black/70"
+                  className={cn(
+                    "size-11 min-h-[44px] min-w-[44px]",
+                    studio ? "border border-border bg-card hover:bg-muted" : "bg-black/50 backdrop-blur-md hover:bg-black/70",
+                  )}
                 >
                   <HugeiconsIcon icon={MoreHorizontalIcon} size={16} strokeWidth={2.2} />
                 </Button>
@@ -246,10 +328,17 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false 
         )}
       </div>
 
-      <div className="p-4">
+      <div className={cn("min-w-0 flex-1 p-4", feed && "flex flex-col justify-center")}>
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h3 className="truncate text-[15px] font-semibold tracking-tight">{gen.productName || gen.name || "Untitled"}</h3>
+          <div className="min-w-0 flex-1">
+            <h3
+              className={cn(
+                "text-[15px] font-semibold tracking-tight",
+                feed || (studio && forCommunity) ? "line-clamp-2 text-pretty" : "truncate",
+              )}
+            >
+              {gen.productName || gen.name || "Untitled"}
+            </h3>
             <p className="mt-0.5 text-xs text-muted-foreground">{formatDate(gen.createdAt)}</p>
           </div>
           <Badge variant="outline" className="shrink-0 font-mono">
@@ -265,14 +354,14 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false 
 
         {!forCommunity && (
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" className="h-9" onClick={() => navigate(`/result/${gen.id}`)}>
+            <Button variant="outline" size="sm" className="min-h-11" onClick={() => navigate(`/result/${gen.id}`)}>
               <HugeiconsIcon icon={Link01Icon} size={14} />
               Open
             </Button>
             <Button
               variant={gen.isPublished ? "secondary" : "default"}
               size="sm"
-              className="h-9"
+              className="min-h-11"
               loading={publishing}
               loadingText={gen.isPublished ? "Unpublishing" : "Publishing"}
               disabled={!hasMedia}
@@ -286,13 +375,13 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false 
 
         {forCommunity && hasMedia && (
           <div className="mt-4 flex gap-2">
-            <Button asChild variant="outline" size="sm" className="h-9 flex-1">
+            <Button asChild variant="outline" size="sm" className="min-h-11 flex-1">
               <a href={gen.generatedVideo || gen.generatedImage} download target="_blank" rel="noreferrer">
                 <HugeiconsIcon icon={Download01Icon} size={14} />
                 Download
               </a>
             </Button>
-            <Button variant="ghost" size="icon-sm" className="size-9" aria-label="Share" onClick={() => void shareProject(gen)}>
+            <Button variant="ghost" size="icon-sm" className="size-11 min-h-[44px] min-w-[44px]" aria-label="Share" onClick={() => void shareProject(gen)}>
               <HugeiconsIcon icon={Share08Icon} size={15} />
             </Button>
           </div>
