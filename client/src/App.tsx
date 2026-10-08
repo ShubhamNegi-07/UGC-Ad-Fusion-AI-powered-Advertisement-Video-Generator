@@ -10,11 +10,11 @@ import ScrollRoot from "@/components/ScrollRoot";
 import PageTransition from "@/components/PageTransition";
 import Home from "@/pages/Home";
 import Loading from "@/pages/Loading";
+import Generator from "@/pages/Generator";
+import Result from "@/pages/Result";
+import MyGenerations from "@/pages/MyGenerations";
+import Community from "@/pages/Community";
 
-const Generator = lazy(() => import("@/pages/Generator"));
-const Result = lazy(() => import("@/pages/Result"));
-const MyGenerations = lazy(() => import("@/pages/MyGenerations"));
-const Community = lazy(() => import("@/pages/Community"));
 const Plans = lazy(() => import("@/pages/Plans"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const DevStyleguide = import.meta.env.DEV ? lazy(() => import("@/pages/Styleguide")) : null;
@@ -56,6 +56,7 @@ export default function App() {
               padding: "12px 16px",
               maxWidth: "420px",
               boxShadow: "var(--shadow-md)",
+              fontFamily: '"Geist", sans-serif',
               fontSize: "13px",
               lineHeight: "1.45",
             },
@@ -80,14 +81,14 @@ export default function App() {
           Skip to content
         </a>
         <Navbar />
-        <main id="main" className="relative z-10">
+        <main id="main" className="relative z-0">
           <AnimatePresence mode="wait" initial={false}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-              <Route path="/generate" element={<LazyPage><Generator /></LazyPage>} />
-              <Route path="/result/:projectId" element={<LazyPage><Result /></LazyPage>} />
-              <Route path="/my-generations" element={<LazyPage><MyGenerations /></LazyPage>} />
-              <Route path="/community" element={<LazyPage><Community /></LazyPage>} />
+              <Route path="/generate" element={<PageTransition><Generator /></PageTransition>} />
+              <Route path="/result/:projectId" element={<PageTransition><Result /></PageTransition>} />
+              <Route path="/my-generations" element={<PageTransition><MyGenerations /></PageTransition>} />
+              <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
               <Route path="/plans" element={<LazyPage><Plans /></LazyPage>} />
               <Route path="/loading" element={<PageTransition><Loading /></PageTransition>} />
               {import.meta.env.DEV && DevStyleguide && (
