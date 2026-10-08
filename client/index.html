@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-surface="marketing" style="background-color: #07070a;">
+<html lang="en" data-surface="marketing" style="background-color: #07070a; font-family: Geist, sans-serif;">
 
 <head>
     <meta charset="UTF-8" />
@@ -10,14 +10,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.svg" />
-    <link rel="preload" href="/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/generated/generated1.webp" as="image" type="image/webp" fetchpriority="high" />
     <style>
         html,
-        body {
+        body,
+        #root {
             background-color: #07070a;
             margin: 0;
+            font-family: "Geist", sans-serif;
+        }
+
+        input,
+        textarea,
+        select,
+        button {
+            font-family: "Geist", sans-serif;
         }
     </style>
     <meta property="og:type" content="website" />
@@ -29,7 +36,7 @@
     <title>UGC.AI | AI image & video ads</title>
 </head>
 
-<body style="background-color: #07070a;">
+<body style="background-color: #07070a; font-family: Geist, sans-serif;">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 </body>

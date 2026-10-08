@@ -15,7 +15,7 @@ if (!PUBLISHABLE_KEY) {
       style={{
         backgroundColor: "#07070a",
         color: "#f5f2eb",
-        fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+        fontFamily: '"Geist", sans-serif',
       }}
     >
       <div
@@ -28,7 +28,7 @@ if (!PUBLISHABLE_KEY) {
       >
         <p
           className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
-          style={{ color: "#2dd4bf" }}
+          style={{ color: "#60a5fa" }}
         >
           Configuration required
         </p>
