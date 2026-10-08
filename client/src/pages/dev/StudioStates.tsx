@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "re
 import type { Project } from "@/Types";
 import GeneratorStudioView from "@/components/studio/GeneratorStudioView";
 import ResultStudioView from "@/components/studio/ResultStudioView";
+import MyGenerationsStudioView from "@/components/studio/MyGenerationsStudioView";
+import CommunityStudioView from "@/components/studio/CommunityStudioView";
 
 const MOCK_IMAGE = "/generated/generated1.webp";
 const MOCK_IMAGE_B = "/generated/generated2.webp";
@@ -296,6 +298,9 @@ function GeneratorCreditsMock() {
   );
 }
 
+const LONG_TITLE =
+  "Ultra-premium organic cold-pressed extra virgin avocado oil with rosemary and a very long product name for truncation testing in the community feed";
+
 const baseProject = (): Project => ({
   id: "dev-mock",
   name: "Mock project",
@@ -308,6 +313,27 @@ const baseProject = (): Project => ({
   uploadedImages: [],
   createdAt: new Date().toISOString(),
 });
+
+const mockImageOnly = (): Project => ({
+  ...baseProject(),
+  id: "mock-image",
+  productName: "Image-only mock",
+  generatedImage: MOCK_IMAGE,
+});
+
+const mockVideo = (): Project => ({
+  ...baseProject(),
+  id: "mock-video",
+  productName: "Video mock",
+  generatedImage: MOCK_IMAGE,
+  generatedVideo: MOCK_VIDEO,
+});
+
+const mockMixed = (): Project[] => [
+  mockImageOnly(),
+  mockVideo(),
+  { ...baseProject(), id: "mock-b", productName: "Second item", generatedImage: MOCK_IMAGE_B },
+];
 
 export default function StudioStates() {
   return (
@@ -411,6 +437,126 @@ export default function StudioStates() {
           onGenerateVideo={() => {}}
           onShare={() => {}}
           hideStickyVideoBar
+        />
+      </DevSection>
+
+      <DevSection id="mygen-loading" title="My generations · loading">
+        <MyGenerationsStudioView
+          rootId="mygen-loading"
+          loading
+          signedIn
+          generations={[]}
+          setGenerations={() => {}}
+          onRefresh={() => {}}
+          onSignIn={() => {}}
+        />
+      </DevSection>
+
+      <DevSection id="mygen-empty" title="My generations · empty">
+        <MyGenerationsStudioView
+          rootId="mygen-empty"
+          loading={false}
+          signedIn
+          generations={[]}
+          setGenerations={() => {}}
+          onRefresh={() => {}}
+          onSignIn={() => {}}
+        />
+      </DevSection>
+
+      <DevSection id="mygen-image" title="My generations · image only">
+        <MyGenerationsStudioView
+          rootId="mygen-image"
+          loading={false}
+          signedIn
+          generations={[mockImageOnly()]}
+          setGenerations={() => {}}
+          onRefresh={() => {}}
+          onSignIn={() => {}}
+        />
+      </DevSection>
+
+      <DevSection id="mygen-video" title="My generations · video">
+        <MyGenerationsStudioView
+          rootId="mygen-video"
+          loading={false}
+          signedIn
+          generations={[mockVideo()]}
+          setGenerations={() => {}}
+          onRefresh={() => {}}
+          onSignIn={() => {}}
+        />
+      </DevSection>
+
+      <DevSection id="mygen-aspects" title="My generations · aspect ratios (9:16, 1:1, 16:9)">
+        <MyGenerationsStudioView
+          rootId="mygen-aspects"
+          loading={false}
+          signedIn
+          generations={[
+            { ...mockImageOnly(), id: "aspect-916", aspectRatio: "9:16", productName: "Portrait 9:16" },
+            { ...mockImageOnly(), id: "aspect-11", aspectRatio: "1:1", productName: "Square 1:1" },
+            { ...mockImageOnly(), id: "aspect-169", aspectRatio: "16:9", productName: "Landscape 16:9" },
+          ]}
+          setGenerations={() => {}}
+          onRefresh={() => {}}
+          onSignIn={() => {}}
+        />
+      </DevSection>
+
+      <DevSection id="mygen-mixed" title="My generations · mixed grid">
+        <MyGenerationsStudioView
+          rootId="mygen-mixed"
+          loading={false}
+          signedIn
+          generations={mockMixed()}
+          setGenerations={() => {}}
+          onRefresh={() => {}}
+          onSignIn={() => {}}
+        />
+      </DevSection>
+
+      <DevSection id="mygen-error" title="My generations · error">
+        <MyGenerationsStudioView
+          rootId="mygen-error"
+          loading={false}
+          signedIn
+          generations={[]}
+          setGenerations={() => {}}
+          onRefresh={() => {}}
+          onSignIn={() => {}}
+          errorMessage="Could not load your generations. Check your connection and try again."
+        />
+      </DevSection>
+
+      <DevSection id="community-loading" title="Community · loading">
+        <CommunityStudioView rootId="community-loading" loading projects={[]} setProjects={() => {}} />
+      </DevSection>
+
+      <DevSection id="community-empty" title="Community · empty">
+        <CommunityStudioView rootId="community-empty" loading={false} projects={[]} setProjects={() => {}} />
+      </DevSection>
+
+      <DevSection id="community-feed" title="Community · feed (long titles)">
+        <CommunityStudioView
+          rootId="community-feed"
+          loading={false}
+          projects={[
+            { ...mockVideo(), id: "c1", productName: LONG_TITLE, isPublished: true },
+            { ...mockImageOnly(), id: "c2", productName: "Short title ad", isPublished: true },
+          ]}
+          setProjects={() => {}}
+        />
+      </DevSection>
+
+      <DevSection id="community-error" title="Community · error">
+        <CommunityStudioView
+          rootId="community-error"
+          loading={false}
+          projects={[]}
+          setProjects={() => {}}
+          onRetry={() => {}}
+          errorMessage="Could not load community projects. Try again in a moment."
         />
       </DevSection>
     </div>
