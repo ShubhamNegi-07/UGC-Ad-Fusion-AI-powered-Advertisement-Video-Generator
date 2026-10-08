@@ -128,8 +128,8 @@ export default function UploadZone({ id, label, hint, file, onClear, onFile, dis
                 className={cn(
                   "absolute left-3 top-3 flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium",
                   studio
-                    ? "border border-border bg-muted text-emerald-300"
-                    : "bg-emerald-400/20 text-emerald-200 backdrop-blur",
+                    ? "border border-brand/30 bg-brand/10 text-brand-muted"
+                    : "bg-brand/20 text-brand-muted backdrop-blur",
                 )}
               >
                 <HugeiconsIcon icon={Tick02Icon} size={10} strokeWidth={3} />

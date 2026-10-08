@@ -206,7 +206,11 @@ export default function GeneratorStudioView({
   }
 
   return (
-    <div id={rootId} className={cn("studio-shell studio-shell-bottom studio-scroll-pad pt-nav", className)}>
+    <div id={rootId} className={cn("studio-shell studio-shell-bottom studio-scroll-pad relative pt-nav", className)}>
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-56 bg-gradient-to-b from-brand/[0.07] to-transparent"
+        aria-hidden
+      />
       <Title
         as="h1"
         studio

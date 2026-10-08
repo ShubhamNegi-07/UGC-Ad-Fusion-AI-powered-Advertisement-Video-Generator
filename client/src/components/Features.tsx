@@ -33,7 +33,7 @@ export default function Features() {
                 <HugeiconsIcon icon={feature.icon} size={20} strokeWidth={1.8} />
               </div>
               <h3 className="text-base font-semibold tracking-tight">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-400">{feature.desc}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{feature.desc}</p>
             </motion.li>
           ))}
         </motion.ul>

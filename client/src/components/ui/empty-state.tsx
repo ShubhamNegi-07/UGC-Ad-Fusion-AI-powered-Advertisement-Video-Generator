@@ -19,7 +19,7 @@ function EmptyState({ icon, title, description, action, className, ...props }: E
       {...props}
     >
       <div className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-48 w-72 rounded-full bg-white/[0.06] blur-3xl" />
-      <div className="relative mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-zinc-200 shadow-inner">
+      <div className="relative mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl border border-border bg-muted text-muted-foreground shadow-inner">
         <HugeiconsIcon icon={icon} size={24} strokeWidth={1.8} />
       </div>
       <h3 className="relative text-lg font-semibold tracking-tight">{title}</h3>

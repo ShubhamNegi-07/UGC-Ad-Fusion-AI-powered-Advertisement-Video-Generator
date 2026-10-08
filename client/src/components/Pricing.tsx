@@ -41,7 +41,7 @@ export default function Pricing({ compact = false }: { compact?: boolean }) {
               )}
             >
               {plan.popular && (
-                <div className="pointer-events-none absolute inset-x-0 -top-px mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-zinc-200/70 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 -top-px mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-brand-muted/45 to-transparent" />
               )}
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-muted-foreground">{plan.name}</h3>
@@ -56,7 +56,7 @@ export default function Pricing({ compact = false }: { compact?: boolean }) {
               <ul className="mt-6 space-y-2.5 text-sm">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5">
-                    <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-300">
+                    <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand-muted">
                       <HugeiconsIcon icon={Tick02Icon} size={11} strokeWidth={3} />
                     </span>
                     <span className="text-foreground/85">{f}</span>
