@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SoftBackdrop from "@/components/SoftBackdrop";
-import SmoothScroll from "@/components/lenis";
+import ScrollRoot from "@/components/ScrollRoot";
 import PageTransition from "@/components/PageTransition";
 import Home from "@/pages/Home";
 import Generator from "@/pages/Generator";
@@ -23,7 +23,7 @@ export default function App() {
   const hideFooter = studioRoutes.some((path) => location.pathname.startsWith(path));
 
   return (
-    <SmoothScroll>
+    <ScrollRoot>
       <TooltipProvider delayDuration={200}>
         <Toaster
           position="bottom-center"
@@ -89,6 +89,6 @@ export default function App() {
         </main>
         {!hideFooter && <Footer />}
       </TooltipProvider>
-    </SmoothScroll>
+    </ScrollRoot>
   );
 }

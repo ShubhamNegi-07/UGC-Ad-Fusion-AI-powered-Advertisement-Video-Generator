@@ -255,7 +255,6 @@ export default function Result() {
             {/* Side panel */}
             <div
               className="flex flex-col gap-3 lg:max-h-[calc(100dvh-var(--nav-offset)-5.5rem)] lg:overflow-y-auto lg:pr-1"
-              data-lenis-prevent
             >
               <motion.div variants={fadeUp}>
                 <Card className="gap-3">
