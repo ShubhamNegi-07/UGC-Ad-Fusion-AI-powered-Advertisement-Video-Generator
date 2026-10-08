@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, ArrowDown01Icon, Image02Icon, Video02Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, Image02Icon, Video02Icon } from "@hugeicons/core-free-icons";
 import { Accordion as AccordionPrimitive } from "radix-ui";
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
@@ -29,17 +29,24 @@ const plansFaq = [
 
 export default function Plans() {
   return (
-    <div className="bg-background pb-[var(--space-section)] pt-nav">
-      <div className="container-marketing">
-        <Title
-          marketing
-          as="h1"
-          title="Pricing"
-          heading="Start free, upgrade when we ship billing"
-          description="Only the free tier is active in the app today. Paid plans stay disabled until checkout and server slugs are aligned."
-          className="mb-10 md:mb-14"
-        />
+    <div className="bg-background">
+      <section className="hero-dark-band relative overflow-hidden pb-10 pt-nav md:pb-14">
+        <div className="hero-dark-band-bg pointer-events-none absolute inset-0" aria-hidden />
+        <div className="monex-backdrop-grid pointer-events-none absolute inset-0 opacity-45" aria-hidden />
+        <div className="container-marketing relative z-[1]">
+          <Title
+            as="h1"
+            align="left"
+            darkHero
+            title="Pricing"
+            heading="Start free, upgrade when we ship billing"
+            description="Only the free tier is active in the app today. Paid plans stay disabled until checkout and server slugs are aligned."
+            className="mb-0"
+          />
+        </div>
+      </section>
 
+      <div className="container-marketing pb-[var(--space-section)] pt-10 md:pt-12">
         <div className="grid gap-5 lg:grid-cols-2 lg:items-stretch">
           <article className="relative flex flex-col rounded-[var(--radius-xl)] border-2 border-brand bg-card p-6 shadow-md">
             <Badge className="mb-4 w-fit border-0 bg-brand text-brand-foreground">Active</Badge>
@@ -66,11 +73,8 @@ export default function Plans() {
                 20 credits to start
               </li>
             </ul>
-            <Button asChild size="lg" className="mt-8 w-full rounded-full">
-              <Link to="/generate">
-                Start generating free
-                <HugeiconsIcon icon={ArrowRight01Icon} size={18} strokeWidth={2} />
-              </Link>
+            <Button asChild size="lg" className="mt-8 w-full">
+              <Link to="/generate">Start generating free</Link>
             </Button>
           </article>
 
@@ -80,10 +84,9 @@ export default function Plans() {
             </Badge>
             <h2 className="marketing-display text-2xl font-semibold tracking-tight text-foreground">Paid plans</h2>
             <p className="mt-2 flex-1 text-sm text-muted-foreground">
-              Credit packs and checkout will appear here after we verify prices, slug names, and Clerk billing with the
-              server webhook.
+              Credit packs and in-app checkout are on the way. The free tier above is what you can use today.
             </p>
-            <Button type="button" size="lg" variant="outline" className="mt-8 w-full rounded-full" disabled>
+            <Button type="button" size="lg" variant="outline" className="mt-8 w-full" disabled>
               Coming soon
             </Button>
           </article>

@@ -27,7 +27,7 @@ const semanticTokens = [
   { name: "Success", fg: "#15803D", bg: "#FFFFFF", onBg: "#F0FDF4" },
   { name: "Warning", fg: "#A16207", bg: "#FFFFFF", onBg: "#FFFBEB" },
   { name: "Destructive / error", fg: "#DC2626", bg: "#FFFFFF", onBg: "#FEF2F2" },
-  { name: "Brand accent (locked teal)", fg: "#0F766E", bg: "#FFFFFF", onBg: "#FFFFFF" },
+  { name: "Brand accent (locked cobalt)", fg: "#2563EB", bg: "#030712", onBg: "#0f172a" },
 ];
 
 function contrastRatio(fg: string, bg: string) {
@@ -106,10 +106,10 @@ function ModePanel({
       <h2 className="mb-6 text-xl font-semibold tracking-tight">{title}</h2>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
-        <Swatch name="Background" css={mode === "marketing" ? "#FFFFFF" : "#0F0E0C"} />
-        <Swatch name="Card" css={mode === "marketing" ? "#FFFFFF" : "#1A1917"} />
-        <Swatch name="Brand" css={accent ? brandAccents[accent].brand : "#0F766E"} />
-        <Swatch name="Muted text" css={mode === "marketing" ? "#52525B" : "#9C958C"} />
+        <Swatch name="Background" css="#030712" />
+        <Swatch name="Card" css="rgb(15 23 42 / 0.78)" />
+        <Swatch name="Brand" css={accent ? brandAccents[accent].brand : "#2563EB"} />
+        <Swatch name="Muted text" css="#94a3b8" />
       </div>
 
       <div className="mb-8">
@@ -190,7 +190,7 @@ const matchesCreatify = [
 ];
 
 const differentCreatify = [
-  "Accent: teal or crimson (not Creatify purple/lavender)",
+  "Accent: cobalt blue or crimson (not Creatify purple/lavender)",
   "Typography: Geist only (they use a distinct display sans)",
   "Copy, logo, and all imagery from UGC Ad Fusion outputs",
   "Hero collage uses our upload + still + 9:16 generated video",
@@ -200,7 +200,7 @@ const differentCreatify = [
 
 export default function Styleguide() {
   const { openSignIn } = useClerk();
-  const [accent, setAccent] = useState<BrandAccentId>("teal");
+  const [accent, setAccent] = useState<BrandAccentId>("cobalt");
 
   return (
     <div className="container-marketing pb-20 pt-nav">
@@ -216,7 +216,7 @@ export default function Styleguide() {
         <SemanticStates />
 
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold">Accent (locked: Performance teal)</h2>
+          <h2 className="text-lg font-semibold">Accent (locked: cobalt blue)</h2>
           <div className="flex flex-wrap gap-2">
             {(Object.keys(brandAccents) as BrandAccentId[]).map((id) => (
               <Button
@@ -231,7 +231,7 @@ export default function Styleguide() {
             ))}
           </div>
           <p className="text-xs text-muted-foreground">
-            Preview below uses selected accent. Studio dark mode uses teal until you lock the choice in Phase 4.
+            Preview below uses selected accent. Production marketing and studio both use locked cobalt (#2563EB).
           </p>
         </section>
 

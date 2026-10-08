@@ -18,7 +18,7 @@ export default function Loading() {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="animate-pulse-ring flex size-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-zinc-200"
+        className="animate-pulse-ring flex size-16 items-center justify-center rounded-2xl border border-border bg-muted text-muted-foreground"
       >
         <HugeiconsIcon icon={SparklesIcon} size={26} strokeWidth={1.8} />
       </motion.span>
