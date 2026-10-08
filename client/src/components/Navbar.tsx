@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLenis } from "@/components/lenis-hooks";
 import { useAuth, useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -45,12 +44,16 @@ export default function Navbar() {
 
   const [credits, setCredits] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const lenis = useLenis();
   const marketing = getSurfaceMode(pathname) === "marketing";
+  const homeRoute = pathname === "/";
+  const homeDarkNav = marketing && homeRoute && !scrolled;
 
-  useLenis((instance) => {
-    setScrolled(instance.scroll > 24);
-  });
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const displayCredits = user ? credits : null;
 
@@ -74,13 +77,13 @@ export default function Navbar() {
   }, [user, pathname, getToken]);
 
   useEffect(() => {
-    if (!lenis) return;
-    if (menuOpen) lenis.stop();
-    else lenis.start();
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      lenis.start();
+      document.body.style.overflow = prev;
     };
-  }, [menuOpen, lenis]);
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -114,10 +117,13 @@ export default function Navbar() {
           <nav
             aria-label="Primary"
             className={cn(
-              "nav-chrome nav-chrome-inner surface-panel flex w-full items-center justify-between gap-3 transition-shadow duration-[var(--motion-duration)]",
-              marketing ? "h-16" : "mx-auto h-14 max-w-6xl rounded-[var(--radius-lg)] px-3 pl-4",
+              "nav-chrome nav-chrome-inner flex w-full items-center justify-between gap-3 transition-[background-color,border-color,box-shadow,color] duration-[var(--motion-duration)]",
+              marketing ? "h-16" : "surface-panel mx-auto h-14 max-w-6xl rounded-[var(--radius-lg)] px-3 pl-4",
+              marketing && !homeDarkNav && "surface-panel",
+              homeDarkNav && "border-transparent bg-transparent shadow-none text-white",
               !marketing && scrolled && "shadow-lg",
-              marketing && scrolled && "shadow-sm",
+              marketing && scrolled && homeRoute && "surface-panel shadow-sm",
+              marketing && scrolled && !homeRoute && "shadow-sm",
             )}
           >
             <Link
@@ -125,7 +131,11 @@ export default function Navbar() {
               className="flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="UGC Ad Fusion home"
             >
-              <img src={assets.logo} alt="" className="h-7 w-auto" />
+              <img
+                src={assets.logo}
+                alt=""
+                className={cn("h-7 w-auto", homeDarkNav && "nav-logo-on-dark")}
+              />
             </Link>
 
             <ul className="hidden items-center gap-1 md:flex">
@@ -137,7 +147,13 @@ export default function Navbar() {
                     className={({ isActive }) =>
                       cn(
                         "relative rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                        homeDarkNav
+                          ? isActive
+                            ? "text-white"
+                            : "text-white/70 hover:text-white"
+                          : isActive
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground",
                       )
                     }
                   >
@@ -147,7 +163,10 @@ export default function Navbar() {
                           <motion.span
                             layoutId="nav-pill"
                             transition={spring}
-                            className="absolute inset-0 -z-10 rounded-[var(--radius-sm)] bg-muted"
+                            className={cn(
+                              "absolute inset-0 -z-10 rounded-[var(--radius-sm)]",
+                              homeDarkNav ? "bg-white/15" : "bg-muted",
+                            )}
                           />
                         )}
                         {link.name}
@@ -237,7 +256,6 @@ export default function Navbar() {
             aria-modal="true"
             aria-label="Navigation menu"
             className="fixed inset-0 z-40 md:hidden"
-            data-lenis-prevent
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
