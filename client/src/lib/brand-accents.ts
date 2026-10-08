@@ -1,20 +1,20 @@
-/** Gate 3 accent options — user picks one in Phase 4. Default: teal. */
+/** Styleguide accent options — production site locks cobalt blue. */
 
-export type BrandAccentId = "teal" | "crimson";
+export type BrandAccentId = "cobalt" | "crimson";
 
 export const brandAccents: Record<
   BrandAccentId,
   { label: string; brand: string; hover: string; muted: string; foreground: string }
 > = {
-  teal: {
-    label: "Option A — Performance teal",
-    brand: "#0F766E",
-    hover: "#0B6B62",
-    muted: "#2DD4BF",
+  cobalt: {
+    label: "Cobalt blue (locked)",
+    brand: "#2563EB",
+    hover: "#1D4ED8",
+    muted: "#60A5FA",
     foreground: "#FFFFFF",
   },
   crimson: {
-    label: "Option B — Signal crimson",
+    label: "Signal crimson (comparison only)",
     brand: "#BE123C",
     hover: "#9F1239",
     muted: "#FB7185",
@@ -22,7 +22,9 @@ export const brandAccents: Record<
   },
 };
 
-export const defaultBrandAccent: BrandAccentId = "teal";
+export const defaultBrandAccent: BrandAccentId = "cobalt";
 
-/** Gate 3 locked — crimson kept for styleguide comparison only. */
-export const lockedBrandAccent: BrandAccentId = "teal";
+export const lockedBrandAccent: BrandAccentId = "cobalt";
+
+/** @deprecated Use `cobalt` — alias for older styleguide state */
+export type LegacyBrandAccentId = "teal";
