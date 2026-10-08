@@ -150,7 +150,7 @@ export default function Navbar() {
                         homeDarkNav
                           ? isActive
                             ? "text-white"
-                            : "text-white/70 hover:text-white"
+                            : "text-white/90 hover:text-white"
                           : isActive
                             ? "text-foreground"
                             : "text-muted-foreground hover:text-foreground",

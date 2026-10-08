@@ -1,25 +1,40 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { Button } from "@/components/ui/button";
+import { fadeUp, viewportOnce } from "@/components/ui/motion";
 
 export default function HomeCTA() {
   return (
-    <section className="container-marketing pb-[var(--space-section)]">
-      <div className="rounded-[var(--radius-xl)] border border-border bg-muted/40 px-6 py-14 text-center md:px-12">
-        <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-          Ready to make your first ad?
-        </h2>
-        <p className="mx-auto mt-4 max-w-lg text-pretty text-[15px] text-muted-foreground">
-          Sign up, get 20 free credits, and run your first still — then add a talking video when you are happy with the
-          frame. No credit card required.
-        </p>
-        <Button asChild size="lg" className="mt-8 rounded-full px-8 uppercase tracking-wide">
-          <Link to="/generate">
-            Start creating now
-            <HugeiconsIcon icon={ArrowRight01Icon} size={18} strokeWidth={2} />
+    <section className="hero-dark-band relative overflow-hidden py-[var(--space-section)]">
+      <div className="hero-dark-band-bg pointer-events-none absolute inset-0" aria-hidden />
+      <div className="container-marketing relative z-[1]">
+        <motion.div
+          className="mx-auto max-w-2xl text-center"
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          variants={fadeUp}
+        >
+          <h2 className="marketing-display text-balance text-3xl font-semibold tracking-tight text-white md:text-4xl">
+            Ready to make your first ad?
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-pretty text-[15px] leading-relaxed text-white/70">
+            Sign up, get 20 free credits, and run your first still — then add a talking video when you are happy with
+            the frame. No credit card required.
+          </p>
+          <Link
+            to="/generate"
+            className="hero-split-cta group mt-8 inline-flex overflow-hidden rounded-lg shadow-lg transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <span className="flex items-center justify-center bg-brand px-4 py-3.5 text-brand-foreground">
+              <HugeiconsIcon icon={ArrowRight01Icon} size={20} strokeWidth={2.5} />
+            </span>
+            <span className="flex min-h-[52px] items-center bg-black px-8 text-xs font-semibold uppercase tracking-[0.14em] text-white md:text-sm">
+              Start creating now
+            </span>
           </Link>
-        </Button>
+        </motion.div>
       </div>
     </section>
   );

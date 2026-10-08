@@ -33,12 +33,12 @@ export default function Hero() {
           </motion.h1>
           <motion.p
             variants={fadeUp}
-            className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/70 md:text-lg"
+            className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/90 md:text-lg"
           >
             Upload a product and a model. We fuse them into a photoreal still, then animate it into a short clip where
             the creator talks to camera and shows the product.
           </motion.p>
-          <motion.p variants={fadeUp} className="mt-3 text-sm text-white/55">
+          <motion.p variants={fadeUp} className="mt-3 text-sm text-white/75">
             Image first, then optional talking video — the same flow as in Generator.
           </motion.p>
 
