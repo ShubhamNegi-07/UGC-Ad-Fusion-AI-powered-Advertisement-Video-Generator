@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp, studioReveal } from "@/components/ui/motion";
+import { StudioMediaBackdrop } from "@/components/studio/StudioMediaFill";
+import { writeCachedProject } from "@/lib/studio-cache";
 import { cn, formatDate } from "@/lib/utils";
 
 interface ProjectCardProps {
@@ -48,8 +50,12 @@ interface ProjectCardProps {
   feed?: boolean;
 }
 
-function aspectClass(ratio: string, studioFrame?: boolean) {
-  if (studioFrame) return "aspect-[4/5]";
+function aspectClass(ratio: string, studioGrid?: boolean) {
+  if (studioGrid) {
+    if (ratio === "9:16") return "aspect-[9/16] max-h-[min(480px,52vh)] w-full";
+    if (ratio === "1:1") return "aspect-square max-h-[min(400px,44vh)] w-full";
+    return "aspect-video max-h-[min(320px,36vh)] w-full";
+  }
   if (ratio === "9:16") return "aspect-[9/16]";
   if (ratio === "1:1") return "aspect-square";
   return "aspect-video";
@@ -79,6 +85,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
   const [deleting, setDeleting] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [mediaLoaded, setMediaLoaded] = useState(false);
+  const [mediaInView, setMediaInView] = useState(false);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -91,7 +98,9 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
     if (!wrap || !video) return;
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) void video.play().catch(() => undefined);
+        const visible = entry.isIntersecting;
+        setMediaInView(visible);
+        if (visible) void video.play().catch(() => undefined);
         else video.pause();
       },
       { threshold: 0.35 },
@@ -123,7 +132,12 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
         headers: { Authorization: `Bearer ${token}` },
       });
       setGenerations((prev) =>
-        prev.map((item) => (item.id === gen.id ? { ...item, isPublished: data.isPublished } : item)),
+        prev.map((item) => {
+          if (item.id !== gen.id) return item;
+          const next = { ...item, isPublished: data.isPublished };
+          writeCachedProject(next);
+          return next;
+        }),
       );
       toast.success(data.isPublished ? "Published to community" : "Removed from community");
     } catch (error) {
@@ -153,7 +167,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
       <div
         ref={mediaWrapRef}
         className={cn(
-          "relative flex shrink-0 items-center justify-center overflow-hidden bg-muted",
+          "relative flex shrink-0 items-center justify-center overflow-hidden bg-[var(--studio-media-bg,#020617)]",
           aspectClass(gen.aspectRatio, studio && !feed),
           feed ? "w-full sm:w-44 md:w-52" : "w-full",
         )}
@@ -162,13 +176,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
 
         {gen.generatedImage && studio && (
           <>
-            <img
-              src={gen.generatedImage}
-              alt=""
-              aria-hidden
-              loading="lazy"
-              className="absolute inset-0 h-full w-full scale-105 object-cover opacity-30"
-            />
+            <StudioMediaBackdrop src={gen.generatedImage} />
             <img
               src={gen.generatedImage}
               alt={gen.productName || "Generated image"}
@@ -179,7 +187,11 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
               className={cn(
                 "absolute inset-0 z-[1] h-full w-full object-contain",
                 mediaLoaded ? "opacity-100" : "opacity-0",
-                gen.generatedVideo && "transition-opacity duration-300 group-hover:opacity-0",
+                gen.generatedVideo &&
+                  studio &&
+                  mediaInView &&
+                  "opacity-0 transition-opacity duration-300",
+                gen.generatedVideo && !studio && "transition-opacity duration-300 group-hover:opacity-0",
               )}
             />
           </>
@@ -215,8 +227,10 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
             height={1376}
             onLoadedData={() => setMediaLoaded(true)}
             className={cn(
-              "absolute inset-0 z-[2] h-full w-full",
-              studio ? "object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100" : "object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100",
+              "absolute inset-0 z-[2] h-full w-full transition-opacity duration-300",
+              studio
+                ? cn("object-contain", mediaInView ? "opacity-100" : "opacity-0")
+                : "object-cover opacity-0 group-hover:opacity-100",
             )}
             onMouseEnter={studio ? undefined : (e) => void e.currentTarget.play().catch(() => undefined)}
             onMouseLeave={studio ? undefined : (e) => e.currentTarget.pause()}
@@ -268,6 +282,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
+                  framer={false}
                   variant="secondary"
                   size="icon-sm"
                   aria-label="Project actions"
@@ -312,7 +327,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
           </div>
         )}
 
-        {gen.uploadedImages?.length > 0 && (
+        {!studio && gen.uploadedImages?.length > 0 && (
           <div className="absolute bottom-3 right-3 flex -space-x-3">
             {gen.uploadedImages.slice(0, 2).map((src, i) => (
               <img
@@ -354,12 +369,19 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
 
         {!forCommunity && (
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" className="min-h-11" onClick={() => navigate(`/result/${gen.id}`)}>
+            <Button
+              framer={false}
+              variant="outline"
+              size="sm"
+              className="min-h-11"
+              onClick={() => navigate(`/result/${gen.id}`)}
+            >
               <HugeiconsIcon icon={Link01Icon} size={14} />
               Open
             </Button>
             <Button
-              variant={gen.isPublished ? "secondary" : "default"}
+              framer={false}
+              variant={gen.isPublished ? "secondary" : "gradient"}
               size="sm"
               className="min-h-11"
               loading={publishing}
