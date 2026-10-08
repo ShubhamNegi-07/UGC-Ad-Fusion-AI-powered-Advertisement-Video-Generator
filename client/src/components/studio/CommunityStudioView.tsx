@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Alert02Icon, PlusSignIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Alert02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import type { Project } from "@/Types";
 import type { Dispatch, SetStateAction } from "react";
-import ProjectCard from "@/components/ProjectCard";
+import CommunityMasonry from "@/components/studio/CommunityMasonry";
+import StudioPageHero from "@/components/studio/StudioPageHero";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { GridSkeleton } from "@/components/ui/skeleton";
@@ -24,7 +25,7 @@ export type CommunityStudioViewProps = {
 export default function CommunityStudioView({
   loading,
   projects,
-  setProjects,
+  setProjects: _setProjects,
   onRetry,
   errorMessage,
   rootId,
@@ -35,15 +36,27 @@ export default function CommunityStudioView({
   const stagger = reduceMotion ? studioStagger(0, 0) : studioStagger(0.04, 0.05);
 
   return (
-    <div id={rootId} className={cn("studio-shell studio-shell-bottom pt-nav", className)}>
-      <motion.header variants={stagger} initial="hidden" animate="show" className="mb-8 sm:mb-10">
-        <motion.h1 variants={enter} className="studio-page-title text-2xl font-semibold tracking-tight md:text-3xl">
-          Community
-        </motion.h1>
-        <motion.p variants={enter} className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Ads creators chose to publish. Browse the feed — no rankings or view counts.
-        </motion.p>
-      </motion.header>
+    <div id={rootId} className={cn("studio-shell studio-shell-bottom relative pt-nav", className)}>
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 bg-gradient-to-b from-brand/[0.08] to-transparent"
+        aria-hidden
+      />
+      <div className="monex-backdrop-grid pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 opacity-40" aria-hidden />
+
+      <motion.div variants={stagger} initial="hidden" animate="show">
+        <motion.div variants={enter}>
+          <StudioPageHero
+            eyebrow="Published feed"
+            title="Community"
+            description="Published ads from your projects — drag the masonry wall to explore. Videos play when a tile is in view."
+            actions={
+              <Button asChild variant="outline" size="sm">
+                <Link to="/my-generations">My generations</Link>
+              </Button>
+            }
+          />
+        </motion.div>
+      </motion.div>
 
       {errorMessage && (
         <div
@@ -68,22 +81,15 @@ export default function CommunityStudioView({
         <EmptyState
           icon={UserGroupIcon}
           title="Nothing published yet"
-          description="Generate an ad, then choose Publish on the card in My generations."
+          description="Generate an ad, then publish from Result or from a card in My generations."
           action={
             <Button asChild variant="gradient" className="min-h-11">
-              <Link to="/generate">
-                <HugeiconsIcon icon={PlusSignIcon} size={16} strokeWidth={2.2} aria-hidden />
-                Create an ad
-              </Link>
+              <Link to="/generate">Create an ad</Link>
             </Button>
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} gen={project} setGenerations={setProjects} forCommunity studio />
-          ))}
-        </div>
+        <CommunityMasonry projects={projects} />
       )}
     </div>
   );
