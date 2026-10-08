@@ -80,6 +80,7 @@ function CreditsAndSubmit({
   compact,
   creditsHint,
   formId,
+  creditsHintId,
 }: {
   signedIn: boolean;
   isLoaded: boolean;
@@ -88,6 +89,7 @@ function CreditsAndSubmit({
   compact?: boolean;
   creditsHint?: string | null;
   formId?: string;
+  creditsHintId: string;
 }) {
   return (
     <div
@@ -117,7 +119,7 @@ function CreditsAndSubmit({
         loading={isGenerating}
         loadingText="Generating image…"
         disabled={isLoaded && signedIn && !isValid}
-        aria-describedby="generator-credits-hint"
+        aria-describedby={creditsHintId}
       >
         <HugeiconsIcon icon={AiMagicIcon} size={18} strokeWidth={2} aria-hidden />
         {signedIn ? "Generate image" : "Sign in to generate"}
@@ -131,13 +133,14 @@ function StatusBanner({ banner }: { banner: GeneratorStatusBanner }) {
     banner.variant === "error"
       ? "border-destructive/40 bg-destructive/10 text-destructive"
       : banner.variant === "warning"
-        ? "border-amber-500/40 bg-amber-500/10 text-amber-100"
+        ? "border-amber-600/45 bg-amber-500/15 text-foreground"
         : "border-border bg-muted text-foreground";
 
+  const isAlert = banner.variant === "error";
   return (
     <div
-      role={banner.variant === "error" ? "alert" : "status"}
-      aria-live={banner.live ?? (banner.variant === "error" ? "assertive" : "polite")}
+      role={isAlert ? "alert" : "status"}
+      aria-live={isAlert ? undefined : (banner.live ?? "polite")}
       className={cn("mb-6 flex gap-2.5 rounded-[var(--radius-lg)] border px-4 py-3 text-sm", styles)}
     >
       <HugeiconsIcon icon={Alert02Icon} size={18} className="mt-0.5 shrink-0" aria-hidden />
@@ -176,6 +179,7 @@ export default function GeneratorStudioView({
   useVisualViewportInset();
   const pid = (base: string) => `${idPrefix}${base}`;
   const formId = idPrefix ? `${idPrefix}${GENERATOR_FORM_ID}` : GENERATOR_FORM_ID;
+  const creditsHintId = pid("generator-credits-hint");
   const reduceMotion = useReducedMotion();
   const enter = reduceMotion ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } } : studioReveal;
   const stagger = reduceMotion ? studioStagger(0, 0) : studioStagger(0.04, 0.05);
@@ -195,6 +199,7 @@ export default function GeneratorStudioView({
           compact
           creditsHint={creditsHint}
           formId={formId}
+          creditsHintId={creditsHintId}
         />
       </div>
     );
@@ -370,7 +375,7 @@ export default function GeneratorStudioView({
           </Card>
 
           <motion.div variants={enter} className="surface-panel hidden rounded-[var(--radius-lg)] p-4 lg:block">
-            <p id="generator-credits-hint" className="sr-only">
+            <p id={creditsHintId} className="sr-only">
               Image generation costs five credits.
             </p>
             <CreditsAndSubmit
@@ -380,6 +385,7 @@ export default function GeneratorStudioView({
               isGenerating={isGenerating}
               creditsHint={creditsHint}
               formId={formId}
+              creditsHintId={creditsHintId}
             />
           </motion.div>
         </motion.div>

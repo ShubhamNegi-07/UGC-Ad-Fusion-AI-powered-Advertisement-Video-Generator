@@ -16,6 +16,7 @@ const Result = lazy(() => import("@/pages/Result"));
 const MyGenerations = lazy(() => import("@/pages/MyGenerations"));
 const Community = lazy(() => import("@/pages/Community"));
 const Plans = lazy(() => import("@/pages/Plans"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 const DevStyleguide = import.meta.env.DEV ? lazy(() => import("@/pages/Styleguide")) : null;
 const DevStudioStates = import.meta.env.DEV ? lazy(() => import("@/pages/dev/StudioStates")) : null;
 
@@ -109,6 +110,7 @@ export default function App() {
                   }
                 />
               )}
+              <Route path="*" element={<LazyPage><NotFound /></LazyPage>} />
             </Routes>
           </AnimatePresence>
         </main>
