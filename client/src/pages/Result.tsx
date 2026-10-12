@@ -5,6 +5,17 @@ import toast from "react-hot-toast";
 import type { Project } from "@/Types";
 import api from "@/configs/axios";
 import ResultStudioView from "@/components/studio/ResultStudioView";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Delete02Icon } from "@hugeicons/core-free-icons";
 import { readCachedProject, writeCachedProject } from "@/lib/studio-cache";
 import { errorMessage } from "@/lib/utils";
 
@@ -21,6 +32,8 @@ export default function Result() {
   const [loading, setLoading] = useState(!cachedOnMount);
   const [isGenerating, setIsGenerating] = useState(Boolean(cachedOnMount?.isGenerating));
   const [isPublishing, setIsPublishing] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [mediaReady, setMediaReady] = useState(Boolean(cachedOnMount?.generatedImage || cachedOnMount?.generatedVideo));
 
   const fetchProject = useCallback(
@@ -117,6 +130,22 @@ export default function Result() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!project?.id) return;
+    try {
+      setDeleting(true);
+      const token = await getToken();
+      await api.delete(`/api/project/${project.id}`, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success("Project deleted");
+      navigate("/my-generations");
+    } catch (error) {
+      toast.error(errorMessage(error, "Could not delete project"));
+    } finally {
+      setDeleting(false);
+      setDeleteOpen(false);
+    }
+  };
+
   const share = async () => {
     if (!mediaSrc) return;
     try {
@@ -134,16 +163,40 @@ export default function Result() {
   const showLoading = !isLoaded || (loading && !project);
 
   return (
-    <ResultStudioView
-      loading={showLoading}
-      project={project}
-      isGenerating={isGenerating}
-      mediaReady={mediaReady}
-      onMediaReady={() => setMediaReady(true)}
-      onGenerateVideo={handleGenerateVideo}
-      onShare={share}
-      isPublishing={isPublishing}
-      onTogglePublish={togglePublish}
-    />
+    <>
+      <ResultStudioView
+        loading={showLoading}
+        project={project}
+        isGenerating={isGenerating}
+        mediaReady={mediaReady}
+        onMediaReady={() => setMediaReady(true)}
+        onGenerateVideo={handleGenerateVideo}
+        onShare={share}
+        isPublishing={isPublishing}
+        onTogglePublish={togglePublish}
+        onDelete={project ? () => setDeleteOpen(true) : undefined}
+      />
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete this project?</DialogTitle>
+            <DialogDescription>
+              “{project?.productName || "This project"}” and its generated media will be removed permanently. Credits
+              are not refunded.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => void handleDelete()} loading={deleting} loadingText="Deleting">
+              <HugeiconsIcon icon={Delete02Icon} size={15} />
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
