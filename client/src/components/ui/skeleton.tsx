@@ -24,7 +24,7 @@ function GridSkeleton({ count = 6, layout = "masonry" }: { count?: number; layou
       >
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} className="overflow-hidden rounded-[var(--radius-lg)] border border-border">
-            <Skeleton className="aspect-[9/16] max-h-[min(480px,52vh)] w-full rounded-none" />
+            <Skeleton className="h-[min(17.5rem,34dvh)] w-full rounded-none sm:h-[min(19rem,36dvh)]" />
             <div className="space-y-2 p-4">
               <Skeleton className="h-4 w-2/3 rounded-md" />
               <Skeleton className="h-3 w-1/3 rounded-md" />
