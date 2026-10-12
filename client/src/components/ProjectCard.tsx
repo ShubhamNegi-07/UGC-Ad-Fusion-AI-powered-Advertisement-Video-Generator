@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp, studioReveal } from "@/components/ui/motion";
-import { StudioMediaBackdrop } from "@/components/studio/StudioMediaFill";
 import { writeCachedProject } from "@/lib/studio-cache";
 import { cn, formatDate } from "@/lib/utils";
 
@@ -50,15 +49,23 @@ interface ProjectCardProps {
   feed?: boolean;
 }
 
+/** Fixed preview height on My generations so 1:1 / 9:16 / 16:9 cards align in the grid. */
+const STUDIO_GRID_MEDIA_HEIGHT =
+  "h-[min(17.5rem,34dvh)] w-full sm:h-[min(19rem,36dvh)]";
+
 function aspectClass(ratio: string, studioGrid?: boolean) {
-  if (studioGrid) {
-    if (ratio === "9:16") return "aspect-[9/16] max-h-[min(480px,52vh)] w-full";
-    if (ratio === "1:1") return "aspect-square max-h-[min(400px,44vh)] w-full";
-    return "aspect-video max-h-[min(320px,36vh)] w-full";
-  }
+  if (studioGrid) return STUDIO_GRID_MEDIA_HEIGHT;
   if (ratio === "9:16") return "aspect-[9/16]";
   if (ratio === "1:1") return "aspect-square";
   return "aspect-video";
+}
+
+function studioGridImageClass(hasVideo: boolean, mediaInView: boolean, loaded: boolean) {
+  return cn(
+    "relative z-[1] max-h-full max-w-full object-contain object-center",
+    loaded ? "opacity-100" : "opacity-0",
+    hasVideo && mediaInView && "opacity-0 transition-opacity duration-300",
+  );
 }
 
 
@@ -160,14 +167,14 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
       transition={studio ? undefined : { type: "spring", stiffness: 300, damping: 26 }}
       className={cn(
         "group overflow-hidden rounded-[var(--radius-lg)] border border-border transition-colors duration-200",
-        studio ? "surface-panel mb-0 break-inside-auto" : "glass mb-4 break-inside-avoid hover:border-white/15",
+        studio ? "surface-panel mb-0 flex h-full w-full flex-col break-inside-auto" : "glass mb-4 break-inside-avoid hover:border-white/15",
         feed && "flex flex-col sm:flex-row sm:items-stretch",
       )}
     >
       <div
         ref={mediaWrapRef}
         className={cn(
-          "relative flex shrink-0 items-center justify-center overflow-hidden bg-[var(--studio-media-bg,#020617)]",
+          "relative flex shrink-0 items-center justify-center overflow-hidden bg-[var(--studio-media-bg,#020617)] p-2 sm:p-2.5",
           aspectClass(gen.aspectRatio, studio && !feed),
           feed ? "w-full sm:w-44 md:w-52" : "w-full",
         )}
@@ -175,26 +182,15 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
         {!mediaLoaded && hasMedia && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
 
         {gen.generatedImage && studio && (
-          <>
-            <StudioMediaBackdrop src={gen.generatedImage} />
-            <img
-              src={gen.generatedImage}
-              alt={gen.productName || "Generated image"}
-              loading="lazy"
-              width={768}
-              height={1376}
-              onLoad={() => setMediaLoaded(true)}
-              className={cn(
-                "absolute inset-0 z-[1] h-full w-full object-contain",
-                mediaLoaded ? "opacity-100" : "opacity-0",
-                gen.generatedVideo &&
-                  studio &&
-                  mediaInView &&
-                  "opacity-0 transition-opacity duration-300",
-                gen.generatedVideo && !studio && "transition-opacity duration-300 group-hover:opacity-0",
-              )}
-            />
-          </>
+          <img
+            src={gen.generatedImage}
+            alt={gen.productName || "Generated image"}
+            loading="lazy"
+            width={768}
+            height={1376}
+            onLoad={() => setMediaLoaded(true)}
+            className={studioGridImageClass(Boolean(gen.generatedVideo), mediaInView, mediaLoaded)}
+          />
         )}
 
         {gen.generatedImage && !studio && (
@@ -227,10 +223,13 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
             height={1376}
             onLoadedData={() => setMediaLoaded(true)}
             className={cn(
-              "absolute inset-0 z-[2] h-full w-full transition-opacity duration-300",
+              "z-[2] transition-opacity duration-300",
               studio
-                ? cn("object-contain", mediaInView ? "opacity-100" : "opacity-0")
-                : "object-cover opacity-0 group-hover:opacity-100",
+                ? cn(
+                    "pointer-events-none absolute left-1/2 top-1/2 max-h-[calc(100%-0.5rem)] max-w-[calc(100%-0.5rem)] -translate-x-1/2 -translate-y-1/2 object-contain",
+                    mediaInView ? "opacity-100" : "opacity-0",
+                  )
+                : "absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100",
             )}
             onMouseEnter={studio ? undefined : (e) => void e.currentTarget.play().catch(() => undefined)}
             onMouseLeave={studio ? undefined : (e) => e.currentTarget.pause()}
@@ -252,11 +251,8 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
         )}
 
         {!studio && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />}
-        {studio && hasMedia && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-border/80 bg-card/90 px-2 py-1 sm:hidden" aria-hidden />
-        )}
 
-        <div className="absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
+        <div className="absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5">
           {gen.isGenerating && (
             <Badge variant="warning">
               <span className="size-1.5 animate-pulse rounded-full bg-amber-300" />
@@ -278,8 +274,10 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
         </div>
 
         {!forCommunity && (
-          <div className="absolute right-3 top-3 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
-            <DropdownMenu>
+          <div
+            className="absolute right-2 top-2 z-20 sm:right-2.5 sm:top-2.5 max-sm:opacity-100"
+          >
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button
                   framer={false}
@@ -287,14 +285,19 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
                   size="icon-sm"
                   aria-label="Project actions"
                   className={cn(
-                    "size-11 min-h-[44px] min-w-[44px]",
-                    studio ? "border border-border bg-card hover:bg-muted" : "bg-black/50 backdrop-blur-md hover:bg-black/70",
+                    "size-8 min-h-8 min-w-8 rounded-lg p-0 shadow-sm sm:size-9 sm:min-h-9 sm:min-w-9",
+                    "sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto",
+                    "sm:group-focus-within:opacity-100 sm:group-focus-within:pointer-events-auto",
+                    "data-[state=open]:opacity-100 data-[state=open]:pointer-events-auto",
+                    studio
+                      ? "border border-border/80 bg-card/95 backdrop-blur-sm hover:bg-muted"
+                      : "border-0 bg-black/55 backdrop-blur-md hover:bg-black/70",
                   )}
                 >
-                  <HugeiconsIcon icon={MoreHorizontalIcon} size={16} strokeWidth={2.2} />
+                  <HugeiconsIcon icon={MoreHorizontalIcon} size={14} strokeWidth={2.2} aria-hidden />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="z-[110]">
                 {gen.generatedImage && (
                   <DropdownMenuItem asChild>
                     <a href={gen.generatedImage} download target="_blank" rel="noreferrer">
@@ -343,7 +346,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
         )}
       </div>
 
-      <div className={cn("min-w-0 flex-1 p-4", feed && "flex flex-col justify-center")}>
+      <div className={cn("min-w-0 flex-1 p-4", studio && !feed && "mt-auto", feed && "flex flex-col justify-center")}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h3
@@ -368,30 +371,44 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
         )}
 
         {!forCommunity && (
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <Button
-              framer={false}
-              variant="outline"
-              size="sm"
-              className="min-h-11"
-              onClick={() => navigate(`/result/${gen.id}`)}
-            >
-              <HugeiconsIcon icon={Link01Icon} size={14} />
-              Open
-            </Button>
-            <Button
-              framer={false}
-              variant={gen.isPublished ? "secondary" : "gradient"}
-              size="sm"
-              className="min-h-11"
-              loading={publishing}
-              loadingText={gen.isPublished ? "Unpublishing" : "Publishing"}
-              disabled={!hasMedia}
-              onClick={togglePublish}
-            >
-              <HugeiconsIcon icon={gen.isPublished ? LockIcon : GlobalIcon} size={14} />
-              {gen.isPublished ? "Unpublish" : "Publish"}
-            </Button>
+          <div className="mt-4 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                framer={false}
+                variant="outline"
+                size="sm"
+                className="min-h-11"
+                onClick={() => navigate(`/result/${gen.id}`)}
+              >
+                <HugeiconsIcon icon={Link01Icon} size={14} />
+                Open
+              </Button>
+              <Button
+                framer={false}
+                variant={gen.isPublished ? "secondary" : "gradient"}
+                size="sm"
+                className="min-h-11"
+                loading={publishing}
+                loadingText={gen.isPublished ? "Unpublishing" : "Publishing"}
+                disabled={!hasMedia}
+                onClick={togglePublish}
+              >
+                <HugeiconsIcon icon={gen.isPublished ? LockIcon : GlobalIcon} size={14} />
+                {gen.isPublished ? "Unpublish" : "Publish"}
+              </Button>
+            </div>
+            {studio && (
+              <Button
+                framer={false}
+                variant="outline"
+                size="sm"
+                className="min-h-11 w-full border-destructive/35 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => setConfirmOpen(true)}
+              >
+                <HugeiconsIcon icon={Delete02Icon} size={14} />
+                Delete project
+              </Button>
+            )}
           </div>
         )}
 
