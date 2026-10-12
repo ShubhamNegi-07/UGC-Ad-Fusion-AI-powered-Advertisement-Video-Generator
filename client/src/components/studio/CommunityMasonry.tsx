@@ -4,7 +4,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Download01Icon, PlayIcon, Share08Icon } from "@hugeicons/core-free-icons";
 import toast from "react-hot-toast";
 import type { Project } from "@/Types";
-import { StudioMediaBackdrop } from "@/components/studio/StudioMediaFill";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useMasonryColumns } from "@/hooks/useMasonryColumns";
@@ -61,8 +60,12 @@ function MasonryTile({ project }: { project: Project }) {
       ref={wrapRef}
       className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c1018] shadow-[0_12px_40px_rgb(0_0_0_/_0.35)]"
     >
-      <div className={cn("relative w-full", aspectClass(project.aspectRatio))}>
-        <StudioMediaBackdrop src={project.generatedImage || mediaSrc} />
+      <div
+        className={cn(
+          "relative flex w-full items-center justify-center overflow-hidden bg-[var(--studio-media-bg,#020617)] p-2",
+          aspectClass(project.aspectRatio),
+        )}
+      >
         {hasVideo ? (
           <video
             ref={videoRef}
@@ -74,7 +77,7 @@ function MasonryTile({ project }: { project: Project }) {
             preload="metadata"
             onLoadedData={() => setLoaded(true)}
             className={cn(
-              "relative z-[1] h-full w-full object-contain transition-opacity duration-300",
+              "max-h-full max-w-full object-contain object-center transition-opacity duration-300",
               loaded ? "opacity-100" : "opacity-0",
             )}
           />
@@ -85,7 +88,7 @@ function MasonryTile({ project }: { project: Project }) {
             loading="lazy"
             onLoad={() => setLoaded(true)}
             className={cn(
-              "relative z-[1] h-full w-full object-contain transition-opacity duration-300",
+              "max-h-full max-w-full object-contain object-center transition-opacity duration-300",
               loaded ? "opacity-100" : "opacity-0",
             )}
           />
