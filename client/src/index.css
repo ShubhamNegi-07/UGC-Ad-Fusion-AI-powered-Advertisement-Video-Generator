@@ -482,27 +482,6 @@ html[data-surface="studio"] {
     transform: translateY(-4px);
   }
 
-  .hero-carousel-fade::before,
-  .hero-carousel-fade::after {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    bottom: 0.75rem;
-    z-index: 2;
-    width: 2.5rem;
-  }
-
-  .hero-carousel-fade::before {
-    left: 0;
-    background: linear-gradient(to right, var(--hero-band-bg, #020617) 15%, transparent);
-  }
-
-  .hero-carousel-fade::after {
-    right: 0;
-    background: linear-gradient(to left, var(--hero-band-bg, #020617) 15%, transparent);
-  }
-
   .hero-video-ring {
     animation: hero-ring-pulse 2.75s var(--motion-ease) infinite;
   }
