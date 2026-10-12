@@ -28,17 +28,21 @@ export function StudioMediaFrame({
   backdropSrc,
   className,
   children,
+  fit = "aspect",
 }: {
   aspectRatio: string;
   backdropSrc?: string | null;
   className?: string;
   children: ReactNode;
+  /** aspect = fixed ratio box; cell = fill parent height, media centered */
+  fit?: "aspect" | "cell";
 }) {
   return (
     <div
       className={cn(
         "relative overflow-hidden bg-[var(--studio-media-bg,#020617)]",
-        studioMediaAspect(aspectRatio),
+        fit === "aspect" && studioMediaAspect(aspectRatio),
+        fit === "cell" && "flex h-full min-h-[14rem] w-full items-center justify-center",
         className,
       )}
     >
