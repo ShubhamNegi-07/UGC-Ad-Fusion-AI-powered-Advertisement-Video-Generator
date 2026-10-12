@@ -157,7 +157,7 @@ export default function HeroOutputCarousel(_props?: { featuredPulse?: boolean })
           </Button>
         </div>
       </div>
-      <div className="hero-carousel-fade relative -mx-1 px-1">
+      <div className="relative overflow-x-clip">
         <div
           id="hero-output-carousel"
           ref={scroller}
