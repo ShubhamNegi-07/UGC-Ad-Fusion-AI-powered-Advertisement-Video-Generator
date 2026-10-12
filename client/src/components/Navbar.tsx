@@ -237,10 +237,10 @@ export default function Navbar() {
                 </>
               ) : (
                 <div className="hidden items-center gap-1.5 md:flex">
-                  <Button variant="ghost" size="sm" className="h-9" onClick={() => openSignIn()}>
+                  <Button framer={false} variant="ghost" size="sm" className="h-9 px-3" onClick={() => openSignIn()}>
                     Sign in
                   </Button>
-                  <Button variant="default" size="sm" className="h-9 px-4" onClick={() => openSignUp()}>
+                  <Button framer={false} variant="default" size="sm" className="h-9 px-4" onClick={() => openSignUp()}>
                     Get started
                   </Button>
                 </div>
@@ -334,10 +334,10 @@ export default function Navbar() {
               </ul>
               {!user && (
                 <div className="mt-2 grid grid-cols-2 gap-2 border-t border-border p-2 pt-4">
-                  <Button variant="outline" onClick={() => { setMenuOpen(false); openSignIn(); }}>
+                  <Button framer={false} variant="outline" onClick={() => { setMenuOpen(false); openSignIn(); }}>
                     Sign in
                   </Button>
-                  <Button variant="default" onClick={() => { setMenuOpen(false); openSignUp(); }}>
+                  <Button framer={false} variant="default" onClick={() => { setMenuOpen(false); openSignUp(); }}>
                     Get started
                   </Button>
                 </div>
