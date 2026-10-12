@@ -13,7 +13,7 @@ export interface ButtonProps
   asChild?: boolean;
   loading?: boolean;
   loadingText?: string;
-  /** Split Framer-style chrome (video reference). Default true for text CTAs. */
+  /** Split Framer-style chrome — only for large primary CTAs unless set explicitly. */
   framer?: boolean;
 }
 
@@ -37,8 +37,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isDisabled = disabled || loading;
     const isLink = variant === "link";
     const iconOnly = size === "icon" || size === "icon-sm";
-    const useFramer =
-      framer ?? (!isLink && !iconOnly);
+    const isHeroCta =
+      variant === "gradient" && (size === "lg" || size === "xl") && !iconOnly;
+    const useFramer = framer ?? (isHeroCta && !isLink);
 
     const face = (
       <ButtonFace loading={loading && !isLink} iconOnly={false}>
