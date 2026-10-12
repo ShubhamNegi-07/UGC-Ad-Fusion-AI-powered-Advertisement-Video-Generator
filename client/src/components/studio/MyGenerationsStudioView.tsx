@@ -46,7 +46,7 @@ export default function MyGenerationsStudioView({
   const stagger = reduceMotion ? studioStagger(0, 0) : studioStagger(0.04, 0.05);
 
   return (
-    <div id={rootId} className={cn("studio-shell studio-shell-bottom relative pt-nav", className)}>
+    <div id={rootId} className={cn("studio-shell studio-shell-bottom relative overflow-x-clip pt-nav", className)}>
       <div
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 bg-gradient-to-b from-brand/[0.08] to-transparent"
         aria-hidden
@@ -121,13 +121,13 @@ export default function MyGenerationsStudioView({
         />
       ) : (
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+          className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
           variants={stagger}
           initial="hidden"
           animate="show"
         >
           {generations.map((gen) => (
-            <motion.div key={gen.id} variants={enter} className="min-w-0">
+            <motion.div key={gen.id} variants={enter} className="flex min-w-0">
               <ProjectCard gen={gen} setGenerations={setGenerations} studio />
             </motion.div>
           ))}
