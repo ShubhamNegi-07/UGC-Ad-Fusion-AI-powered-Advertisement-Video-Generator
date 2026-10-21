@@ -77,8 +77,8 @@ export const createProject = async (req:Request, res: Response) => {
 
         const generatedImage = await uploadPublicMedia(generated.buffer, generated.mimeType, 'generated.png');
 
-            await prisma.project.update({
-                where: {id: project.id},
+            await prisma.project.updateMany({
+                where: {id: project.id, userId},
                 data: {
                     generatedImage,
                     isGenerating: false
@@ -91,8 +91,8 @@ export const createProject = async (req:Request, res: Response) => {
         const message = error?.message || 'Image generation failed';
         if(tempProjectId){
             // update project status and error message
-            await prisma.project.update({
-                where: {id: tempProjectId},
+            await prisma.project.updateMany({
+                where: {id: tempProjectId, userId},
                 data: {isGenerating: false, error: message}
             })
         }
@@ -134,7 +134,7 @@ export const createVideo = async (req:Request, res: Response) => {
             return res.status(401).json({ message: 'Insufficient credits' });
         }
 
-        const project = await prisma.project.findUnique({
+        const project = await prisma.project.findFirst({
             where: {id: projectId, userId}
         })
 
@@ -157,8 +157,8 @@ export const createVideo = async (req:Request, res: Response) => {
         });
         isCreditDeducted = true;
 
-        await prisma.project.update({
-            where: {id: projectId},
+        await prisma.project.updateMany({
+            where: {id: projectId, userId},
             data: {isGenerating: true, error: ''}
         })
 
@@ -178,8 +178,8 @@ export const createVideo = async (req:Request, res: Response) => {
 
         const videoUrl = await uploadPublicMedia(video.buffer, 'video/mp4', `${userId}-${Date.now()}.mp4`);
 
-        await prisma.project.update({
-            where: {id: project.id},
+        await prisma.project.updateMany({
+            where: {id: project.id, userId},
             data: {
                 generatedVideo: videoUrl,
                 isGenerating: false,
@@ -193,7 +193,7 @@ export const createVideo = async (req:Request, res: Response) => {
         const message = error?.message || 'Video generation failed';
 
         try {
-            await prisma.project.update({
+            await prisma.project.updateMany({
                 where: {id: projectId, userId},
                 data: {isGenerating: false, error: message}
             })
@@ -223,9 +223,25 @@ export const createVideo = async (req:Request, res: Response) => {
 export const getAllPublishedProjects = async (req:Request, res: Response) => {
     try {
 
-        const projects = await prisma.project.findMany({
-            where: {isPublished: true}
+        const rows = await prisma.project.findMany({
+            where: {isPublished: true},
+            orderBy: {createdAt: 'desc'},
+            select: {
+                id: true,
+                name: true,
+                productName: true,
+                productDescription: true,
+                aspectRatio: true,
+                targetLength: true,
+                generatedImage: true,
+                generatedVideo: true,
+                isGenerating: true,
+                isPublished: true,
+                createdAt: true,
+                updatedAt: true,
+            }
         })
+        const projects = rows.map((row) => ({ ...row, uploadedImages: [] as string[] }))
         res.json({projects})
 
     } catch (error:any) {
@@ -240,15 +256,12 @@ export const deleteProject = async (req:Request, res: Response) => {
         const { userId } = req.auth();
         const { projectId } = req.params;
         
-        const project = await prisma.project.findUnique({
+        const deleted = await prisma.project.deleteMany({
             where: {id: projectId, userId}
         })
-        if (!project){
+        if (deleted.count === 0){
             return res.status(404).json({ message: 'Project not found' });
         }
-        await prisma.project.delete({
-            where: {id: projectId}
-        })
         res.json({ message: 'Project deleted' });
 
     } catch (error:any) {

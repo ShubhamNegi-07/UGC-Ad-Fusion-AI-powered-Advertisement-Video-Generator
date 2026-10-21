@@ -7,6 +7,8 @@ const userRouter = express.Router();
 userRouter.get('/credits', protect, getUserCredits)
 userRouter.get('/projects', protect, getAllProjects)
 userRouter.get('/projects/:projectId', protect, getProjectById)
+userRouter.post('/publish/:projectId', protect, toggleProjectPublic)
+// Deprecated: kept temporarily for client compatibility until UI branch switches to POST
 userRouter.get('/publish/:projectId', protect, toggleProjectPublic)
 
 export default userRouter;

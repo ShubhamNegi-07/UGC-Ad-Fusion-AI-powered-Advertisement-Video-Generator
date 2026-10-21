@@ -43,7 +43,7 @@ export const getProjectById = async (req: Request, res: Response) =>{
         const {userId} = req.auth();
         const {projectId} = req.params;
 
-        const project = await prisma.project.findUnique({
+        const project = await prisma.project.findFirst({
             where: {id: projectId, userId}
         })
         
@@ -63,7 +63,7 @@ export const toggleProjectPublic = async (req: Request, res: Response) =>{
         const {userId} = req.auth();
         const {projectId} = req.params;
 
-        const project = await prisma.project.findUnique({
+        const project = await prisma.project.findFirst({
             where: {id: projectId, userId}
         })
 
@@ -73,11 +73,15 @@ export const toggleProjectPublic = async (req: Request, res: Response) =>{
             return res.status(404).json({message: 'image or video not generated' })
         }
         
-        await prisma.project.update({
-            where: { id: projectId },
-            data: {isPublished: !project.isPublished}
+        const nextPublished = !project.isPublished;
+        const updated = await prisma.project.updateMany({
+            where: { id: projectId, userId },
+            data: {isPublished: nextPublished}
         })
-        res. json({isPublished: !project.isPublished})
+        if (updated.count === 0) {
+            return res.status(404).json({message: 'Project not found' })
+        }
+        res.json({isPublished: nextPublished})
 
     } catch (error: any) {
             Sentry.captureException(error)
