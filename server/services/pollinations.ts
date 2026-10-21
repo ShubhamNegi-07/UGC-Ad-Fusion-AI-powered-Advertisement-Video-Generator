@@ -54,7 +54,7 @@ function aspectSize(aspectRatio: string) {
     return { width: 576, height: 1024 };
 }
 
-async function requestMedia(url: string, params: Record<string, string | number>, timeout: number) {
+async function requestMedia(url: string, params: Record<string, string | number | boolean>, timeout: number) {
     return axios.get(url, {
         params,
         headers: { Authorization: `Bearer ${assertPollinationsKey()}` },
