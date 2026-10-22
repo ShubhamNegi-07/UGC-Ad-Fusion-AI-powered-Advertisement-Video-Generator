@@ -15,7 +15,7 @@ if (!PUBLISHABLE_KEY) {
       style={{
         backgroundColor: "#07070a",
         color: "#f5f2eb",
-        fontFamily: '"Geist", sans-serif',
+        fontFamily: '"Plus Jakarta Sans", sans-serif',
       }}
     >
       <div

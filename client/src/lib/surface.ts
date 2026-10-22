@@ -13,7 +13,3 @@ export function getSurfaceMode(pathname: string): SurfaceMode {
   if (marketingPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return "marketing";
   return "marketing";
 }
-
-export function isStudioRoute(pathname: string): boolean {
-  return getSurfaceMode(pathname) === "studio";
-}

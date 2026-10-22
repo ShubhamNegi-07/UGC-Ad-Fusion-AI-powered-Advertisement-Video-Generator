@@ -9,9 +9,17 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("./assets/fonts/PlusJakartaSans-Variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
-  --font-sans: "Geist", sans-serif;
-  --font-mono: "Geist", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-mono: "Plus Jakarta Sans", sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -47,8 +55,9 @@
 
 /* Shared design tokens (both surfaces) */
 :root {
-  --font-geist-sans: "Geist", sans-serif;
-  --font-display: var(--font-geist-sans);
+  --font-geist-sans: "Plus Jakarta Sans", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-display: var(--font-jakarta);
 
   /* Monex-style electric blue accent */
   --brand: #2563eb;
@@ -224,22 +233,21 @@ html[data-surface="studio"] {
     scroll-behavior: auto;
     scroll-padding-top: calc(var(--nav-offset) + var(--safe-top));
     -webkit-text-size-adjust: 100%;
-    font-family: var(--font-geist-sans);
+    font-family: var(--font-jakarta);
   }
 
   html,
   body,
   #root {
     background-color: var(--background);
-    font-family: var(--font-geist-sans);
+    font-family: var(--font-jakarta);
   }
 
   body {
-    font-family: "Geist", sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     @apply font-sans antialiased text-foreground;
     font-size: var(--text-base);
-    font-feature-settings: "ss01", "cv11";
-    font-variation-settings: "wght" 400;
+    font-weight: 400;
     text-rendering: optimizeLegibility;
   }
 
@@ -357,8 +365,7 @@ html[data-surface="studio"] {
   }
 
   .studio-page-title {
-    font-family: var(--font-geist-sans);
-    @apply font-sans;
+    font-family: var(--font-display);
   }
 
   .container-marketing {
@@ -386,6 +393,10 @@ html[data-surface="studio"] {
 
   html[data-surface="marketing"] .nav-chrome-inner {
     @apply mx-auto h-14 w-full max-w-5xl rounded-full border border-white/10 bg-white/[0.04] px-4 shadow-[0_8px_32px_rgb(0_0_0_/_0.45)] backdrop-blur-xl sm:px-6;
+  }
+
+  html[data-surface="marketing"] .nav-chrome-inner.nav-marketing-light {
+    @apply border-border bg-background/95 text-foreground shadow-md backdrop-blur-none;
   }
 
   html[data-surface="marketing"] .nav-chrome.nav-on-hero {
@@ -416,6 +427,68 @@ html[data-surface="studio"] {
   @media (prefers-reduced-motion: reduce) {
     .workflow-step {
       animation: none;
+    }
+  }
+
+  @keyframes shimmer-sweep {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.06) 50%,
+      transparent 100%
+    );
+    animation: shimmer-sweep 1.75s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer::after {
+      animation: none;
+    }
+  }
+
+  @keyframes plus-grid-wave {
+    0%,
+    100% {
+      opacity: 0.04;
+      transform: scale(0.82);
+    }
+    40% {
+      opacity: 0.95;
+      transform: scale(1);
+    }
+    75% {
+      opacity: 0.08;
+      transform: scale(0.86);
+    }
+  }
+
+  .plus-grid-cell {
+    opacity: 0.04;
+    animation: plus-grid-wave 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: opacity, transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plus-grid-cell {
+      animation: none;
+      opacity: 0.55;
     }
   }
 
@@ -452,10 +525,10 @@ html[data-surface="studio"] {
   }
 
   .hero-display {
-    font-family: var(--font-geist-sans);
-    @apply font-sans font-medium;
+    font-family: var(--font-display);
+    @apply font-medium;
     font-size: clamp(2.125rem, 3.2vw + 1rem, 3.5rem);
-    line-height: 1.12;
+    line-height: 1.18;
     letter-spacing: -0.035em;
     max-width: 100%;
     overflow-wrap: break-word;
@@ -464,14 +537,13 @@ html[data-surface="studio"] {
   @media (max-width: 767px) {
     .hero-display {
       font-size: clamp(1.875rem, 7vw + 0.5rem, 2.5rem);
-      line-height: 1.14;
+      line-height: 1.2;
       letter-spacing: -0.03em;
     }
   }
 
   .marketing-display {
-    font-family: var(--font-geist-sans);
-    @apply font-sans;
+    font-family: var(--font-display);
   }
 
   .hero-carousel-tile {
@@ -681,11 +753,11 @@ html[data-surface="studio"] {
 
   .react-hot-toast,
   [data-radix-popper-content-wrapper] {
-    font-family: "Geist", sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
   }
 
   .font-sans,
   .font-mono {
-    font-family: "Geist", sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
   }
 }

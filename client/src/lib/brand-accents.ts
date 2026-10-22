@@ -21,10 +21,3 @@ export const brandAccents: Record<
     foreground: "#FFFFFF",
   },
 };
-
-export const defaultBrandAccent: BrandAccentId = "cobalt";
-
-export const lockedBrandAccent: BrandAccentId = "cobalt";
-
-/** @deprecated Use `cobalt` — alias for older styleguide state */
-export type LegacyBrandAccentId = "teal";

@@ -8,7 +8,7 @@ const surfaceBg = "#030712";
 const surfaceText = "#f8fafc";
 const surfaceMuted = "#94a3b8";
 const surfaceInput = "#0f172a";
-const geistStack = '"Geist", sans-serif';
+const geistStack = '"Plus Jakarta Sans", sans-serif';
 
 export function clerkAppearance(_surface: SurfaceMode): Appearance {
   return {
