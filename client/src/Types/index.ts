@@ -14,6 +14,7 @@ export interface User {
   id?: string;
   name?: string;
   email?: string;
+  image?: string;
 }
 
 export interface Project {
@@ -31,6 +32,10 @@ export interface Project {
   videoUrl?: string;
   isGenerating: boolean;
   isPublished: boolean;
+  publishedImage?: boolean;
+  publishedVideo?: boolean;
+  feedId?: string;
+  feedKind?: "image" | "video";
   error?: string;
   createdAt: Date | string;
   updatedAt?: Date | string;

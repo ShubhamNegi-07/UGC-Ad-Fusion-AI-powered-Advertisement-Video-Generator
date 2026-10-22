@@ -1,74 +1,24 @@
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowLeft01Icon,
-  ArrowRight01Icon,
-  PauseIcon,
-  PlayIcon,
-} from "@hugeicons/core-free-icons";
-import { assets, generatedImageMeta } from "@/assets/assets";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useRef, useState, type CSSProperties } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeroVideo from "@/components/marketing/HeroVideo";
-import { StudioMediaFrame } from "@/components/studio/StudioMediaFill";
+import { sampleOutputTiles } from "@/lib/sample-outputs";
 import { cn } from "@/lib/utils";
 
-/** No back-to-back duplicate stills (video posters already show those frames). */
-const tiles = [
-  {
-    type: "video" as const,
-    src: assets.generatedVideo1,
-    poster: assets.generated1,
-    label: "Sample talking ad from our generator",
-    metaKey: null,
-  },
-  {
-    type: "image" as const,
-    src: assets.generated2,
-    label: "Sample fused still output",
-    metaKey: "generated2" as const,
-  },
-  {
-    type: "image" as const,
-    src: assets.generated3,
-    label: "Sample fused still with sneakers",
-    metaKey: "generated3" as const,
-  },
-  {
-    type: "image" as const,
-    src: assets.generated4,
-    label: "Sample fused still output",
-    metaKey: "generated4" as const,
-  },
-  {
-    type: "video" as const,
-    src: assets.generatedVideo2,
-    poster: assets.generated2,
-    label: "Sample talking ad, alternate aspect",
-    metaKey: null,
-  },
-  {
-    type: "image" as const,
-    src: assets.generated1,
-    label: "Sample fused still — product and model",
-    metaKey: "generated1" as const,
-  },
-];
-
-const AUTO_MS = 6000;
-
-function subscribeReducedMotion(onStoreChange: () => void) {
-  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-  mq.addEventListener("change", onStoreChange);
-  return () => mq.removeEventListener("change", onStoreChange);
+function PeekArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={className}>
+      <path
+        d="M4.5 11.5L11.5 4.5M11.5 4.5H5.75M11.5 4.5V10.25"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
 
-function getReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-function CarouselImage({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) {
+function CarouselImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
   return (
     <>
@@ -76,13 +26,13 @@ function CarouselImage({ src, alt, width, height }: { src: string; alt: string; 
       <img
         src={src}
         alt={alt}
-        width={width}
-        height={height}
+        width={768}
+        height={1376}
         loading="lazy"
         decoding="async"
         onLoad={() => setLoaded(true)}
         className={cn(
-          "relative z-[1] max-h-full max-w-full object-contain transition-opacity duration-300",
+          "absolute inset-0 z-[1] h-full w-full object-cover object-[center_12%] transition-opacity duration-300",
           loaded ? "opacity-100" : "opacity-0",
         )}
       />
@@ -92,96 +42,20 @@ function CarouselImage({ src, alt, width, height }: { src: string; alt: string; 
 
 export default function HeroOutputCarousel(_props?: { featuredPulse?: boolean }) {
   const scroller = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
-  const reduceMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false);
-  const pauseRef = useRef(false);
-  const hoverRef = useRef(false);
-
-  const scrollBy = useCallback((dir: -1 | 1) => {
-    const el = scroller.current;
-    if (!el) return;
-    const tile = el.querySelector<HTMLElement>(".hero-carousel-tile");
-    const step = tile ? tile.offsetWidth + 20 : 300;
-    el.scrollBy({ left: dir * step, behavior: reduceMotion ? "auto" : "smooth" });
-  }, [reduceMotion]);
-
-  useEffect(() => {
-    pauseRef.current = paused || hoverRef.current || reduceMotion;
-  }, [paused, reduceMotion]);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const id = window.setInterval(() => {
-      if (pauseRef.current) return;
-      const el = scroller.current;
-      if (!el) return;
-      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 8;
-      if (atEnd) el.scrollTo({ left: 0, behavior: "smooth" });
-      else scrollBy(1);
-    }, AUTO_MS);
-    return () => clearInterval(id);
-  }, [reduceMotion, scrollBy]);
+  const [flipped, setFlipped] = useState<number | null>(null);
 
   return (
-    <div
-      className="relative mt-10 md:mt-14"
-      onMouseEnter={() => {
-        hoverRef.current = true;
-      }}
-      onMouseLeave={() => {
-        hoverRef.current = false;
-      }}
-      onFocusCapture={() => {
-        hoverRef.current = true;
-      }}
-      onBlurCapture={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) hoverRef.current = false;
-      }}
-    >
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-1">
-        <p id="hero-carousel-label" className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">
-          Our generated outputs
-        </p>
-        <div className="flex items-center gap-1">
-          {!reduceMotion && (
-            <Button
-              type="button"
-              framer={false}
-              variant="ghost"
-              size="icon-sm"
-              className="border border-white/10 bg-white/5 text-white hover:bg-white/10"
-              aria-label={paused ? "Play carousel" : "Pause carousel"}
-              aria-controls="hero-output-carousel"
-              onClick={() => setPaused((p) => !p)}
-            >
-              <HugeiconsIcon icon={paused ? PlayIcon : PauseIcon} size={16} strokeWidth={2} />
-            </Button>
-          )}
-          <Button
-            type="button"
-            framer={false}
-            variant="ghost"
-            size="icon-sm"
-            className="border border-white/10 bg-white/5 text-white hover:bg-white/10"
-            aria-label="Previous outputs"
-            onClick={() => scrollBy(-1)}
-          >
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={2} />
-          </Button>
-          <Button
-            type="button"
-            framer={false}
-            variant="ghost"
-            size="icon-sm"
-            className="border border-white/10 bg-white/5 text-white hover:bg-white/10"
-            aria-label="Next outputs"
-            onClick={() => scrollBy(1)}
-          >
-            <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={2} />
-          </Button>
-        </div>
+    <div className="relative mt-8 md:mt-10" onMouseLeave={() => setFlipped(null)}>
+      <div className="hero-peek-heading container-marketing mb-8 text-center md:mb-10">
+        <h2 id="hero-carousel-label">
+          Our generated
+          <br />
+          outputs
+        </h2>
+        <p>Hover to peek, click a card to flip it.</p>
       </div>
-      <div className="relative overflow-x-clip">
+
+      <div className="hero-peek-stage">
         <div
           id="hero-output-carousel"
           ref={scroller}
@@ -189,42 +63,54 @@ export default function HeroOutputCarousel(_props?: { featuredPulse?: boolean })
           aria-roledescription="carousel"
           aria-labelledby="hero-carousel-label"
           tabIndex={0}
-          className="hero-carousel flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 md:gap-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="hero-peek-scroller hero-carousel flex items-end justify-start gap-3 overflow-x-auto px-4 pb-8 pt-6 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-4 sm:px-6 md:pb-10 [&::-webkit-scrollbar]:hidden"
         >
-          {tiles.map((tile, i) => {
-            const meta = tile.metaKey ? generatedImageMeta[tile.metaKey] : null;
-            const w = meta?.width ?? 768;
-            const h = meta?.height ?? 1376;
-            const backdrop = tile.type === "video" ? tile.poster! : tile.src;
+          {sampleOutputTiles.map((tile, i) => {
+            const isFlipped = flipped === i;
             return (
               <figure
-                key={`${tile.type}-${tile.src}`}
-                className="hero-carousel-tile group relative w-[10.5rem] shrink-0 snap-center overflow-hidden rounded-2xl border border-white/12 bg-[#020617] shadow-lg ring-1 ring-white/5 transition-[border-color,box-shadow] hover:border-white/20 sm:w-[12rem] md:w-[13rem]"
+                key={`${tile.type}-${tile.src}-${tile.name}`}
+                className={cn("hero-peek-card hero-carousel-tile", isFlipped && "is-flipped")}
+                style={{ "--peek-i": i } as CSSProperties}
               >
-                <StudioMediaFrame aspectRatio="9:16" backdropSrc={backdrop}>
-                  {tile.type === "video" ? (
-                    <HeroVideo
-                      src={tile.src}
-                      poster={tile.poster!}
-                      className="max-h-full max-w-full object-contain"
-                      priority={i === 0}
-                    />
+                <button
+                  type="button"
+                  className="hero-peek-flip"
+                  aria-pressed={isFlipped}
+                  aria-label={
+                    isFlipped
+                      ? `Hide details for ${tile.name}`
+                      : `${tile.name}, ${tile.type === "video" ? "video" : "generated still"}. Click to flip.`
+                  }
+                  onClick={() => setFlipped((cur) => (cur === i ? null : i))}
+                >
+                  {isFlipped ? (
+                    <span className="hero-peek-face hero-peek-back">
+                      <span className="hero-peek-back-kicker">{tile.type === "video" ? "Video" : "Generated"}</span>
+                      <span className="hero-peek-back-title">{tile.name}</span>
+                      <span className="hero-peek-back-copy">{tile.blurb}</span>
+                    </span>
                   ) : (
-                    <CarouselImage src={tile.src} alt={tile.label} width={w} height={h} />
+                    <span className="hero-peek-face hero-peek-front">
+                      <span className="hero-peek-media">
+                        {tile.type === "video" ? (
+                          <HeroVideo
+                            src={tile.src}
+                            poster={tile.poster}
+                            className="absolute inset-0 h-full w-full object-cover object-[center_12%]"
+                            priority={tile.name === "Talking"}
+                          />
+                        ) : (
+                          <CarouselImage src={tile.src} alt={tile.blurb} />
+                        )}
+                        <span className="hero-peek-chip" aria-hidden>
+                          <PeekArrowIcon className="size-3.5 text-white" />
+                        </span>
+                      </span>
+                      <span className="hero-peek-name">{tile.name}</span>
+                    </span>
                   )}
-                </StudioMediaFrame>
-                <figcaption className="absolute inset-x-0 top-0 flex justify-between gap-1 p-2">
-                  <Badge className="gap-0.5 border-0 bg-black/55 text-[9px] text-white backdrop-blur-sm">
-                    {tile.type === "video" ? (
-                      <>
-                        <HugeiconsIcon icon={PlayIcon} size={10} strokeWidth={2} aria-hidden />
-                        Video
-                      </>
-                    ) : (
-                      "Generated"
-                    )}
-                  </Badge>
-                </figcaption>
+                </button>
               </figure>
             );
           })}

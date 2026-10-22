@@ -40,7 +40,7 @@ export default function HomePreview({ accent }: { accent?: BrandAccentId }) {
 
       <section className="mx-auto grid max-w-[1200px] gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:items-center lg:gap-12 lg:py-16">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">UGC Ad Fusion</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">UGC.AI</p>
           <h1 className="mt-4 text-[length:var(--text-display)] font-bold leading-[1.05] tracking-[-0.03em] text-foreground">
             Turn one product photo into a viral UGC ad
           </h1>

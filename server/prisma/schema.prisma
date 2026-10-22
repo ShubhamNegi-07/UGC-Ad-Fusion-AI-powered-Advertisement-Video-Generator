@@ -18,7 +18,7 @@ model User {
   email     String
   name      String
   image     String
-  credits   Int      @default(20)
+  credits   Int      @default(20) // hard cap 20 — refunds/webhooks must never exceed this
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -40,6 +40,8 @@ model Project {
   generatedVideo     String   @default("")
   isGenerating       Boolean  @default(false)
   isPublished        Boolean  @default(false)
+  publishedImage     Boolean  @default(false)
+  publishedVideo     Boolean  @default(false)
   error              String   @default("")
 
   createdAt DateTime @default(now())

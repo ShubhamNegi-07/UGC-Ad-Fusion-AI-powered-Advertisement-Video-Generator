@@ -81,7 +81,7 @@ export default function Navbar() {
         });
         if (!cancelled) {
           const parsed = Number(data?.credits);
-          setCredits(Number.isFinite(parsed) ? parsed : 0);
+          setCredits(Number.isFinite(parsed) ? Math.max(0, Math.min(20, parsed)) : 0);
         }
       } catch (error) {
         if (!cancelled) toast.error(errorMessage(error, "Could not load credits"));
@@ -143,7 +143,7 @@ export default function Navbar() {
             <Link
               to="/"
               className="flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="UGC Ad Fusion home"
+              aria-label="UGC.AI home"
             >
               <BrandLogo />
             </Link>

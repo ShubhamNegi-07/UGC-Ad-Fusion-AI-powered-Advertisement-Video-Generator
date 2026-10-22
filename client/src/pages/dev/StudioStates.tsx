@@ -418,6 +418,7 @@ export default function StudioStates() {
           onMediaReady={() => {}}
           onGenerateVideo={() => {}}
           onShare={() => {}}
+          onTogglePublish={() => {}}
           hideStickyVideoBar
         />
       </DevSection>
@@ -542,8 +543,8 @@ export default function StudioStates() {
           rootId="community-feed"
           loading={false}
           projects={[
-            { ...mockVideo(), id: "c1", productName: LONG_TITLE, isPublished: true },
-            { ...mockImageOnly(), id: "c2", productName: "Short title ad", isPublished: true },
+            { ...mockVideo(), id: "c1", productName: LONG_TITLE, isPublished: true, user: { name: "Aanya Shah", image: "" } },
+            { ...mockImageOnly(), id: "c2", productName: "Short title ad", isPublished: true, user: { name: "Kabir Mehta", image: "" } },
           ]}
           setProjects={() => {}}
         />

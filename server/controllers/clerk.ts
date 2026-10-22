@@ -47,31 +47,16 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
             case "paymentAttempt.updated": {
                 if((data.charge_type === "recurring" || data.charge_type ===
                 "checkout") && data.status === "paid"){
-                    const credits = {pro: 80, premium: 240,}
                     const clerkUserId = data?.payer?.user_id;
-                    const planId: keyof typeof credits = data?.subscription_items?.
-                    [0]?.plan?.slug;
-
-                    if(planId !== "pro" && planId !== "premium"){
-                        return res.status(400).json({message: "Invalid plan"})
-                    }
                     if (!clerkUserId || typeof clerkUserId !== "string") {
                         return res.status(400).json({ message: "Missing payer user id" });
                     }
 
                     const paymentEventKey = eventKey || `payment:${data.id || clerkUserId}`;
-                    await prisma.$transaction(async (tx) => {
-                        await tx.processedWebhookEvent.create({
-                            data: { id: paymentEventKey, type },
-                        });
-                        await tx.user.updateMany({
-                            where: { id: clerkUserId },
-                            data: {
-                                credits: { increment: credits[planId] },
-                            },
-                        });
+                    await prisma.processedWebhookEvent.create({
+                        data: { id: paymentEventKey, type },
                     });
-                    return res.json({ message: "Webhook Received : " + type });
+                    return res.json({ message: "Paid credit packs are not enabled. Balance stays capped at 20." });
                 }
                 break;
             }

@@ -7,7 +7,7 @@ import type { Dispatch, SetStateAction } from "react";
 import ProjectCard from "@/components/ProjectCard";
 import StudioPageHero from "@/components/studio/StudioPageHero";
 import { Button } from "@/components/ui/button";
-import { GridSkeleton } from "@/components/ui/skeleton";
+import { MyGenerationsGridSkeleton } from "@/components/ui/page-skeletons";
 import { EmptyState } from "@/components/ui/empty-state";
 import { studioReveal, studioStagger } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
@@ -96,7 +96,7 @@ export default function MyGenerationsStudioView({
       )}
 
       {loading ? (
-        <GridSkeleton layout="studio-grid" count={8} />
+        <MyGenerationsGridSkeleton count={6} />
       ) : !signedIn ? (
         <EmptyState
           icon={FolderOpenIcon}

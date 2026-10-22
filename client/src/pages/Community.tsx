@@ -3,11 +3,12 @@ import toast from "react-hot-toast";
 import type { Project } from "@/Types";
 import api from "@/configs/axios";
 import CommunityStudioView from "@/components/studio/CommunityStudioView";
+import { withSampleCommunityProjects } from "@/lib/sample-outputs";
 import { readCachedCommunityProjects, writeCachedCommunityProjects } from "@/lib/studio-cache";
 import { errorMessage } from "@/lib/utils";
 
 export default function Community() {
-  const cachedOnMount = useRef(readCachedCommunityProjects()).current;
+  const cachedOnMount = useRef(withSampleCommunityProjects(readCachedCommunityProjects() ?? [])).current;
   const revalidateSilently = useRef(cachedOnMount !== null);
 
   const [projects, setProjects] = useState<Project[]>(cachedOnMount ?? []);
@@ -17,10 +18,11 @@ export default function Community() {
     try {
       if (!opts?.silent) setLoading(true);
       const { data } = await api.get("/api/project/published");
-      const list = (data.projects ?? []) as Project[];
+      const list = withSampleCommunityProjects((data.projects ?? []) as Project[]);
       setProjects(list);
       writeCachedCommunityProjects(list);
     } catch (error) {
+      setProjects((prev) => (prev.length > 0 ? prev : withSampleCommunityProjects([])));
       if (!opts?.silent) {
         toast.error(errorMessage(error, "Could not load community projects"));
       }

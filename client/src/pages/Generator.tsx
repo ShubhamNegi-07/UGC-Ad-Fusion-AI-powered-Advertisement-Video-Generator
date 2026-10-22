@@ -6,6 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { LockIcon } from "@hugeicons/core-free-icons";
 import api from "@/configs/axios";
 import GeneratorStudioView from "@/components/studio/GeneratorStudioView";
+import { writeCachedProject } from "@/lib/studio-cache";
 import { errorMessage } from "@/lib/utils";
 
 export default function Generator() {
@@ -44,23 +45,48 @@ export default function Generator() {
 
     try {
       setIsGenerating(true);
+      const token = await getToken();
+      const { data } = await api.post(
+        "/api/project/create",
+        {
+          name: name.trim(),
+          productName: productName.trim(),
+          productDescription: productDescription.trim(),
+          userPrompt: userPrompt.trim(),
+          aspectRatio,
+        },
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 20000 },
+      );
+
+      if (!data.projectId) {
+        throw new Error(data.message || "Generation did not start");
+      }
+
+      writeCachedProject({
+        id: data.projectId,
+        name: name.trim(),
+        productName: productName.trim(),
+        productDescription: productDescription.trim(),
+        userPrompt: userPrompt.trim(),
+        aspectRatio,
+        isGenerating: true,
+        isPublished: false,
+        publishedImage: false,
+        publishedVideo: false,
+        uploadedImages: [],
+        createdAt: new Date().toISOString(),
+      });
+      navigate(`/result/${data.projectId}`);
+
       const formData = new FormData();
-      formData.append("name", name.trim());
-      formData.append("productName", productName.trim());
-      formData.append("productDescription", productDescription.trim());
-      formData.append("userPrompt", userPrompt.trim());
-      formData.append("aspectRatio", aspectRatio);
       formData.append("images", productImage as File);
       formData.append("images", modelImage as File);
-
-      const token = await getToken();
-      const { data } = await api.post("/api/project/create", formData, {
+      void api.post(`/api/project/${data.projectId}/start-image`, formData, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 180000,
+      }).catch((error) => {
+        toast.error(errorMessage(error, "Generation failed"));
       });
-
-      toast.success(data.message || "Image generated");
-      navigate(`/result/${data.projectId}`);
     } catch (error) {
       setIsGenerating(false);
       toast.error(errorMessage(error, "Generation failed"));

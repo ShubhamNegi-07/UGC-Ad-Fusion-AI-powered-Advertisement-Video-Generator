@@ -68,7 +68,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             child.props.className,
           ),
         },
-        face,
+        <ButtonFace loading={loading && !isLink} iconOnly={false}>
+          {loading && !isLink ? (loadingText ?? child.props.children) : child.props.children}
+        </ButtonFace>,
       );
     } else {
       content = face;

@@ -13,7 +13,7 @@ export default function StudioPageHero({ eyebrow, title, description, actions, c
   return (
     <header
       className={cn(
-        "surface-panel relative mb-8 overflow-hidden rounded-2xl border border-white/10 p-6 md:mb-10 md:p-8",
+        "surface-panel relative mb-6 overflow-hidden rounded-2xl border border-white/10 p-4 sm:p-6 md:mb-10 md:p-8",
         className,
       )}
     >
@@ -27,7 +27,7 @@ export default function StudioPageHero({ eyebrow, title, description, actions, c
             className={cn(
               "studio-page-title font-semibold tracking-tight text-foreground",
               eyebrow ? "mt-2" : "",
-              "text-2xl md:text-3xl",
+              "text-xl sm:text-2xl md:text-3xl",
             )}
           >
             {title}
@@ -36,7 +36,11 @@ export default function StudioPageHero({ eyebrow, title, description, actions, c
             <p className="mt-3 max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">{description}</p>
           ) : null}
         </div>
-        {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+            {actions}
+          </div>
+        ) : null}
       </div>
     </header>
   );

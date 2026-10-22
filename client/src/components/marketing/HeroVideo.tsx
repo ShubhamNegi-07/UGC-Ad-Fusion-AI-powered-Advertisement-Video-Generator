@@ -9,30 +9,31 @@ type HeroVideoProps = {
 
 export default function HeroVideo({ src, poster, className, priority = false }: HeroVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
-  const [canPlay, setCanPlay] = useState(false);
+  const [canPlay, setCanPlay] = useState(priority);
 
   useEffect(() => {
-    const mqMobile = window.matchMedia("(max-width: 767px)");
     const mqMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mqMobile.matches || mqMotion.matches) return;
+    if (mqMotion.matches) return;
 
     const el = ref.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setCanPlay(true);
-          void el.play().catch(() => {});
-        } else {
-          el.pause();
-        }
+        setCanPlay(entry.isIntersecting);
+        if (!entry.isIntersecting) el.pause();
       },
-      { threshold: 0.35 },
+      { threshold: 0.2 },
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !canPlay) return;
+    void el.play().catch(() => {});
+  }, [canPlay, src]);
 
   return (
     <video
@@ -43,7 +44,8 @@ export default function HeroVideo({ src, poster, className, priority = false }: 
       muted
       loop
       playsInline
-      preload={priority ? "metadata" : "none"}
+      autoPlay
+      preload={priority || canPlay ? "auto" : "none"}
     />
   );
 }

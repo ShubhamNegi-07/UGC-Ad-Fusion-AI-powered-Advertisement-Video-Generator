@@ -1,6 +1,5 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar";
@@ -8,8 +7,9 @@ import Footer from "@/components/Footer";
 import SoftBackdrop from "@/components/SoftBackdrop";
 import ScrollRoot from "@/components/ScrollRoot";
 import PageTransition from "@/components/PageTransition";
+import RouteErrorBoundary from "@/components/RouteErrorBoundary";
 import Home from "@/pages/Home";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageRouteSkeleton } from "@/components/ui/page-skeletons";
 
 const Generator = lazy(() => import("@/pages/Generator"));
 const Result = lazy(() => import("@/pages/Result"));
@@ -23,27 +23,14 @@ const DevStudioStates = import.meta.env.DEV ? lazy(() => import("@/pages/dev/Stu
 
 const studioRoutes = ["/generate", "/result", "/my-generations", "/community"];
 
-function RouteFallback() {
-  return (
-    <div className="container-marketing min-h-[60vh] space-y-6 pb-16 pt-nav" aria-busy="true" aria-label="Loading page">
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-24 rounded-full" />
-        <Skeleton className="h-9 w-72 max-w-full rounded-lg" />
-        <Skeleton className="h-4 w-96 max-w-full rounded-md" />
-      </div>
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Skeleton className="h-72 w-full rounded-[var(--radius-xl)]" />
-        <Skeleton className="h-72 w-full rounded-[var(--radius-xl)]" />
-      </div>
-    </div>
-  );
-}
-
 function LazyPage({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
   return (
-    <PageTransition>
-      <Suspense fallback={<RouteFallback />}>{children}</Suspense>
-    </PageTransition>
+    <RouteErrorBoundary>
+      <PageTransition>
+        <Suspense fallback={<PageRouteSkeleton pathname={pathname} />}>{children}</Suspense>
+      </PageTransition>
+    </RouteErrorBoundary>
   );
 }
 
@@ -94,10 +81,9 @@ export default function App() {
           Skip to content
         </a>
         <Navbar />
-        <main id="main" className="relative z-0">
-          <AnimatePresence mode="wait" initial={false}>
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+        <main id="main" className="relative z-[1]">
+          <Routes location={location}>
+              <Route path="/" element={<RouteErrorBoundary><PageTransition><Home /></PageTransition></RouteErrorBoundary>} />
               <Route path="/generate" element={<LazyPage><Generator /></LazyPage>} />
               <Route path="/result/:projectId" element={<LazyPage><Result /></LazyPage>} />
               <Route path="/my-generations" element={<LazyPage><MyGenerations /></LazyPage>} />
@@ -126,7 +112,6 @@ export default function App() {
               )}
               <Route path="*" element={<LazyPage><NotFound /></LazyPage>} />
             </Routes>
-          </AnimatePresence>
         </main>
         {!hideFooter && <Footer />}
       </TooltipProvider>

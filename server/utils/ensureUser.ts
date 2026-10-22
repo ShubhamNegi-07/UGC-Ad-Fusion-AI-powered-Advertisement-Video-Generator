@@ -1,11 +1,12 @@
 import { clerkClient } from '@clerk/express';
 import { prisma } from '../configs/prisma.js';
+import { clampUserCredits } from './credits.js';
 
 export async function ensureUser(userId: string) {
     const existing = await prisma.user.findUnique({
         where: { id: userId },
     });
-    if (existing) return existing;
+    if (existing) return clampUserCredits(existing);
 
     const clerkUser = await clerkClient.users.getUser(userId);
     const email = clerkUser.emailAddresses.find((item) => item.id === clerkUser.primaryEmailAddressId)?.emailAddress

@@ -1,7 +1,7 @@
 import express from 'express';
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
-import { createProject, createVideo, deleteProject,
-getAllPublishedProjects, regenerateImage } from '../controllers/projectController.js';
+import { createProject, createVideo, deleteProject, downloadPublishedMedia,
+getAllPublishedProjects, regenerateImage, startImageGeneration } from '../controllers/projectController.js';
 import { protect } from '../middlewares/auth.js';
 import { uploadProjectImages } from '../configs/multer.js';
 
@@ -37,10 +37,21 @@ const createVideoLimiter = rateLimit({
     message: { message: 'Too many video generation requests. Please wait 15 minutes before trying again.' },
 });
 
-projectRouter.post('/create', protect, createProjectLimiter, uploadProjectImages, createProject)
+projectRouter.post('/create', protect, createProjectLimiter, createProject)
+projectRouter.post('/:projectId/start-image', protect, createProjectLimiter, uploadProjectImages, startImageGeneration)
 projectRouter.post('/regenerate-image', protect, createProjectLimiter, regenerateImage)
 projectRouter.post('/video', protect, createVideoLimiter, createVideo)
+const downloadLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 40,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    keyGenerator: userOrIpKey,
+    message: { message: 'Too many downloads. Please wait a few minutes.' },
+});
+
 projectRouter.get('/published', getAllPublishedProjects)
+projectRouter.get('/download', downloadLimiter, downloadPublishedMedia)
 projectRouter.delete('/:projectId', protect, deleteProject)
 
 export default projectRouter

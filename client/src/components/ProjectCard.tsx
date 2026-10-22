@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp, studioReveal } from "@/components/ui/motion";
+import { downloadMediaFile, fileSlug } from "@/lib/download";
+import { applyPublishFlags, isStillPublished, isVideoPublished, type PublishMedia } from "@/lib/publish";
 import { writeCachedProject } from "@/lib/studio-cache";
 import { cn, errorMessage, formatDate } from "@/lib/utils";
 
@@ -97,13 +99,18 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
   const { getToken } = useAuth();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [publishing, setPublishing] = useState(false);
+  const [publishingMedia, setPublishingMedia] = useState<PublishMedia | null>(null);
   const [mediaLoaded, setMediaLoaded] = useState(false);
   const [mediaInView, setMediaInView] = useState(false);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const hasMedia = Boolean(gen.generatedImage || gen.generatedVideo);
+  const hasImage = Boolean(gen.generatedImage);
+  const hasVideo = Boolean(gen.generatedVideo || gen.videoUrl);
+  const hasMedia = hasImage || hasVideo;
+  const stillPublished = isStillPublished(gen);
+  const videoPublished = isVideoPublished(gen);
+  const anyPublished = stillPublished || videoPublished;
 
   useEffect(() => {
     if (!studio || !gen.generatedVideo) return;
@@ -138,28 +145,37 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
     }
   };
 
-  const togglePublish = async () => {
+  const togglePublish = async (media: PublishMedia) => {
     try {
-      setPublishing(true);
+      setPublishingMedia(media);
       const token = await getToken();
       const { data } = await api.post(
         `/api/user/publish/${gen.id}`,
-        {},
+        { media },
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setGenerations((prev) =>
         prev.map((item) => {
           if (item.id !== gen.id) return item;
-          const next = { ...item, isPublished: data.isPublished };
+          const next = applyPublishFlags(item, data);
           writeCachedProject(next);
           return next;
         }),
       );
-      toast.success(data.isPublished ? "Published to community" : "Removed from community");
+      const nowOn = media === "image" ? data.publishedImage : data.publishedVideo;
+      toast.success(
+        nowOn
+          ? media === "image"
+            ? "Image published to community"
+            : "Video published to community"
+          : media === "image"
+            ? "Image removed from community"
+            : "Video removed from community",
+      );
     } catch (error) {
       toast.error(errorMessage(error, "Could not update project"));
     } finally {
-      setPublishing(false);
+      setPublishingMedia(null);
     }
   };
 
@@ -187,10 +203,10 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
             Generating
           </Badge>
         )}
-        {gen.isPublished && (
+        {anyPublished && (
           <Badge variant="success">
             <HugeiconsIcon icon={GlobalIcon} />
-            Published
+            {stillPublished && videoPublished ? "Image + video" : stillPublished ? "Image published" : "Video published"}
           </Badge>
         )}
         {gen.generatedVideo && (
@@ -236,7 +252,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="none"
                 width={768}
                 height={1376}
                 onLoadedMetadata={() => setMediaLoaded(true)}
@@ -276,7 +292,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="none"
                 width={768}
                 height={1376}
                 onLoadedMetadata={() => setMediaLoaded(true)}
@@ -318,7 +334,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
 
         {!studio && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />}
 
-        {!forCommunity && (
+        {!forCommunity && !studio && (
           <div
             className="absolute right-2 top-2 z-20 sm:right-2.5 sm:top-2.5 max-sm:opacity-100"
           >
@@ -344,19 +360,29 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="z-[110]">
                 {gen.generatedImage && (
-                  <DropdownMenuItem asChild>
-                    <a href={gen.generatedImage} download target="_blank" rel="noreferrer">
-                      <HugeiconsIcon icon={Image02Icon} />
-                      Download image
-                    </a>
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      void downloadMediaFile(
+                        gen.generatedImage,
+                        `${fileSlug(gen.productName || gen.name || "ad")}-image.jpg`,
+                      ).catch(() => toast.error("Could not download this file"))
+                    }
+                  >
+                    <HugeiconsIcon icon={Image02Icon} />
+                    Download image
                   </DropdownMenuItem>
                 )}
                 {gen.generatedVideo && (
-                  <DropdownMenuItem asChild>
-                    <a href={gen.generatedVideo} download target="_blank" rel="noreferrer">
-                      <HugeiconsIcon icon={Video02Icon} />
-                      Download video
-                    </a>
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      void downloadMediaFile(
+                        gen.generatedVideo,
+                        `${fileSlug(gen.productName || gen.name || "ad")}-video.mp4`,
+                      ).catch(() => toast.error("Could not download this file"))
+                    }
+                  >
+                    <HugeiconsIcon icon={Video02Icon} />
+                    Download video
                   </DropdownMenuItem>
                 )}
                 {hasMedia && (
@@ -418,7 +444,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
 
         {!forCommunity && (
           <div className="mt-4 space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+            <div className={cn("grid gap-2", hasImage && hasVideo ? "grid-cols-1" : "grid-cols-2")}>
               <Button
                 framer={false}
                 variant="outline"
@@ -429,20 +455,52 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
                 <HugeiconsIcon icon={Link01Icon} size={14} />
                 Open
               </Button>
-              <Button
-                framer={false}
-                variant={gen.isPublished ? "secondary" : "gradient"}
-                size="sm"
-                className="min-h-11"
-                loading={publishing}
-                loadingText={gen.isPublished ? "Unpublishing" : "Publishing"}
-                disabled={!hasMedia}
-                onClick={togglePublish}
-              >
-                <HugeiconsIcon icon={gen.isPublished ? LockIcon : GlobalIcon} size={14} />
-                {gen.isPublished ? "Unpublish" : "Publish"}
-              </Button>
+              {hasImage && hasVideo ? null : (
+                <Button
+                  framer={false}
+                  variant={(hasVideo ? videoPublished : stillPublished) ? "secondary" : "gradient"}
+                  size="sm"
+                  className="min-h-11"
+                  loading={publishingMedia !== null}
+                  loadingText={(hasVideo ? videoPublished : stillPublished) ? "Unpublishing" : "Publishing"}
+                  disabled={!hasMedia || publishingMedia !== null}
+                  onClick={() => void togglePublish(hasVideo ? "video" : "image")}
+                >
+                  <HugeiconsIcon icon={(hasVideo ? videoPublished : stillPublished) ? LockIcon : GlobalIcon} size={14} />
+                  {(hasVideo ? videoPublished : stillPublished) ? "Unpublish" : "Publish"}
+                </Button>
+              )}
             </div>
+            {hasImage && hasVideo ? (
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  framer={false}
+                  variant={stillPublished ? "secondary" : "gradient"}
+                  size="sm"
+                  className="min-h-11"
+                  loading={publishingMedia === "image"}
+                  loadingText={stillPublished ? "Removing image" : "Publishing image"}
+                  disabled={publishingMedia !== null}
+                  onClick={() => void togglePublish("image")}
+                >
+                  <HugeiconsIcon icon={stillPublished ? LockIcon : Image02Icon} size={14} />
+                  {stillPublished ? "Remove image" : "Publish image"}
+                </Button>
+                <Button
+                  framer={false}
+                  variant={videoPublished ? "secondary" : "gradient"}
+                  size="sm"
+                  className="min-h-11"
+                  loading={publishingMedia === "video"}
+                  loadingText={videoPublished ? "Unpublishing" : "Publishing"}
+                  disabled={publishingMedia !== null}
+                  onClick={() => void togglePublish("video")}
+                >
+                  <HugeiconsIcon icon={videoPublished ? LockIcon : Video02Icon} size={14} />
+                  {videoPublished ? "Remove video" : "Publish video"}
+                </Button>
+              </div>
+            ) : null}
             {studio && (
               <Button
                 framer={false}
@@ -460,11 +518,19 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
 
         {forCommunity && hasMedia && (
           <div className="mt-4 flex gap-2">
-            <Button asChild variant="outline" size="sm" className="min-h-11 flex-1">
-              <a href={gen.generatedVideo || gen.generatedImage} download target="_blank" rel="noreferrer">
-                <HugeiconsIcon icon={Download01Icon} size={14} />
-                Download
-              </a>
+            <Button
+              variant="outline"
+              size="sm"
+              className="min-h-11 flex-1"
+              onClick={() =>
+                void downloadMediaFile(
+                  gen.generatedVideo || gen.generatedImage,
+                  `${fileSlug(gen.productName || gen.name || "ad")}${gen.generatedVideo ? ".mp4" : ".jpg"}`,
+                ).catch(() => toast.error("Could not download this file"))
+              }
+            >
+              <HugeiconsIcon icon={Download01Icon} size={14} />
+              Download
             </Button>
             <Button variant="ghost" size="icon-sm" className="size-11 min-h-[44px] min-w-[44px]" aria-label="Share" onClick={() => void shareProject(gen)}>
               <HugeiconsIcon icon={Share08Icon} size={15} />

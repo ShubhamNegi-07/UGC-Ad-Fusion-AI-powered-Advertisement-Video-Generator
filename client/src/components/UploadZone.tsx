@@ -90,8 +90,7 @@ export default function UploadZone({ id, label, hint, file, onClear, onFile, dis
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "group relative w-full min-h-[11rem] cursor-pointer overflow-hidden rounded-[var(--radius-lg)] border border-dashed transition-[border-color,background-color,box-shadow] duration-200 outline-none sm:min-h-[12rem]",
-          studio ? "aspect-square" : "aspect-square",
+          "group relative aspect-square w-full min-h-0 cursor-pointer overflow-hidden rounded-[var(--radius-lg)] border border-dashed transition-[border-color,background-color,box-shadow] duration-200 outline-none",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           studio
             ? file
@@ -183,13 +182,13 @@ export default function UploadZone({ id, label, hint, file, onClear, onFile, dis
               initial={studio ? "hidden" : { opacity: 0 }}
               animate={studio ? "show" : { opacity: 1 }}
               exit={{ opacity: studio ? 1 : 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center"
+              className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-2 text-center sm:gap-3 sm:p-4"
             >
               <motion.span
                 animate={dragging ? { scale: 1.04, y: -2 } : { scale: 1, y: 0 }}
                 transition={spring}
                 className={cn(
-                  "flex size-12 items-center justify-center rounded-[var(--radius-md)] border transition-colors",
+                  "flex size-9 items-center justify-center rounded-[var(--radius-md)] border transition-colors sm:size-12",
                   studio
                     ? "border-border bg-muted text-brand"
                     : "border-white/10 bg-white/[0.05] text-zinc-300 group-hover:border-white/20",
@@ -198,10 +197,12 @@ export default function UploadZone({ id, label, hint, file, onClear, onFile, dis
                 <HugeiconsIcon icon={ImageUpload01Icon} size={22} strokeWidth={1.8} />
               </motion.span>
               <div>
-                <p className="text-sm font-medium">
-                  {dragging ? "Drop to upload" : "Click or drop image"}
+                <p className="text-xs font-medium sm:text-sm">
+                  {dragging ? "Drop to upload" : "Add image"}
                 </p>
-                <p className="mt-1 text-[11px] text-muted-foreground">JPG, PNG, WEBP · up to {MAX_MB} MB</p>
+                <p className="mt-0.5 hidden text-[11px] text-muted-foreground sm:mt-1 sm:block">
+                  JPG, PNG, WEBP · up to {MAX_MB} MB
+                </p>
               </div>
             </motion.div>
           )}

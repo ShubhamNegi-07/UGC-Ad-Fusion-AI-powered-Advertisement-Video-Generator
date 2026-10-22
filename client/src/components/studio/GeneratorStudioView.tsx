@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactNode } from "react";
+import { type FormEvent } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -16,10 +16,8 @@ import { Input, Textarea } from "@/components/ui/input";
 import { Label, FieldHint } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GenerationPlusGridOverlay } from "@/components/ui/plus-grid-loader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { studioReveal, studioStagger } from "@/components/ui/motion";
-import { useVisualViewportInset } from "@/hooks/useVisualViewportInset";
 import { cn } from "@/lib/utils";
 
 export const GENERATOR_FORM_ID = "generator-form";
@@ -96,15 +94,20 @@ function CreditsAndSubmit({
   return (
     <div
       className={cn(
-        compact ? "flex flex-col gap-3" : "flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between",
+        "flex w-full items-center gap-3",
+        compact ? "flex-row" : "flex-col sm:flex-row sm:justify-between",
       )}
     >
-      <div className="flex min-w-0 items-center gap-3 text-sm">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-border bg-muted text-brand">
-          <HugeiconsIcon icon={Coins01Icon} size={18} strokeWidth={2} aria-hidden />
-        </span>
+      <div className={cn("flex min-w-0 items-center text-sm", compact ? "shrink-0 gap-2" : "gap-3")}>
+        {!compact && (
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-border bg-muted text-brand">
+            <HugeiconsIcon icon={Coins01Icon} size={18} strokeWidth={2} aria-hidden />
+          </span>
+        )}
         <div className="min-w-0 leading-tight">
-          <p className="font-medium text-foreground">Costs 5 credits</p>
+          <p className={cn("font-medium text-foreground", compact && "whitespace-nowrap text-xs sm:text-sm")}>
+            {compact ? "5 credits" : "Costs 5 credits"}
+          </p>
           {!compact && (
             <p className="text-xs text-muted-foreground">
               {creditsHint ?? "Refunded automatically if the generation fails."}
@@ -113,14 +116,15 @@ function CreditsAndSubmit({
         </div>
       </div>
       {!isLoaded ? (
-        <Skeleton className="h-11 w-full rounded-[var(--radius-md)] sm:w-44" />
+        <Skeleton className={cn("h-11 rounded-[var(--radius-md)]", compact ? "min-w-0 flex-1" : "w-full sm:w-44")} />
       ) : (
         <Button
           type="submit"
           form={compact ? formId : undefined}
+          framer={false}
           variant="gradient"
           size="lg"
-          className="min-h-11 w-full sm:w-auto"
+          className={cn("min-h-11", compact ? "min-w-0 flex-1" : "w-full sm:w-auto")}
           loading={isGenerating}
           loadingText="Generating image…"
           disabled={signedIn && !isValid}
@@ -179,10 +183,9 @@ export default function GeneratorStudioView({
   creditsHint,
   className,
   rootId,
-  hideStickyBar,
+  hideStickyBar: _hideStickyBar,
   idPrefix = "",
 }: GeneratorStudioViewProps) {
-  useVisualViewportInset();
   const pid = (base: string) => `${idPrefix}${base}`;
   const formId = idPrefix ? `${idPrefix}${GENERATOR_FORM_ID}` : GENERATOR_FORM_ID;
   const creditsHintId = pid("generator-credits-hint");
@@ -190,29 +193,8 @@ export default function GeneratorStudioView({
   const enter = reduceMotion ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } } : studioReveal;
   const stagger = reduceMotion ? studioStagger(0, 0) : studioStagger(0.04, 0.05);
 
-  let stickyBar: ReactNode = null;
-  if (!hideStickyBar) {
-    stickyBar = (
-      <div
-        className="surface-panel studio-sticky-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border px-4 py-3 lg:hidden"
-        data-lenis-prevent
-      >
-        <CreditsAndSubmit
-          signedIn={signedIn}
-          isLoaded={isLoaded}
-          isValid={isValid}
-          isGenerating={isGenerating}
-          compact
-          creditsHint={creditsHint}
-          formId={formId}
-          creditsHintId={creditsHintId}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div id={rootId} className={cn("studio-shell studio-shell-bottom studio-scroll-pad relative pt-nav", className)}>
+    <div id={rootId} className={cn("studio-shell relative overflow-x-clip pb-16 pt-nav", className)}>
       <div
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-56 bg-gradient-to-b from-brand/[0.07] to-transparent"
         aria-hidden
@@ -221,52 +203,30 @@ export default function GeneratorStudioView({
         as="h1"
         studio
         align="left"
-        heading="Generate an in-context product image"
-        description="Upload your product and a model. We produce a photoreal still first, then you can turn it into a talking video on the result page."
-        className="mb-8 !text-left md:mb-10"
+        heading="Generate an image"
+        description="Upload a product and a model photo, then optionally turn the still into a talking video."
+        className="mb-4 !text-left md:mb-10"
       />
 
       {statusBanner && <StatusBanner banner={statusBanner} />}
-
-      {isGenerating && (
-        <div className="surface-panel mb-6 flex justify-center rounded-[var(--radius-xl)] p-3 sm:p-4">
-          <div
-            className={cn(
-              "relative mx-auto overflow-hidden rounded-[var(--radius-lg)] ring-1 ring-white/10",
-              aspectRatio === "9:16"
-                ? "w-full max-w-[min(100%,20rem)] aspect-[9/16]"
-                : aspectRatio === "1:1"
-                  ? "w-full max-w-sm aspect-square"
-                  : "w-full max-w-2xl aspect-video",
-            )}
-          >
-            <GenerationPlusGridOverlay
-              title="Creating your still image"
-              subtitle="Blending product and model with studio lighting…"
-              steps={["Uploading", "Generating", "Finalizing"]}
-              className="absolute inset-0 h-full w-full"
-            />
-          </div>
-        </div>
-      )}
 
       <motion.ol
         variants={stagger}
         initial="hidden"
         animate="show"
         aria-label="Steps"
-        className="mb-8 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-auto sm:mb-10 sm:max-w-3xl sm:grid sm:grid-cols-3 sm:gap-3 sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden"
+        className="mb-5 grid grid-cols-3 gap-2 sm:mx-auto sm:mb-10 sm:max-w-3xl sm:gap-3"
       >
         {steps.map((s) => (
           <motion.li
             key={s.n}
             variants={enter}
-            className="surface-panel flex min-w-[9.75rem] shrink-0 snap-start items-center gap-3 rounded-[var(--radius-lg)] px-3 py-3 sm:min-w-0 sm:px-4"
+            className="surface-panel flex min-w-0 items-center gap-2 rounded-[var(--radius-lg)] px-2 py-2 sm:gap-3 sm:px-4 sm:py-3"
           >
             <span className="font-mono text-[11px] text-muted-foreground">{s.n}</span>
             <div className="min-w-0 leading-tight">
-              <p className="truncate text-xs font-medium sm:text-sm">{s.title}</p>
-              <p className="truncate text-[10px] text-muted-foreground sm:text-[11px]">{s.desc}</p>
+              <p className="truncate text-[11px] font-medium sm:text-sm">{s.title}</p>
+              <p className="hidden truncate text-[10px] text-muted-foreground sm:block sm:text-[11px]">{s.desc}</p>
             </div>
           </motion.li>
         ))}
@@ -287,7 +247,7 @@ export default function GeneratorStudioView({
               <CardTitle>Source images</CardTitle>
               <CardDescription>Clear, well-lit photos give the best fusion.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-5 pb-6 sm:grid-cols-2 lg:grid-cols-1">
+            <CardContent className="grid grid-cols-2 items-start gap-3 pb-5 lg:grid-cols-1 lg:gap-5 lg:pb-6">
               <UploadZone
                 id={pid("product-image")}
                 label="Product image"
@@ -318,8 +278,8 @@ export default function GeneratorStudioView({
               <CardTitle>Details</CardTitle>
               <CardDescription>Tell the model what it is looking at.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-5 pb-6">
-              <div className="grid gap-5 sm:grid-cols-2">
+            <CardContent className="grid gap-4 pb-5 sm:gap-5 sm:pb-6">
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
                 <div className="grid gap-2">
                   <Label htmlFor={pid("name")}>Project name</Label>
                   <Input
@@ -379,7 +339,7 @@ export default function GeneratorStudioView({
                       key={r.value}
                       value={r.value}
                       aria-label={`${r.label} ${r.value}`}
-                      className="min-h-11 h-auto flex-col gap-1 py-2.5"
+                      className="h-auto min-h-10 flex-col gap-0.5 px-1 py-2 sm:min-h-11 sm:py-2.5"
                     >
                       <HugeiconsIcon icon={r.icon} size={18} strokeWidth={1.8} aria-hidden />
                       <span className="text-xs font-medium">{r.label}</span>
@@ -406,7 +366,7 @@ export default function GeneratorStudioView({
             </CardContent>
           </Card>
 
-          <motion.div variants={enter} className="surface-panel hidden rounded-[var(--radius-lg)] p-4 lg:block">
+          <motion.div variants={enter} className="surface-panel rounded-[var(--radius-lg)] p-4">
             <p id={creditsHintId} className="sr-only">
               Image generation costs five credits.
             </p>
@@ -422,8 +382,6 @@ export default function GeneratorStudioView({
           </motion.div>
         </motion.div>
       </motion.form>
-
-      {stickyBar}
     </div>
   );
 }

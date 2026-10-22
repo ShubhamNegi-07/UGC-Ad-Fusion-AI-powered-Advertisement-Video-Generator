@@ -9,6 +9,7 @@ const generated3 = "/generated/generated3.webp";
 const generated4 = "/generated/generated4.webp";
 const generatedVideo1 = "/videos/generatedVideo1.mp4";
 const generatedVideo2 = "/videos/generatedVideo2.mp4";
+const headphonesPoster = "/generated/headphones-poster.jpg";
 
 export const generatedImageMeta = {
   generated1: { width: 768, height: 1376 },
@@ -33,4 +34,5 @@ export const assets = {
   generated4,
   generatedVideo1,
   generatedVideo2,
+  headphonesPoster,
 };

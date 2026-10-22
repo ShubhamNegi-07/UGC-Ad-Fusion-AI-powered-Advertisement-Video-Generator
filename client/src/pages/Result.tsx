@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon } from "@hugeicons/core-free-icons";
+import { applyPublishFlags, type PublishMedia } from "@/lib/publish";
 import { readCachedProject, writeCachedProject } from "@/lib/studio-cache";
 import { errorMessage } from "@/lib/utils";
 
@@ -27,12 +28,13 @@ export default function Result() {
 
   const cachedOnMount = useRef(projectId ? readCachedProject(projectId) : null).current;
   const revalidateSilently = useRef(Boolean(cachedOnMount));
+  const errorToasted = useRef(false);
 
   const [project, setProject] = useState<Project | null>(cachedOnMount);
   const [loading, setLoading] = useState(!cachedOnMount);
   const [isGenerating, setIsGenerating] = useState(Boolean(cachedOnMount?.isGenerating));
   const [isRegeneratingImage, setIsRegeneratingImage] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishingMedia, setPublishingMedia] = useState<PublishMedia | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [mediaReady, setMediaReady] = useState(
@@ -61,6 +63,10 @@ export default function Result() {
           setIsGenerating(Boolean(next.isGenerating));
           if (next.generatedImage || resolvedVideo) {
             setMediaReady(true);
+          }
+          if (!next.isGenerating && next.error && !next.generatedImage && !errorToasted.current) {
+            errorToasted.current = true;
+            toast.error(next.error);
           }
         }
       } catch (error) {
@@ -159,33 +165,42 @@ export default function Result() {
 
   useEffect(() => {
     if (!user || !isGenerating) return;
-    const interval = setInterval(() => void fetchProject({ silent: true }), 10000);
+    const interval = setInterval(() => void fetchProject({ silent: true }), 4000);
     return () => clearInterval(interval);
   }, [user, isGenerating, fetchProject]);
 
   const mediaSrc = project?.videoUrl || project?.generatedVideo || project?.generatedImage;
 
-  const togglePublish = async () => {
+  const togglePublish = async (media: PublishMedia) => {
     if (!project?.id) return;
-    setIsPublishing(true);
+    setPublishingMedia(media);
     try {
       const token = await getToken();
       const { data } = await api.post(
         `/api/user/publish/${project.id}`,
-        {},
+        { media },
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setProject((prev) => {
         if (!prev) return prev;
-        const next = { ...prev, isPublished: data.isPublished };
+        const next = applyPublishFlags(prev, data);
         writeCachedProject(next);
         return next;
       });
-      toast.success(data.isPublished ? "Published to Community" : "Removed from Community");
+      const nowOn = media === "image" ? data.publishedImage : data.publishedVideo;
+      toast.success(
+        nowOn
+          ? media === "image"
+            ? "Image published to Community"
+            : "Video published to Community"
+          : media === "image"
+            ? "Image removed from Community"
+            : "Video removed from Community",
+      );
     } catch (error) {
       toast.error(errorMessage(error, "Could not update publish status"));
     } finally {
-      setIsPublishing(false);
+      setPublishingMedia(null);
     }
   };
 
@@ -233,7 +248,7 @@ export default function Result() {
         onGenerateVideo={handleGenerateVideo}
         onRegenerateImage={handleRegenerateImage}
         onShare={share}
-        isPublishing={isPublishing}
+        publishingMedia={publishingMedia}
         onTogglePublish={togglePublish}
         onDelete={project ? () => setDeleteOpen(true) : undefined}
       />

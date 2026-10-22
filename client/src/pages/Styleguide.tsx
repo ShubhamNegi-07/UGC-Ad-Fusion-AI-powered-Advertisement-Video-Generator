@@ -192,7 +192,7 @@ const matchesCreatify = [
 const differentCreatify = [
   "Accent: cobalt blue or crimson (not Creatify purple/lavender)",
   "Typography: Geist only (they use a distinct display sans)",
-  "Copy, logo, and all imagery from UGC Ad Fusion outputs",
+  "Copy, logo, and all imagery from UGC.AI outputs",
   "Hero collage uses our upload + still + 9:16 generated video",
   "Signature brand-ring pulse on hero video (our motion)",
   "Studio routes stay matte dark with same token scale",
@@ -249,7 +249,7 @@ export default function Styleguide() {
               />
             </div>
             <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">UGC Ad Fusion preview</p>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">UGC.AI preview</p>
               <HomePreview accent={accent} />
             </div>
           </div>

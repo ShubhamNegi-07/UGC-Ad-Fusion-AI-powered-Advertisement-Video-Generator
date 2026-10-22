@@ -62,8 +62,8 @@ export default function Title({
               : "text-balance font-semibold tracking-tight text-zinc-50",
             (studio || darkHero) && "studio-page-title",
             isPageTitle
-              ? "text-2xl leading-tight md:text-3xl lg:text-[2rem]"
-              : "text-3xl md:text-4xl lg:text-[2.75rem] lg:leading-[1.1]",
+              ? "text-xl leading-tight sm:text-2xl md:text-3xl lg:text-[2rem]"
+              : "text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] lg:leading-[1.1]",
           )}
         >
           {heading}
@@ -74,9 +74,10 @@ export default function Title({
           variants={enter}
           className={cn(
             marketing && !onDark
-              ? "mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-muted-foreground"
-              : "mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-zinc-400",
+              ? "mt-3 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-[15px]"
+              : "mt-3 max-w-xl text-pretty text-sm leading-relaxed text-zinc-400 sm:mt-4 sm:text-[15px]",
             align === "center" && "mx-auto",
+            studio && "hidden sm:block",
           )}
         >
           {description}

@@ -33,7 +33,7 @@ function GridSkeleton({
       >
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} className="surface-panel flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border">
-            <Skeleton className="h-[min(17.5rem,34dvh)] w-full rounded-none sm:h-[min(19rem,36dvh)]" />
+            <Skeleton className="aspect-[4/5] w-full rounded-none" />
             <div className="flex flex-1 flex-col justify-between space-y-3 p-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
@@ -41,9 +41,8 @@ function GridSkeleton({
                   <Skeleton className="h-5 w-12 rounded-full" />
                 </div>
                 <Skeleton className="h-3 w-1/3 rounded-md" />
-                <Skeleton className="h-3.5 w-5/6 rounded-md" />
               </div>
-              <div className="space-y-2 pt-2">
+              <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <Skeleton className="h-11 rounded-xl" />
                   <Skeleton className="h-11 rounded-xl" />
@@ -60,23 +59,24 @@ function GridSkeleton({
   if (layout === "community-grid") {
     return (
       <div
-        className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+        className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[repeat(auto-fill,minmax(16.5rem,1fr))] sm:gap-5"
         aria-hidden
         aria-busy="true"
       >
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="surface-panel flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border">
-            <Skeleton className="h-[min(17.5rem,34dvh)] w-full rounded-none sm:h-[min(19rem,36dvh)]" />
-            <div className="mt-auto space-y-2.5 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <Skeleton className="h-4 w-2/3 rounded-md" />
-                <Skeleton className="h-5 w-12 rounded-full" />
-              </div>
-              <Skeleton className="h-3 w-1/3 rounded-md" />
-              <Skeleton className="h-3.5 w-4/5 rounded-md" />
-              <div className="flex gap-2 pt-2">
-                <Skeleton className="h-9 flex-1 rounded-xl" />
-                <Skeleton className="h-9 flex-1 rounded-xl" />
+          <div key={i} className="surface-panel flex flex-col overflow-hidden rounded-[1.1rem] border border-white/8">
+            <div className="relative flex items-center justify-center bg-[var(--studio-media-bg,#070b12)] px-3 py-3">
+              <Skeleton className="mx-auto aspect-[9/16] w-full max-w-[min(100%,18rem)] rounded-lg" />
+            </div>
+            <div className="flex items-start gap-2 px-3.5 py-3">
+              <Skeleton className="mt-0.5 size-6 shrink-0 rounded-full" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-3.5 w-24 rounded-md" />
+                <Skeleton className="h-3 w-20 rounded-md" />
+                <div className="flex justify-between gap-2">
+                  <Skeleton className="h-3 w-16 rounded-md" />
+                  <Skeleton className="h-3 w-8 rounded-md" />
+                </div>
               </div>
             </div>
           </div>

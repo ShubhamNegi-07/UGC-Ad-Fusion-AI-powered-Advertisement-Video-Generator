@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { ResultPageSkeleton, ResultWorkspaceSkeleton } from "@/components/ui/page-skeletons";
 
 import { GenerationPlusGridOverlay } from "@/components/ui/plus-grid-loader";
 
@@ -41,6 +42,8 @@ import { studioReveal, studioStagger } from "@/components/ui/motion";
 
 import { useVisualViewportInset } from "@/hooks/useVisualViewportInset";
 
+import { downloadMediaFile } from "@/lib/download";
+import { isStillPublished, isVideoPublished, type PublishMedia } from "@/lib/publish";
 import { cn, formatDate } from "@/lib/utils";
 
 
@@ -50,37 +53,7 @@ const SHELL = "studio-shell studio-shell-bottom studio-scroll-pad relative overf
 
 
 export function ResultStudioSkeleton() {
-  return (
-    <div
-      className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_min(22rem,32vw)] xl:grid-cols-[minmax(0,1fr)_26rem]"
-      aria-hidden
-      aria-busy="true"
-    >
-      <div className="surface-panel flex w-full items-center justify-center rounded-[var(--radius-xl)] p-3 sm:p-4">
-        <Skeleton className="aspect-[9/16] w-full max-w-[min(100%,22rem)] rounded-[var(--radius-lg)]" />
-      </div>
-      <div className="surface-panel flex w-full flex-col gap-4 rounded-[var(--radius-xl)] p-5 sm:p-6">
-        <div className="space-y-2.5">
-          <Skeleton className="h-3.5 w-24 rounded-md" />
-          <Skeleton className="h-11 w-full rounded-xl" />
-        </div>
-        <div className="space-y-2.5">
-          <Skeleton className="h-3.5 w-28 rounded-md" />
-          <div className="grid grid-cols-2 gap-2">
-            <Skeleton className="h-10 rounded-[var(--radius-md)]" />
-            <Skeleton className="h-10 rounded-[var(--radius-md)]" />
-          </div>
-          <Skeleton className="h-11 w-full rounded-xl" />
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-3.5 w-16 rounded-md" />
-          <Skeleton className="h-11 w-full rounded-xl" />
-          <Skeleton className="h-11 w-full rounded-xl" />
-          <Skeleton className="h-11 w-full rounded-xl" />
-        </div>
-      </div>
-    </div>
-  );
+  return <ResultWorkspaceSkeleton />;
 }
 
 export type ResultStudioViewProps = {
@@ -93,8 +66,8 @@ export type ResultStudioViewProps = {
   onGenerateVideo: () => void;
   onRegenerateImage?: () => void;
   onShare: () => void;
-  isPublishing?: boolean;
-  onTogglePublish?: () => void;
+  publishingMedia?: PublishMedia | null;
+  onTogglePublish?: (media: PublishMedia) => void;
   onDelete?: () => void;
   rootId?: string;
   className?: string;
@@ -107,7 +80,8 @@ function resultHeroDescription(project: Project) {
 
   const parts = [formatDate(project.createdAt), project.aspectRatio];
 
-  if (project.isPublished) parts.push("Published to Community");
+  if (isStillPublished(project)) parts.push("Image published");
+  if (isVideoPublished(project)) parts.push("Video published");
 
   return parts.join(" · ");
 
@@ -171,21 +145,11 @@ function ResultBriefStrip({ project }: { project: Project }) {
 
 type ActiveMediaView = "image" | "video";
 
-async function downloadMediaFile(url: string | undefined, filename: string) {
-  if (!url) return;
+async function saveMediaFile(url: string | undefined, filename: string) {
   try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = objectUrl;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    await downloadMediaFile(url, filename);
   } catch {
-    window.open(url, "_blank", "noopener,noreferrer");
+    // Keep the result page usable if the host blocks fetch.
   }
 }
 
@@ -224,12 +188,20 @@ function ResultActionsAside({
 
   return (
     <aside className="surface-panel flex w-full min-w-0 flex-col gap-4 self-start rounded-[var(--radius-xl)] p-5 sm:p-6">
-      {onRegenerateImage && (
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Still image</p>
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Still image</p>
+        {!hasImage ? (
+          <Button asChild framer={false} variant="gradient" size="default" className="min-h-11 w-full">
+            <Link to="/generate">
+              <HugeiconsIcon icon={AiMagicIcon} size={16} strokeWidth={2} aria-hidden />
+              Go to Generate
+            </Link>
+          </Button>
+        ) : null}
+        {onRegenerateImage && (
           <Button
             framer={false}
-            variant="outline"
+            variant={hasImage ? "outline" : "outline"}
             size="default"
             className="min-h-11 w-full"
             onClick={onRegenerateImage}
@@ -238,10 +210,10 @@ function ResultActionsAside({
             disabled={anyBusy}
           >
             <HugeiconsIcon icon={RefreshIcon} size={16} strokeWidth={2} aria-hidden />
-            {hasImage ? "Regenerate image (5 credits)" : "Generate image (5 credits)"}
+            {hasImage ? "Regenerate image (5 credits)" : "Try again (5 credits)"}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
       {showTalkingOnSidebar ? (
         <div className={cn("space-y-2", showStickyVideo && "hidden lg:block")}>
@@ -286,7 +258,7 @@ function ResultActionsAside({
             disabled={!hasImage}
             aria-label="Download image"
             title="Download image"
-            onClick={() => void downloadMediaFile(project.generatedImage, `${slug}-image.png`)}
+            onClick={() => void saveMediaFile(project.generatedImage, `${slug}-image.png`)}
           >
             <HugeiconsIcon icon={Download01Icon} size={15} aria-hidden />
           </Button>
@@ -319,7 +291,7 @@ function ResultActionsAside({
             disabled={!hasVideo}
             aria-label="Download video"
             title="Download video"
-            onClick={() => void downloadMediaFile(videoUrl, `${slug}-video.mp4`)}
+            onClick={() => void saveMediaFile(videoUrl, `${slug}-video.mp4`)}
           >
             <HugeiconsIcon icon={Download01Icon} size={15} aria-hidden />
           </Button>
@@ -459,25 +431,6 @@ function VideoGenerateBlock({
 
           </div>
 
-          {/pollen|top-up/i.test(projectError) && (
-
-            <a
-
-              href="https://enter.pollinations.ai/top-up"
-
-              target="_blank"
-
-              rel="noreferrer"
-
-              className="inline-flex min-h-10 items-center rounded-md border border-destructive/30 bg-destructive/15 px-3 font-medium"
-
-            >
-
-              Add Pollen
-
-            </a>
-
-          )}
 
         </div>
 
@@ -619,7 +572,7 @@ export default function ResultStudioView({
   onGenerateVideo,
   onRegenerateImage,
   onShare,
-  isPublishing = false,
+  publishingMedia = null,
   onTogglePublish,
   onDelete,
   rootId,
@@ -661,8 +614,7 @@ export default function ResultStudioView({
     return (
       <div id={rootId} className={shellClass}>
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-56 bg-gradient-to-b from-brand/[0.08] to-transparent" aria-hidden />
-        <StudioPageHero eyebrow="Result" title="Loading project…" description="Fetching your generation." />
-        <ResultStudioSkeleton />
+        <ResultPageSkeleton embedded />
       </div>
     );
   }
@@ -683,8 +635,6 @@ export default function ResultStudioView({
       </div>
     );
   }
-
-  const hasMedia = hasImage || hasVideo;
 
   const activeView: ActiveMediaView =
     selectedView === "video" && hasVideo ? "video" : hasImage ? "image" : "video";
@@ -717,45 +667,75 @@ export default function ResultStudioView({
 
             actions={
 
-              <div className="flex max-w-full flex-wrap items-center gap-2">
+              <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
 
-                {onTogglePublish && (
+                {onTogglePublish && hasImage && (
 
                   <Button
 
                     framer={false}
 
-                    variant={project.isPublished ? "secondary" : "gradient"}
+                    variant={isStillPublished(project) ? "secondary" : "gradient"}
 
                     size="default"
 
-                    className="min-h-11 w-auto"
+                    className="min-h-11 w-full sm:w-auto"
 
-                    loading={isPublishing}
+                    loading={publishingMedia === "image"}
 
-                    loadingText={project.isPublished ? "Unpublishing…" : "Publishing…"}
+                    loadingText={isStillPublished(project) ? "Removing image…" : "Publishing image…"}
 
-                    disabled={!hasMedia}
+                    disabled={!hasImage || publishingMedia !== null}
 
-                    onClick={onTogglePublish}
+                    onClick={() => onTogglePublish("image")}
 
                   >
 
-                    <HugeiconsIcon icon={project.isPublished ? LockIcon : GlobalIcon} size={16} aria-hidden />
+                    <HugeiconsIcon icon={isStillPublished(project) ? LockIcon : GlobalIcon} size={16} aria-hidden />
 
-                    {project.isPublished ? "Unpublish" : "Publish"}
+                    {isStillPublished(project) ? (hasVideo ? "Remove image" : "Unpublish") : hasVideo ? "Publish image" : "Publish"}
 
                   </Button>
 
                 )}
 
-                <Button asChild framer={false} variant="outline" size="default" className="min-h-11 w-auto">
+                {onTogglePublish && hasVideo && (
+
+                  <Button
+
+                    framer={false}
+
+                    variant={isVideoPublished(project) ? "secondary" : "gradient"}
+
+                    size="default"
+
+                    className="min-h-11 w-full sm:w-auto"
+
+                    loading={publishingMedia === "video"}
+
+                    loadingText={isVideoPublished(project) ? "Removing video…" : "Publishing video…"}
+
+                    disabled={!hasVideo || publishingMedia !== null}
+
+                    onClick={() => onTogglePublish("video")}
+
+                  >
+
+                    <HugeiconsIcon icon={isVideoPublished(project) ? LockIcon : GlobalIcon} size={16} aria-hidden />
+
+                    {isVideoPublished(project) ? (hasImage ? "Remove video" : "Unpublish") : hasImage ? "Publish video" : "Publish"}
+
+                  </Button>
+
+                )}
+
+                <Button asChild framer={false} variant="outline" size="default" className="min-h-11 w-full sm:w-auto">
 
                   <Link to="/my-generations">My generations</Link>
 
                 </Button>
 
-                <Button asChild framer={false} variant="outline" size="default" className="min-h-11 w-auto">
+                <Button asChild framer={false} variant="outline" size="default" className="min-h-11 w-full sm:w-auto">
 
                   <Link to="/generate">New generation</Link>
 
@@ -771,7 +751,7 @@ export default function ResultStudioView({
 
                     size="default"
 
-                    className="min-h-11 w-auto border-destructive/35 text-destructive hover:bg-destructive/10"
+                    className="min-h-11 w-full border-destructive/35 text-destructive hover:bg-destructive/10 sm:w-auto"
 
                     onClick={onDelete}
 

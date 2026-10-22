@@ -1,17 +1,15 @@
-import { lazy, Suspense, type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import type { Project } from "@/Types";
-import StudioPageHero from "@/components/studio/StudioPageHero";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { GridSkeleton } from "@/components/ui/skeleton";
+import { CommunityFeedSkeleton } from "@/components/ui/page-skeletons";
 import { studioReveal, studioStagger } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
-
-const CommunityMasonry = lazy(() => import("@/components/studio/CommunityMasonry"));
+import CommunityMasonry from "@/components/studio/CommunityMasonry";
 
 export type CommunityStudioViewProps = {
   loading: boolean;
@@ -45,17 +43,19 @@ export default function CommunityStudioView({
       <div className="monex-backdrop-grid pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 opacity-40" aria-hidden />
 
       <motion.div variants={stagger} initial="hidden" animate="show">
-        <motion.div variants={enter}>
-          <StudioPageHero
-            eyebrow="Published feed"
-            title="Community"
-            description="Published ads from your projects — browse stills and talking videos across the community feed."
-            actions={
-              <Button asChild variant="outline" size="sm">
-                <Link to="/my-generations">My generations</Link>
-              </Button>
-            }
-          />
+        <motion.div variants={enter} className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand">Published feed</p>
+            <h1 className="studio-page-title mt-1 text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+              Community
+            </h1>
+            <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+              Sample outputs plus ads published by creators — see who posted each still or video.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm" className="w-fit shrink-0">
+            <Link to="/my-generations">My generations</Link>
+          </Button>
         </motion.div>
       </motion.div>
 
@@ -76,8 +76,8 @@ export default function CommunityStudioView({
         </div>
       )}
 
-      {loading ? (
-        <GridSkeleton layout="community-grid" count={8} />
+      {loading && projects.length === 0 ? (
+        <CommunityFeedSkeleton count={6} />
       ) : projects.length === 0 ? (
         <EmptyState
           icon={UserGroupIcon}
@@ -90,9 +90,7 @@ export default function CommunityStudioView({
           }
         />
       ) : (
-        <Suspense fallback={<GridSkeleton layout="community-grid" count={8} />}>
-          <CommunityMasonry projects={projects} />
-        </Suspense>
+        <CommunityMasonry projects={projects} />
       )}
     </div>
   );
