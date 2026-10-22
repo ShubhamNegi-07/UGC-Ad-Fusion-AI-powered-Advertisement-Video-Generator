@@ -16,6 +16,8 @@ import { Input, Textarea } from "@/components/ui/input";
 import { Label, FieldHint } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GenerationPlusGridOverlay } from "@/components/ui/plus-grid-loader";
+import { Skeleton } from "@/components/ui/skeleton";
 import { studioReveal, studioStagger } from "@/components/ui/motion";
 import { useVisualViewportInset } from "@/hooks/useVisualViewportInset";
 import { cn } from "@/lib/utils";
@@ -110,20 +112,24 @@ function CreditsAndSubmit({
           )}
         </div>
       </div>
-      <Button
-        type="submit"
-        form={compact ? formId : undefined}
-        variant="gradient"
-        size="lg"
-        className="min-h-11 w-full sm:w-auto"
-        loading={isGenerating}
-        loadingText="Generating image…"
-        disabled={isLoaded && signedIn && !isValid}
-        aria-describedby={creditsHintId}
-      >
-        <HugeiconsIcon icon={AiMagicIcon} size={18} strokeWidth={2} aria-hidden />
-        {signedIn ? "Generate image" : "Sign in to generate"}
-      </Button>
+      {!isLoaded ? (
+        <Skeleton className="h-11 w-full rounded-[var(--radius-md)] sm:w-44" />
+      ) : (
+        <Button
+          type="submit"
+          form={compact ? formId : undefined}
+          variant="gradient"
+          size="lg"
+          className="min-h-11 w-full sm:w-auto"
+          loading={isGenerating}
+          loadingText="Generating image…"
+          disabled={signedIn && !isValid}
+          aria-describedby={creditsHintId}
+        >
+          <HugeiconsIcon icon={AiMagicIcon} size={18} strokeWidth={2} aria-hidden />
+          {signedIn ? "Generate image" : "Sign in to generate"}
+        </Button>
+      )}
     </div>
   );
 }
@@ -221,6 +227,28 @@ export default function GeneratorStudioView({
       />
 
       {statusBanner && <StatusBanner banner={statusBanner} />}
+
+      {isGenerating && (
+        <div className="surface-panel mb-6 flex justify-center rounded-[var(--radius-xl)] p-3 sm:p-4">
+          <div
+            className={cn(
+              "relative mx-auto overflow-hidden rounded-[var(--radius-lg)] ring-1 ring-white/10",
+              aspectRatio === "9:16"
+                ? "w-full max-w-[min(100%,20rem)] aspect-[9/16]"
+                : aspectRatio === "1:1"
+                  ? "w-full max-w-sm aspect-square"
+                  : "w-full max-w-2xl aspect-video",
+            )}
+          >
+            <GenerationPlusGridOverlay
+              title="Creating your still image"
+              subtitle="Blending product and model with studio lighting…"
+              steps={["Uploading", "Generating", "Finalizing"]}
+              className="absolute inset-0 h-full w-full"
+            />
+          </div>
+        </div>
+      )}
 
       <motion.ol
         variants={stagger}

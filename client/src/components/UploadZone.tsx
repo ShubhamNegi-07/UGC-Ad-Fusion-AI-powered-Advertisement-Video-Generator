@@ -5,6 +5,7 @@ import { Cancel01Icon, ImageUpload01Icon, Tick02Icon } from "@hugeicons/core-fre
 import toast from "react-hot-toast";
 import type { UploadZoneProps } from "@/Types";
 import { Label, FieldHint } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { spring, studioReveal } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +19,11 @@ function formatSize(bytes: number) {
 export default function UploadZone({ id, label, hint, file, onClear, onFile, disabled, studio }: UploadZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [previewLoaded, setPreviewLoaded] = useState(false);
 
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
   useEffect(() => {
+    setPreviewLoaded(false);
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
@@ -114,7 +117,18 @@ export default function UploadZone({ id, label, hint, file, onClear, onFile, dis
               transition={spring}
               className="absolute inset-0"
             >
-              <img src={previewUrl} alt={`${label} preview`} className="h-full w-full object-cover" />
+              {!previewLoaded && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
+              <img
+                src={previewUrl}
+                alt={`${label} preview`}
+                loading="lazy"
+                decoding="async"
+                onLoad={() => setPreviewLoaded(true)}
+                className={cn(
+                  "h-full w-full object-cover transition-opacity duration-300",
+                  previewLoaded ? "opacity-100" : "opacity-0",
+                )}
+              />
               <div
                 className={cn(
                   "absolute inset-x-0 bottom-0 p-3 pt-10",
