@@ -35,8 +35,8 @@ export default defineConfig({
                     if (id.includes('@clerk')) return 'vendor-clerk';
                     if (id.includes('framer-motion')) return 'vendor-motion';
                     if (id.includes('@hugeicons')) return 'vendor-icons';
-                    if (id.includes('react-dom') || id.includes('/react/') || id.includes('react-router'))
-                        return 'vendor-react';
+                    // Keep react, react-dom, and react-router in the main graph — splitting them
+                    // caused a blank prod shell (Activity / duplicate React runtime).
                 },
             },
         },

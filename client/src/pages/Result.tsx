@@ -31,10 +31,13 @@ export default function Result() {
   const [project, setProject] = useState<Project | null>(cachedOnMount);
   const [loading, setLoading] = useState(!cachedOnMount);
   const [isGenerating, setIsGenerating] = useState(Boolean(cachedOnMount?.isGenerating));
+  const [isRegeneratingImage, setIsRegeneratingImage] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [mediaReady, setMediaReady] = useState(Boolean(cachedOnMount?.generatedImage || cachedOnMount?.generatedVideo));
+  const [mediaReady, setMediaReady] = useState(
+    Boolean(cachedOnMount?.generatedImage || cachedOnMount?.generatedVideo || cachedOnMount?.videoUrl),
+  );
 
   const fetchProject = useCallback(
     async (opts?: { silent?: boolean }) => {
@@ -45,11 +48,20 @@ export default function Result() {
         const { data } = await api.get(`/api/user/projects/${projectId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const next = data.project as Project | undefined;
-        if (next) {
+        const raw = data.project as Project | undefined;
+        if (raw) {
+          const resolvedVideo = raw.videoUrl || raw.generatedVideo || "";
+          const next: Project = {
+            ...raw,
+            generatedVideo: resolvedVideo,
+            videoUrl: resolvedVideo || undefined,
+          };
           setProject(next);
           writeCachedProject(next);
           setIsGenerating(Boolean(next.isGenerating));
+          if (next.generatedImage || resolvedVideo) {
+            setMediaReady(true);
+          }
         }
       } catch (error) {
         if (!opts?.silent) {
@@ -71,13 +83,21 @@ export default function Result() {
         { projectId },
         { headers: { Authorization: `Bearer ${token}` }, timeout: 360000 },
       );
-      setMediaReady(false);
+      const nextVideoUrl = data.videoUrl || data.project?.videoUrl || data.project?.generatedVideo || "";
       setProject((prev) => {
-        if (!prev) return prev;
-        const next = { ...prev, generatedVideo: data.videoUrl, isGenerating: false, error: "" };
+        const base = data.project ? { ...(prev ?? {}), ...data.project } : prev;
+        if (!base) return prev;
+        const next: Project = {
+          ...base,
+          generatedVideo: nextVideoUrl,
+          videoUrl: nextVideoUrl || undefined,
+          isGenerating: false,
+          error: "",
+        };
         writeCachedProject(next);
         return next;
       });
+      setMediaReady(true);
       toast.success(data.message || "Video generated");
     } catch (error) {
       const message = errorMessage(error, "Video generation failed");
@@ -87,6 +107,43 @@ export default function Result() {
       await fetchProject({ silent: true });
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleRegenerateImage = async () => {
+    if (!projectId) return;
+    setIsRegeneratingImage(true);
+    try {
+      const token = await getToken();
+      const { data } = await api.post(
+        "/api/project/regenerate-image",
+        { projectId },
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 180000 },
+      );
+      const nextImage = data.generatedImage || data.project?.generatedImage || "";
+      setProject((prev) => {
+        const base = data.project ? { ...(prev ?? {}), ...data.project } : prev;
+        if (!base) return prev;
+        const resolvedVideo = base.videoUrl || base.generatedVideo || "";
+        const next: Project = {
+          ...base,
+          generatedImage: nextImage,
+          generatedVideo: resolvedVideo,
+          videoUrl: resolvedVideo || undefined,
+          isGenerating: false,
+          error: "",
+        };
+        writeCachedProject(next);
+        return next;
+      });
+      setMediaReady(true);
+      toast.success(data.message || "Image regenerated");
+    } catch (error) {
+      const message = errorMessage(error, "Image regeneration failed");
+      toast.error(message, { duration: 6000 });
+      await fetchProject({ silent: true });
+    } finally {
+      setIsRegeneratingImage(false);
     }
   };
 
@@ -106,16 +163,18 @@ export default function Result() {
     return () => clearInterval(interval);
   }, [user, isGenerating, fetchProject]);
 
-  const mediaSrc = project?.generatedVideo || project?.generatedImage;
+  const mediaSrc = project?.videoUrl || project?.generatedVideo || project?.generatedImage;
 
   const togglePublish = async () => {
     if (!project?.id) return;
     setIsPublishing(true);
     try {
       const token = await getToken();
-      const { data } = await api.get(`/api/user/publish/${project.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.post(
+        `/api/user/publish/${project.id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
       setProject((prev) => {
         if (!prev) return prev;
         const next = { ...prev, isPublished: data.isPublished };
@@ -168,9 +227,11 @@ export default function Result() {
         loading={showLoading}
         project={project}
         isGenerating={isGenerating}
+        isRegeneratingImage={isRegeneratingImage}
         mediaReady={mediaReady}
         onMediaReady={() => setMediaReady(true)}
         onGenerateVideo={handleGenerateVideo}
+        onRegenerateImage={handleRegenerateImage}
         onShare={share}
         isPublishing={isPublishing}
         onTogglePublish={togglePublish}

@@ -28,13 +28,14 @@ export default function WorkflowStory() {
                   src={step.image}
                   poster={assets.generated1}
                   className="h-full w-full object-cover"
+                  preload="metadata"
                   muted
                   loop
                   autoPlay
                   playsInline
                 />
               ) : (
-                <img src={step.image} alt="" className="h-full w-full object-cover" />
+                <img src={step.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
               )}
             </div>
           </article>
@@ -44,7 +45,7 @@ export default function WorkflowStory() {
         <figcaption className="border-b border-border px-4 py-3 text-sm text-muted-foreground">
           Our Generator UI (baseline capture — real app chrome)
         </figcaption>
-        <img src={generateUi} alt="" className="w-full" />
+        <img src={generateUi} alt="" loading="lazy" decoding="async" className="w-full" />
       </figure>
     </div>
   );

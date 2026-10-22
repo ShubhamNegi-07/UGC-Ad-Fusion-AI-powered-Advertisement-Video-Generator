@@ -243,6 +243,8 @@ export default function Styleguide() {
               <img
                 src={creatifyHomeRef}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="rounded-[var(--radius-lg)] border border-border shadow-sm"
               />
             </div>

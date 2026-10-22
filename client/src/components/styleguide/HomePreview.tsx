@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, ImageUpload01Icon, Video02Icon } from "@hugeicons/core-free-icons";
-import { assets } from "@/assets/assets";
+import BrandLogo from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import type { BrandAccentId } from "@/lib/brand-accents";
 
@@ -19,8 +19,8 @@ export default function HomePreview({ accent }: { accent?: BrandAccentId }) {
     <div className={cnMarketingPreview(accentClass)}>
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={assets.logo} alt="" className="h-7 w-auto" />
+          <Link to="/" className="flex items-center gap-2 text-foreground">
+            <BrandLogo />
           </Link>
           <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
             <span>Features</span>
@@ -84,10 +84,10 @@ export default function HomePreview({ accent }: { accent?: BrandAccentId }) {
           <div className="grid grid-cols-[0.9fr_1.2fr] gap-3">
             <div className="flex flex-col gap-3">
               <figure className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
-                <img src={assets.product7} alt="" className="aspect-square w-full object-cover" />
+                <img src={assets.product7} alt="" loading="lazy" decoding="async" className="aspect-square w-full object-cover" />
               </figure>
               <figure className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
-                <img src={assets.model1} alt="" className="aspect-square w-full object-cover object-top" />
+                <img src={assets.model1} alt="" loading="lazy" decoding="async" className="aspect-square w-full object-cover object-top" />
               </figure>
             </div>
             <figure className="hero-video-ring overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
@@ -96,6 +96,7 @@ export default function HomePreview({ accent }: { accent?: BrandAccentId }) {
                   src={assets.generatedVideo1}
                   poster={assets.generated1}
                   className="h-full w-full object-cover"
+                  preload="metadata"
                   autoPlay
                   muted
                   loop
