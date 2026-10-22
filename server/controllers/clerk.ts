@@ -3,13 +3,47 @@ import { verifyWebhook } from '@clerk/express/webhooks'
 import { prisma } from '../configs/prisma.js';
 import * as Sentry from "@sentry/node"
 
+function getClerkWebhookSecret() {
+    return (
+        process.env.CLERK_WEBHOOK_SIGNING_SECRET?.trim() ||
+        process.env.CLERK_WEBHOOK_SECRET?.trim() ||
+        ''
+    );
+}
+
 const clerkWebhooks = async (req: Request, res: Response) =>{
     try {
-        const evt: any = await verifyWebhook(req)
+        const svixId = req.header('svix-id')?.trim();
+        const svixTimestamp = req.header('svix-timestamp')?.trim();
+        const svixSignature = req.header('svix-signature')?.trim();
+
+        if (!svixId || !svixTimestamp || !svixSignature) {
+            console.error('[Clerk webhook] Missing Svix headers', {
+                hasSvixId: Boolean(svixId),
+                hasSvixTimestamp: Boolean(svixTimestamp),
+                hasSvixSignature: Boolean(svixSignature),
+                contentType: req.headers['content-type'],
+            });
+            return res.status(400).json({ message: 'Missing svix-id, svix-timestamp, or svix-signature' });
+        }
+
+        const signingSecret = getClerkWebhookSecret();
+        if (!signingSecret) {
+            console.error('[Clerk webhook] Missing CLERK_WEBHOOK_SIGNING_SECRET or CLERK_WEBHOOK_SECRET');
+            return res.status(500).json({ message: 'Webhook signing secret is not configured' });
+        }
+
+        if (!Buffer.isBuffer(req.body) && typeof req.body !== 'string') {
+            console.error('[Clerk webhook] Raw body required for signature verify', {
+                bodyType: req.body === undefined ? 'undefined' : typeof req.body,
+            });
+            return res.status(400).json({ message: 'Webhook body must be raw JSON' });
+        }
+
+        const evt: any = await verifyWebhook(req, { signingSecret })
 
         //Getting Data from request
         const{ data, type} = evt;
-        const svixId = req.header('svix-id')?.trim();
         const eventKey = svixId || (data?.id ? `${type}:${data.id}:${data?.status || ''}` : '');
 
         if (eventKey) {
@@ -17,7 +51,7 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
                 where: { id: eventKey },
             });
             if (alreadyProcessed) {
-                return res.json({ message: "Webhook already processed : " + type });
+                return res.status(200).json({ message: "Webhook already processed : " + type });
             }
         }
 
@@ -56,7 +90,7 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
                     await prisma.processedWebhookEvent.create({
                         data: { id: paymentEventKey, type },
                     });
-                    return res.json({ message: "Paid credit packs are not enabled. Balance stays capped at 20." });
+                    return res.status(200).json({ message: "Paid credit packs are not enabled. Balance stays capped at 20." });
                 }
                 break;
             }
@@ -73,15 +107,20 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
             });
         }
 
-        res.json({message: "Webhook Received : " + type})
+        return res.status(200).json({message: "Webhook Received : " + type})
 
     } catch (error: any) {
         if (error?.code === 'P2002') {
-            return res.json({ message: "Webhook already processed" });
+            return res.status(200).json({ message: "Webhook already processed" });
         }
-        console.error("WEBHOOK ERROR:", error);
+        console.error('[Clerk webhook] Verification or processing failed', {
+            message: error?.message,
+            name: error?.name,
+            code: error?.code,
+            stack: error?.stack,
+        });
         Sentry.captureException(error)
-        res.status(400).json({ message: "Webhook processing failed" });
+        return res.status(400).json({ message: "Webhook processing failed" });
         
     }
 }

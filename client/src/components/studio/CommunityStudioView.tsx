@@ -2,7 +2,7 @@ import { type Dispatch, type SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Alert02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Alert02Icon, UserGroupIcon } from "@/icons";
 import type { Project } from "@/Types";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -45,7 +45,7 @@ export default function CommunityStudioView({
       <motion.div variants={stagger} initial="hidden" animate="show">
         <motion.div variants={enter} className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand">Published feed</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted">Published feed</p>
             <h1 className="studio-page-title mt-1 text-xl font-semibold tracking-tight text-foreground md:text-2xl">
               Community
             </h1>

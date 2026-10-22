@@ -47,7 +47,7 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
 
-app.use(cors({
+const corsMiddleware = cors({
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.has(origin)) {
             return callback(null, true);
@@ -55,15 +55,21 @@ app.use(cors({
         return callback(new Error('Origin not allowed by CORS'));
     },
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}))
+    allowedHeaders: ['Content-Type', 'Authorization', 'svix-id', 'svix-timestamp', 'svix-signature'],
+})
+
+app.use((req, res, next) => {
+    if (req.path === '/api/clerk') return next();
+    return corsMiddleware(req, res, next);
+})
 
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 })
 
-app.post('/api/clerk', express.raw({ type: 'application/json', limit: '64kb' }), clerkWebhooks)
+// Raw body must be kept for Svix signature verification. Do this before express.json().
+app.post('/api/clerk', express.raw({ type: () => true, limit: '64kb' }), clerkWebhooks)
 
 app.use(express.json({ limit: '100kb' }))
 app.use(clerkMiddleware())

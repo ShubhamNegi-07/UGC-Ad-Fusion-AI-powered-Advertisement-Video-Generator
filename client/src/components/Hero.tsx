@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ImageUpload01Icon, SparklesIcon, Video02Icon } from "@hugeicons/core-free-icons";
+import { ImageUpload01Icon, SparklesIcon, Video02Icon } from "@/icons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { assets } from "@/assets/assets";
@@ -14,7 +14,7 @@ const workflow = [
   { step: "Video", desc: "Talking clip", icon: Video02Icon },
 ];
 
-function HeroThumb({ src, width, height, className }: { src: string; width: number; height: number; className?: string }) {
+const HeroThumb = memo(function HeroThumb({ src, width, height, className }: { src: string; width: number; height: number; className?: string }) {
   const [loaded, setLoaded] = useState(false);
   return (
     <figure className="relative size-14 overflow-hidden rounded-xl border border-white/15 bg-white/5 shadow-md">
@@ -35,7 +35,7 @@ function HeroThumb({ src, width, height, className }: { src: string; width: numb
       />
     </figure>
   );
-}
+});
 
 export default function Hero() {
   return (
@@ -86,11 +86,11 @@ export default function Hero() {
           </div>
 
           <div className="mx-auto mt-8 flex max-w-md flex-wrap items-center justify-center gap-2">
-            <HeroThumb src={assets.product7} width={474} height={474} />
+            <HeroThumb src={assets.product7Thumb} width={128} height={128} />
             <span className="text-white/40" aria-hidden>
               +
             </span>
-            <HeroThumb src={assets.model1} width={470} height={470} className="object-top" />
+            <HeroThumb src={assets.model1Thumb} width={128} height={128} className="object-top" />
             <span className="text-white/40" aria-hidden>
               →
             </span>

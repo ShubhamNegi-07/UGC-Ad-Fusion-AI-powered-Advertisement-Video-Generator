@@ -13,6 +13,8 @@ export function StudioMediaBackdrop({ src, className }: { src: string; className
       src={src}
       alt=""
       aria-hidden
+      width={768}
+      height={1376}
       loading="lazy"
       decoding="async"
       className={cn(

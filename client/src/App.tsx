@@ -3,7 +3,6 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import SoftBackdrop from "@/components/SoftBackdrop";
 import ScrollRoot from "@/components/ScrollRoot";
 import PageTransition from "@/components/PageTransition";
@@ -11,6 +10,7 @@ import RouteErrorBoundary from "@/components/RouteErrorBoundary";
 import Home from "@/pages/Home";
 import { PageRouteSkeleton } from "@/components/ui/page-skeletons";
 
+const Footer = lazy(() => import("@/components/Footer"));
 const Generator = lazy(() => import("@/pages/Generator"));
 const Result = lazy(() => import("@/pages/Result"));
 const MyGenerations = lazy(() => import("@/pages/MyGenerations"));
@@ -113,7 +113,11 @@ export default function App() {
               <Route path="*" element={<LazyPage><NotFound /></LazyPage>} />
             </Routes>
         </main>
-        {!hideFooter && <Footer />}
+        {!hideFooter && (
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
+        )}
       </TooltipProvider>
     </ScrollRoot>
   );

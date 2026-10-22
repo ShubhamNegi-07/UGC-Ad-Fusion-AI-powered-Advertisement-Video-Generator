@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Delete02Icon } from "@hugeicons/core-free-icons";
+import { Delete02Icon } from "@/icons";
 import { applyPublishFlags, type PublishMedia } from "@/lib/publish";
 import { readCachedProject, writeCachedProject } from "@/lib/studio-cache";
 import { errorMessage } from "@/lib/utils";

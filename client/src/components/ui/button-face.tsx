@@ -1,6 +1,6 @@
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { Loading03Icon } from "@/icons";
 import FramerButtonArrow from "@/components/ui/FramerButtonArrow";
 import { cn } from "@/lib/utils";
 

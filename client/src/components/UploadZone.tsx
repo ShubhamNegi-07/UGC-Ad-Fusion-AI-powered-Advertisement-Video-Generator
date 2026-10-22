@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, ImageUpload01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, ImageUpload01Icon, Tick02Icon } from "@/icons";
 import toast from "react-hot-toast";
 import type { UploadZoneProps } from "@/Types";
 import { Label, FieldHint } from "@/components/ui/label";
@@ -120,6 +120,8 @@ export default function UploadZone({ id, label, hint, file, onClear, onFile, dis
               <img
                 src={previewUrl}
                 alt={`${label} preview`}
+                width={512}
+                height={512}
                 loading="lazy"
                 decoding="async"
                 onLoad={() => setPreviewLoaded(true)}

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Slot } from "radix-ui";
 import type { VariantProps } from "class-variance-authority";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { Loading03Icon } from "@/icons";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ButtonFace } from "@/components/ui/button-face";

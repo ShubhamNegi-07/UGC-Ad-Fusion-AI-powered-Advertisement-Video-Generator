@@ -8,7 +8,7 @@ import {
   ComputerIcon,
   SmartPhone01Icon,
   SquareIcon,
-} from "@hugeicons/core-free-icons";
+} from "@/icons";
 import Title from "@/components/Title";
 import UploadZone from "@/components/UploadZone";
 import { Button } from "@/components/ui/button";

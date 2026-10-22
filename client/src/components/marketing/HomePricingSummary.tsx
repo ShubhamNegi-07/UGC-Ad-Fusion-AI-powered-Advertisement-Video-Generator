@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Image02Icon, Video02Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { Image02Icon, Video02Icon, ArrowRight01Icon } from "@/icons";
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
 

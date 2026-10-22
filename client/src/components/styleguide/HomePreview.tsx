@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, ImageUpload01Icon, Video02Icon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, ImageUpload01Icon, Video02Icon } from "@/icons";
 import BrandLogo from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import type { BrandAccentId } from "@/lib/brand-accents";

@@ -119,7 +119,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/[0.08] pt-7 text-sm text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} UGC.AI. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} UGC.AI      All rights reserved.</p>
           <p className="text-foreground/70">AI video ads for modern brands &amp; creators.</p>
         </div>
       </div>

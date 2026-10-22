@@ -1,6 +1,6 @@
 import { Accordion as AccordionPrimitive } from "radix-ui";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon } from "@/icons";
 import Title from "@/components/Title";
 
 const homeFaq = [

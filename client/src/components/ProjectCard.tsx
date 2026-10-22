@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { memo, useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@clerk/clerk-react";
@@ -16,7 +16,7 @@ import {
   PlayIcon,
   Share08Icon,
   Video02Icon,
-} from "@hugeicons/core-free-icons";
+} from "@/icons";
 import type { Project } from "@/Types";
 import api from "@/configs/axios";
 import { Button } from "@/components/ui/button";
@@ -94,7 +94,7 @@ async function shareProject(gen: Project) {
   }
 }
 
-export default function ProjectCard({ gen, setGenerations, forCommunity = false, studio = false, feed = false }: ProjectCardProps) {
+function ProjectCard({ gen, setGenerations, forCommunity = false, studio = false, feed = false }: ProjectCardProps) {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -408,6 +408,8 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
                 key={i}
                 src={src}
                 alt={i === 0 ? "Product source" : "Model source"}
+                width={44}
+                height={44}
                 loading="lazy"
                 decoding="async"
                 className="size-11 rounded-full border-2 border-background/80 object-cover shadow-lg transition-transform duration-300 group-hover:-translate-y-1"
@@ -561,3 +563,5 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
     </motion.article>
   );
 }
+
+export default memo(ProjectCard);

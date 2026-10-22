@@ -21,7 +21,7 @@ export default function StudioPageHero({ eyebrow, title, description, actions, c
       <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div className="min-w-0 flex-1">
           {eyebrow ? (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand">{eyebrow}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-muted">{eyebrow}</p>
           ) : null}
           <h1
             className={cn(

@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon } from "@/icons";
 import { motion } from "@/components/ui/motion";
 
 import { Button } from "@/components/ui/button";
@@ -89,7 +89,7 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
 
           >
 
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand">{pillar.label}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-muted">{pillar.label}</p>
 
             <h2 className="marketing-display mt-3 text-balance text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
 

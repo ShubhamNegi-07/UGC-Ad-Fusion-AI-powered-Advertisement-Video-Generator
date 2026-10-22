@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useClerk } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { SparklesIcon } from "@hugeicons/core-free-icons";
+import { SparklesIcon } from "@/icons";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -243,6 +243,8 @@ export default function Styleguide() {
               <img
                 src={creatifyHomeRef}
                 alt=""
+                width={1440}
+                height={900}
                 loading="lazy"
                 decoding="async"
                 className="rounded-[var(--radius-lg)] border border-border shadow-sm"

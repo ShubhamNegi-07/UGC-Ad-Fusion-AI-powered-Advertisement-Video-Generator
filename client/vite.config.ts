@@ -34,7 +34,12 @@ export default defineConfig({
                     if (!id.includes('node_modules')) return;
                     if (id.includes('@clerk')) return 'vendor-clerk';
                     if (id.includes('framer-motion')) return 'vendor-motion';
-                    if (id.includes('@hugeicons')) return 'vendor-icons';
+                    if (id.includes('@hugeicons/react')) return 'vendor-icons';
+                    if (id.includes('radix-ui') || id.includes('@radix-ui')) return 'vendor-radix';
+                    if (id.includes('axios')) return 'vendor-axios';
+                    if (id.includes('react-hot-toast')) return 'vendor-toast';
+                    // Do not bucket @hugeicons/core-free-icons — that barrel is 7MB+.
+                    // Icons are deep-imported from src/icons.ts so only used files ship.
                     // Keep react, react-dom, and react-router in the main graph — splitting them
                     // caused a blank prod shell (Activity / duplicate React runtime).
                 },

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon, Image02Icon, Video02Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, Image02Icon, Video02Icon } from "@/icons";
 import { Accordion as AccordionPrimitive } from "radix-ui";
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";

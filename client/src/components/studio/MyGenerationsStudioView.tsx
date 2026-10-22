@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Alert02Icon, FolderOpenIcon, RefreshIcon } from "@hugeicons/core-free-icons";
+import { Alert02Icon, FolderOpenIcon, RefreshIcon } from "@/icons";
 import type { Project } from "@/Types";
 import type { Dispatch, SetStateAction } from "react";
 import ProjectCard from "@/components/ProjectCard";

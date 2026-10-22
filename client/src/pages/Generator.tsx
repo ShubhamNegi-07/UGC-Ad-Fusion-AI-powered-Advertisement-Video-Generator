@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { LockIcon } from "@hugeicons/core-free-icons";
+import { LockIcon } from "@/icons";
 import api from "@/configs/axios";
 import GeneratorStudioView from "@/components/studio/GeneratorStudioView";
 import { writeCachedProject } from "@/lib/studio-cache";

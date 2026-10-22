@@ -18,7 +18,7 @@ function PeekArrowIcon({ className }: { className?: string }) {
   );
 }
 
-function CarouselImage({ src, alt }: { src: string; alt: string }) {
+function CarouselImage({ src, alt, priority = false }: { src: string; alt: string; priority?: boolean }) {
   const [loaded, setLoaded] = useState(false);
   return (
     <>
@@ -28,7 +28,8 @@ function CarouselImage({ src, alt }: { src: string; alt: string }) {
         alt={alt}
         width={768}
         height={1376}
-        loading="lazy"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
         decoding="async"
         onLoad={() => setLoaded(true)}
         className={cn(
@@ -101,7 +102,7 @@ export default function HeroOutputCarousel(_props?: { featuredPulse?: boolean })
                             priority={tile.name === "Talking"}
                           />
                         ) : (
-                          <CarouselImage src={tile.src} alt={tile.blurb} />
+                          <CarouselImage src={tile.src} alt={tile.blurb} priority={i < 2} />
                         )}
                         <span className="hero-peek-chip" aria-hidden>
                           <PeekArrowIcon className="size-3.5 text-white" />

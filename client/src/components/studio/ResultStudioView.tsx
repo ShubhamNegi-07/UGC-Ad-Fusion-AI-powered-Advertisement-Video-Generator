@@ -21,7 +21,7 @@ import {
   RefreshIcon,
   Share08Icon,
   Video02Icon,
-} from "@hugeicons/core-free-icons";
+} from "@/icons";
 
 import type { Project } from "@/Types";
 
@@ -533,7 +533,9 @@ function ResultMediaPanel({
               key={project.generatedImage}
               src={project.generatedImage}
               alt={project.productName || "Generated result"}
-              loading="lazy"
+              width={768}
+              height={1376}
+              loading="eager"
               decoding="async"
               onLoad={onMediaReady}
               className={imageClass}

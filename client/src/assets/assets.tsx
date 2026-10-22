@@ -1,6 +1,8 @@
 import logo from "./logo.svg";
-import product7 from "./product7.png"; // trolly bag
-import model1 from "./model1.png"; // model men
+import product7 from "./product7.webp";
+import model1 from "./model1.webp";
+import product7Thumb from "./product7-thumb.webp";
+import model1Thumb from "./model1-thumb.webp";
 
 /** Marketing hero outputs — static files in /public (not in JS bundle). */
 const generated1 = "/generated/generated1.webp";
@@ -19,15 +21,17 @@ export const generatedImageMeta = {
 } as const;
 
 export const marketingAssets = {
-  generatorUi: "/marketing/generator-ui.webp?v=2",
-  generatorUiWidth: 1440,
-  generatorUiHeight: 1149,
+  generatorUi: "/marketing/generator-ui.webp?v=3",
+  generatorUiWidth: 1200,
+  generatorUiHeight: 958,
 };
 
 export const assets = {
   logo,
   product7,
   model1,
+  product7Thumb,
+  model1Thumb,
   generated1,
   generated2,
   generated3,

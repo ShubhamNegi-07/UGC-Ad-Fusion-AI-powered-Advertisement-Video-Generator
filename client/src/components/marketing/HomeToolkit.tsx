@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "@/components/ui/motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Coins01Icon, ImageUpload01Icon, SmartPhone01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { Coins01Icon, ImageUpload01Icon, SmartPhone01Icon, ArrowRight01Icon } from "@/icons";
 import { assets } from "@/assets/assets";
 import MarketingShowcaseFrame from "@/components/marketing/MarketingShowcaseFrame";
 import Title from "@/components/Title";

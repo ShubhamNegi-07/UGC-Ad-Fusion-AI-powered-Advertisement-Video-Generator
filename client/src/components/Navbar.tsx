@@ -12,7 +12,7 @@ import {
   Menu01Icon,
   SparklesIcon,
   UserGroupIcon,
-} from "@hugeicons/core-free-icons";
+} from "@/icons";
 import toast from "react-hot-toast";
 import api from "@/configs/axios";
 import BrandLogo from "@/components/BrandLogo";

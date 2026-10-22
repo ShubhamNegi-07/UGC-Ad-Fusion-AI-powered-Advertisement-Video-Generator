@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Download01Icon, PlayIcon, Share08Icon } from "@hugeicons/core-free-icons";
+import { Download01Icon, PlayIcon, Share08Icon } from "@/icons";
 import toast from "react-hot-toast";
 import type { Project } from "@/Types";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,7 @@ function mediaFrameClass(ratio: string) {
   return "mx-auto aspect-[9/16] w-full max-w-[min(100%,18rem)]";
 }
 
-function CommunityTile({ project }: { project: Project }) {
+const CommunityTile = memo(function CommunityTile({ project }: { project: Project }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -152,6 +152,8 @@ function CommunityTile({ project }: { project: Project }) {
             <img
               src={project.generatedImage}
               alt={mediaAlt}
+              width={768}
+              height={1376}
               loading="lazy"
               decoding="async"
               onLoad={() => setLoaded(true)}
@@ -234,6 +236,10 @@ function CommunityTile({ project }: { project: Project }) {
           <img
             src={avatar}
             alt=""
+            width={24}
+            height={24}
+            loading="lazy"
+            decoding="async"
             onError={() => setAvatarFailed(true)}
             className="mt-0.5 size-6 shrink-0 rounded-full object-cover ring-1 ring-white/12"
           />
@@ -256,7 +262,7 @@ function CommunityTile({ project }: { project: Project }) {
       </div>
     </article>
   );
-}
+});
 
 export type CommunityMasonryProps = {
   projects: Project[];
