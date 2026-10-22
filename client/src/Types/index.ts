@@ -28,6 +28,7 @@ export interface Project {
   targetLength?: number;
   generatedImage?: string;
   generatedVideo?: string;
+  videoUrl?: string;
   isGenerating: boolean;
   isPublished: boolean;
   error?: string;

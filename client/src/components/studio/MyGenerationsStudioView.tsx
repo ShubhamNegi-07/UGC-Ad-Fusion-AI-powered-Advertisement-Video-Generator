@@ -121,7 +121,7 @@ export default function MyGenerationsStudioView({
         />
       ) : (
         <motion.div
-          className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+          className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
           variants={stagger}
           initial="hidden"
           animate="show"

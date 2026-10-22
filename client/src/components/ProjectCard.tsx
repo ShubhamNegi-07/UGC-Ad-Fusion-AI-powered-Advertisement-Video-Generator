@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { PlusGridLoader } from "@/components/ui/plus-grid-loader";
 import {
   Delete02Icon,
   Download01Icon,
@@ -38,7 +39,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp, studioReveal } from "@/components/ui/motion";
 import { writeCachedProject } from "@/lib/studio-cache";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, errorMessage, formatDate } from "@/lib/utils";
 
 interface ProjectCardProps {
   gen: Project;
@@ -60,9 +61,15 @@ function aspectClass(ratio: string, studioGrid?: boolean) {
   return "aspect-video";
 }
 
+function studioInnerAspectClass(ratio?: string) {
+  if (ratio === "16:9") return "aspect-video w-full max-h-full";
+  if (ratio === "1:1") return "aspect-square h-full max-w-full";
+  return "aspect-[9/16] h-full max-w-full";
+}
+
 function studioGridImageClass(hasVideo: boolean, mediaInView: boolean, loaded: boolean) {
   return cn(
-    "relative z-[1] max-h-full max-w-full object-contain object-center",
+    "relative z-[1] h-full w-full object-cover object-center",
     loaded ? "opacity-100" : "opacity-0",
     hasVideo && mediaInView && "opacity-0 transition-opacity duration-300",
   );
@@ -124,7 +131,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
       setGenerations((prev) => prev.filter((item) => item.id !== gen.id));
       toast.success("Project deleted");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not delete project");
+      toast.error(errorMessage(error, "Could not delete project"));
     } finally {
       setDeleting(false);
       setConfirmOpen(false);
@@ -135,9 +142,11 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
     try {
       setPublishing(true);
       const token = await getToken();
-      const { data } = await api.get(`/api/user/publish/${gen.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.post(
+        `/api/user/publish/${gen.id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
       setGenerations((prev) =>
         prev.map((item) => {
           if (item.id !== gen.id) return item;
@@ -148,7 +157,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
       );
       toast.success(data.isPublished ? "Published to community" : "Removed from community");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not update project");
+      toast.error(errorMessage(error, "Could not update project"));
     } finally {
       setPublishing(false);
     }
@@ -166,11 +175,31 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
       whileHover={studio ? undefined : { y: -3 }}
       transition={studio ? undefined : { type: "spring", stiffness: 300, damping: 26 }}
       className={cn(
-        "group overflow-hidden rounded-[var(--radius-lg)] border border-border transition-colors duration-200",
+        "group relative overflow-hidden rounded-[var(--radius-lg)] border border-border transition-colors duration-200",
         studio ? "surface-panel mb-0 flex h-full w-full flex-col break-inside-auto" : "glass mb-4 break-inside-avoid hover:border-white/15",
         feed && "flex flex-col sm:flex-row sm:items-stretch",
       )}
     >
+      <div className="pointer-events-none absolute left-3 top-3 z-20 flex max-w-[calc(100%-3.5rem)] flex-wrap items-center gap-1.5">
+        {gen.isGenerating && (
+          <Badge variant="warning">
+            <span className="size-1.5 animate-pulse rounded-full bg-amber-300" />
+            Generating
+          </Badge>
+        )}
+        {gen.isPublished && (
+          <Badge variant="success">
+            <HugeiconsIcon icon={GlobalIcon} />
+            Published
+          </Badge>
+        )}
+        {gen.generatedVideo && (
+          <Badge>
+            <HugeiconsIcon icon={PlayIcon} />
+            Video
+          </Badge>
+        )}
+      </div>
       <div
         ref={mediaWrapRef}
         className={cn(
@@ -179,99 +208,115 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
           feed ? "w-full sm:w-44 md:w-52" : "w-full",
         )}
       >
-        {!mediaLoaded && hasMedia && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
-
-        {gen.generatedImage && studio && (
-          <img
-            src={gen.generatedImage}
-            alt={gen.productName || "Generated image"}
-            loading="lazy"
-            width={768}
-            height={1376}
-            onLoad={() => setMediaLoaded(true)}
-            className={studioGridImageClass(Boolean(gen.generatedVideo), mediaInView, mediaLoaded)}
-          />
-        )}
-
-        {gen.generatedImage && !studio && (
-          <img
-            src={gen.generatedImage}
-            alt={gen.productName || "Generated image"}
-            loading="lazy"
-            width={768}
-            height={1376}
-            onLoad={() => setMediaLoaded(true)}
+        {studio && hasMedia ? (
+          <div
             className={cn(
-              "absolute inset-0 h-full w-full object-cover",
-              "transition-[opacity,transform] duration-500",
-              mediaLoaded ? "opacity-100" : "opacity-0",
-              gen.generatedVideo ? "group-hover:opacity-0" : "group-hover:scale-[1.03]",
+              "relative flex items-center justify-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-white/10 bg-black/40",
+              studioInnerAspectClass(gen.aspectRatio),
             )}
-          />
-        )}
-
-        {gen.generatedVideo && (
-          <video
-            ref={videoRef}
-            src={gen.generatedVideo}
-            poster={gen.generatedImage}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            width={768}
-            height={1376}
-            onLoadedData={() => setMediaLoaded(true)}
-            className={cn(
-              "z-[2] transition-opacity duration-300",
-              studio
-                ? cn(
-                    "pointer-events-none absolute left-1/2 top-1/2 max-h-[calc(100%-0.5rem)] max-w-[calc(100%-0.5rem)] -translate-x-1/2 -translate-y-1/2 object-contain",
-                    mediaInView ? "opacity-100" : "opacity-0",
-                  )
-                : "absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100",
+          >
+            {!mediaLoaded && <Skeleton className="absolute inset-0 z-[2] rounded-[var(--radius-md)]" />}
+            {gen.generatedImage && (
+              <img
+                src={gen.generatedImage}
+                alt={gen.productName || "Generated image"}
+                loading="lazy"
+                decoding="async"
+                width={768}
+                height={1376}
+                onLoad={() => setMediaLoaded(true)}
+                className={studioGridImageClass(Boolean(gen.generatedVideo), mediaInView, mediaLoaded)}
+              />
             )}
-            onMouseEnter={studio ? undefined : (e) => void e.currentTarget.play().catch(() => undefined)}
-            onMouseLeave={studio ? undefined : (e) => e.currentTarget.pause()}
-          />
+            {gen.generatedVideo && (
+              <video
+                ref={videoRef}
+                src={gen.generatedVideo}
+                poster={gen.generatedImage}
+                muted
+                loop
+                playsInline
+                preload="auto"
+                width={768}
+                height={1376}
+                onLoadedMetadata={() => setMediaLoaded(true)}
+                onLoadedData={() => setMediaLoaded(true)}
+                className={cn(
+                  "pointer-events-none absolute inset-0 z-[2] h-full w-full object-cover object-center transition-opacity duration-300",
+                  mediaInView ? "opacity-100" : "opacity-0",
+                )}
+              />
+            )}
+          </div>
+        ) : (
+          <>
+            {!mediaLoaded && hasMedia && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
+            {gen.generatedImage && !studio && (
+              <img
+                src={gen.generatedImage}
+                alt={gen.productName || "Generated image"}
+                loading="lazy"
+                decoding="async"
+                width={768}
+                height={1376}
+                onLoad={() => setMediaLoaded(true)}
+                className={cn(
+                  "absolute inset-0 h-full w-full object-cover",
+                  "transition-[opacity,transform] duration-500",
+                  mediaLoaded ? "opacity-100" : "opacity-0",
+                  gen.generatedVideo ? "group-hover:opacity-0" : "group-hover:scale-[1.03]",
+                )}
+              />
+            )}
+            {gen.generatedVideo && !studio && (
+              <video
+                ref={videoRef}
+                src={gen.generatedVideo}
+                poster={gen.generatedImage}
+                muted
+                loop
+                playsInline
+                preload="auto"
+                width={768}
+                height={1376}
+                onLoadedMetadata={() => setMediaLoaded(true)}
+                onLoadedData={() => setMediaLoaded(true)}
+                className="absolute inset-0 z-[2] h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                onMouseEnter={(e) => void e.currentTarget.play().catch(() => undefined)}
+                onMouseLeave={(e) => e.currentTarget.pause()}
+              />
+            )}
+          </>
         )}
 
         {!hasMedia && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-            <span
-              className={cn(
-                "animate-pulse-ring flex size-12 items-center justify-center rounded-full border",
-                studio ? "border-border bg-muted" : "border-white/10 bg-white/[0.05]",
-              )}
-            >
-              <HugeiconsIcon icon={Image02Icon} size={20} aria-hidden />
-            </span>
-            <p className="text-xs">{gen.isGenerating ? "Generating…" : "No media yet"}</p>
+            {gen.isGenerating ? (
+              <div className="relative flex h-full w-full flex-col justify-between bg-[#0b0c10]">
+                <div className="flex min-h-0 flex-1 items-center justify-center">
+                  <PlusGridLoader size="sm" />
+                </div>
+                <p className="border-t border-white/[0.08] bg-[#0e1017]/90 py-2 text-center text-xs font-medium text-foreground/90">
+                  Generating…
+                </p>
+              </div>
+            ) : (
+              <>
+                <span
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-full border",
+                    studio ? "border-border bg-muted" : "border-white/10 bg-white/[0.05]",
+                  )}
+                >
+                  <HugeiconsIcon icon={Image02Icon} size={20} aria-hidden />
+                </span>
+                <p className="text-xs">No media yet</p>
+              </>
+            )}
           </div>
         )}
 
         {!studio && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />}
-
-        <div className="absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5">
-          {gen.isGenerating && (
-            <Badge variant="warning">
-              <span className="size-1.5 animate-pulse rounded-full bg-amber-300" />
-              Generating
-            </Badge>
-          )}
-          {gen.isPublished && (
-            <Badge variant="success">
-              <HugeiconsIcon icon={GlobalIcon} />
-              Published
-            </Badge>
-          )}
-          {gen.generatedVideo && (
-            <Badge>
-              <HugeiconsIcon icon={PlayIcon} />
-              Video
-            </Badge>
-          )}
-        </div>
 
         {!forCommunity && (
           <div
@@ -338,6 +383,7 @@ export default function ProjectCard({ gen, setGenerations, forCommunity = false,
                 src={src}
                 alt={i === 0 ? "Product source" : "Model source"}
                 loading="lazy"
+                decoding="async"
                 className="size-11 rounded-full border-2 border-background/80 object-cover shadow-lg transition-transform duration-300 group-hover:-translate-y-1"
                 style={{ transitionDelay: `${i * 40}ms` }}
               />
