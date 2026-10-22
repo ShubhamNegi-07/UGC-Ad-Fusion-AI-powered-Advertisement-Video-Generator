@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "@/components/ui/motion";
@@ -15,7 +15,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import toast from "react-hot-toast";
 import api from "@/configs/axios";
-import { assets } from "@/assets/assets";
+import BrandLogo from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, errorMessage } from "@/lib/utils";
@@ -47,8 +47,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const marketing = getSurfaceMode(pathname) === "marketing";
   const homeRoute = pathname === "/";
+  const plansRoute = pathname === "/plans";
   const homeDarkNav = marketing && homeRoute && !scrolled;
-  const marketingChrome = marketing;
+  /** White nav treatment only over dark hero bands (home top, plans top). */
+  const marketingDarkNav = homeDarkNav || (plansRoute && !scrolled);
+  const marketingLightNav = marketing && !marketingDarkNav;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -59,38 +62,35 @@ export default function Navbar() {
 
   const displayCredits = user ? credits : null;
 
+  const getTokenRef = useRef(getToken);
+  getTokenRef.current = getToken;
+
   useEffect(() => {
-    if (!user) {
+    if (!isLoaded) return;
+    if (!user?.id) {
       setCredits(null);
       return;
     }
     let cancelled = false;
-    const run = () => {
-      void (async () => {
-        try {
-          const token = await getToken();
-          const { data } = await api.get("/api/user/credits", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (!cancelled) setCredits(Number(data.credits) || 0);
-        } catch (error) {
-          if (!cancelled) toast.error(errorMessage(error, "Could not load credits"));
+    void (async () => {
+      try {
+        const token = await getTokenRef.current();
+        if (!token || cancelled) return;
+        const { data } = await api.get("/api/user/credits", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!cancelled) {
+          const parsed = Number(data?.credits);
+          setCredits(Number.isFinite(parsed) ? parsed : 0);
         }
-      })();
-    };
-    if (typeof requestIdleCallback === "function") {
-      const id = requestIdleCallback(run, { timeout: 2500 });
-      return () => {
-        cancelled = true;
-        cancelIdleCallback(id);
-      };
-    }
-    const t = window.setTimeout(run, 0);
+      } catch (error) {
+        if (!cancelled) toast.error(errorMessage(error, "Could not load credits"));
+      }
+    })();
     return () => {
       cancelled = true;
-      clearTimeout(t);
     };
-  }, [user, getToken]);
+  }, [isLoaded, user?.id, pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -135,7 +135,8 @@ export default function Navbar() {
               "nav-chrome nav-chrome-inner flex w-full items-center justify-between gap-3 transition-[background-color,border-color,box-shadow,color] duration-[var(--motion-duration)]",
               marketing ? "mx-auto h-14 w-full max-w-5xl" : "nav-chrome-inner mx-auto h-14 max-w-6xl px-3 pl-4",
               homeDarkNav && "nav-on-hero",
-              marketingChrome && "text-white",
+              marketingDarkNav && "text-white",
+              marketingLightNav && "nav-marketing-light",
               !marketing && scrolled && "shadow-lg",
             )}
           >
@@ -144,13 +145,7 @@ export default function Navbar() {
               className="flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="UGC Ad Fusion home"
             >
-              <img
-                src={assets.logo}
-                alt="UGC.AI"
-                width={170}
-                height={40}
-                className="h-8 w-auto max-w-[10.5rem] sm:h-9"
-              />
+              <BrandLogo />
             </Link>
 
             <ul className="hidden items-center gap-1 md:flex">
@@ -162,7 +157,7 @@ export default function Navbar() {
                     className={({ isActive }) =>
                       cn(
                         "relative rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        marketingChrome
+                        marketingDarkNav
                           ? isActive
                             ? "text-white"
                             : "text-white/75 hover:text-white"
@@ -180,7 +175,7 @@ export default function Navbar() {
                             transition={spring}
                             className={cn(
                               "absolute inset-0 -z-10 rounded-[var(--radius-sm)]",
-                              marketingChrome ? "bg-white/15" : "bg-muted",
+                              marketingDarkNav ? "bg-white/15" : "bg-muted",
                             )}
                           />
                         )}
@@ -192,7 +187,7 @@ export default function Navbar() {
               ))}
             </ul>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {!isLoaded ? (
                 <Skeleton className="h-9 w-24 rounded-full" />
               ) : user ? (
@@ -202,11 +197,21 @@ export default function Navbar() {
                     variant="outline"
                     size="sm"
                     onClick={() => navigate("/plans")}
-                    className="gap-1.5 pl-2.5 pr-3 font-mono text-xs tabular-nums"
+                    className="gap-1.5 px-2.5 font-mono text-xs tabular-nums text-foreground sm:pl-2.5 sm:pr-3"
                     aria-label={`Credits: ${displayCredits ?? 0}. Open plans`}
                   >
                     <HugeiconsIcon icon={Coins01Icon} size={14} strokeWidth={2} aria-hidden />
-                    {displayCredits === null ? <Skeleton className="h-3 w-6 rounded" /> : displayCredits}
+                    {displayCredits !== null ? (
+                      <span>
+                        <span className="max-[380px]:sr-only">Credits: </span>
+                        {displayCredits}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="max-[380px]:sr-only">Credits:</span>
+                        <Skeleton className="h-3.5 w-6 rounded bg-white/15" />
+                      </span>
+                    )}
                   </Button>
                   <div className="flex size-9 items-center justify-center">
                     <UserButton appearance={{ elements: { avatarBox: "size-8 ring-2 ring-border" } }}>
