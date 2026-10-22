@@ -1,16 +1,17 @@
+import { lazy, Suspense, type Dispatch, type SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import type { Project } from "@/Types";
-import type { Dispatch, SetStateAction } from "react";
-import CommunityMasonry from "@/components/studio/CommunityMasonry";
 import StudioPageHero from "@/components/studio/StudioPageHero";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { GridSkeleton } from "@/components/ui/skeleton";
 import { studioReveal, studioStagger } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
+
+const CommunityMasonry = lazy(() => import("@/components/studio/CommunityMasonry"));
 
 export type CommunityStudioViewProps = {
   loading: boolean;
@@ -48,7 +49,7 @@ export default function CommunityStudioView({
           <StudioPageHero
             eyebrow="Published feed"
             title="Community"
-            description="Published ads from your projects — drag the masonry wall to explore. Videos play when a tile is in view."
+            description="Published ads from your projects — browse stills and talking videos across the community feed."
             actions={
               <Button asChild variant="outline" size="sm">
                 <Link to="/my-generations">My generations</Link>
@@ -76,7 +77,7 @@ export default function CommunityStudioView({
       )}
 
       {loading ? (
-        <GridSkeleton />
+        <GridSkeleton layout="community-grid" count={8} />
       ) : projects.length === 0 ? (
         <EmptyState
           icon={UserGroupIcon}
@@ -89,7 +90,9 @@ export default function CommunityStudioView({
           }
         />
       ) : (
-        <CommunityMasonry projects={projects} />
+        <Suspense fallback={<GridSkeleton layout="community-grid" count={8} />}>
+          <CommunityMasonry projects={projects} />
+        </Suspense>
       )}
     </div>
   );

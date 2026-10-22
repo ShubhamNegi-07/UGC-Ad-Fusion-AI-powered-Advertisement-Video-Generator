@@ -6,14 +6,11 @@ import toast from "react-hot-toast";
 import type { Project } from "@/Types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useMasonryColumns } from "@/hooks/useMasonryColumns";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { studioReveal, studioStagger } from "@/components/ui/motion";
+import { cn, formatDate } from "@/lib/utils";
 
-function aspectClass(ratio: string) {
-  if (ratio === "9:16") return "aspect-[9/16]";
-  if (ratio === "1:1") return "aspect-square";
-  return "aspect-video";
-}
+const COMMUNITY_MEDIA_HEIGHT = "h-[min(17.5rem,34dvh)] w-full sm:h-[min(19rem,36dvh)]";
 
 async function shareProject(gen: Project) {
   const url = gen.generatedVideo || gen.generatedImage;
@@ -30,12 +27,19 @@ async function shareProject(gen: Project) {
   }
 }
 
-function MasonryTile({ project }: { project: Project }) {
+function aspectBoxClass(ratio?: string) {
+  if (ratio === "16:9") return "aspect-video w-full max-h-full";
+  if (ratio === "1:1") return "aspect-square h-full max-w-full";
+  return "aspect-[9/16] h-full max-w-full";
+}
+
+function CommunityTile({ project }: { project: Project }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [loaded, setLoaded] = useState(false);
-  const mediaSrc = project.generatedVideo || project.generatedImage;
-  const hasVideo = Boolean(project.generatedVideo);
+  const videoSrc = project.videoUrl || project.generatedVideo;
+  const mediaSrc = videoSrc || project.generatedImage;
+  const hasVideo = Boolean(videoSrc);
 
   useEffect(() => {
     if (!hasVideo) return;
@@ -58,61 +62,68 @@ function MasonryTile({ project }: { project: Project }) {
   return (
     <article
       ref={wrapRef}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c1018] shadow-[0_12px_40px_rgb(0_0_0_/_0.35)]"
+      className="surface-panel group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border transition-colors duration-200 hover:border-white/15"
     >
       <div
         className={cn(
-          "relative flex w-full items-center justify-center overflow-hidden bg-[var(--studio-media-bg,#020617)] p-2",
-          aspectClass(project.aspectRatio),
+          "relative flex shrink-0 items-center justify-center overflow-hidden bg-[var(--studio-media-bg,#020617)] p-2.5",
+          COMMUNITY_MEDIA_HEIGHT,
         )}
       >
-        {hasVideo ? (
-          <video
-            ref={videoRef}
-            src={project.generatedVideo}
-            poster={project.generatedImage}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            onLoadedData={() => setLoaded(true)}
-            className={cn(
-              "max-h-full max-w-full object-contain object-center transition-opacity duration-300",
-              loaded ? "opacity-100" : "opacity-0",
-            )}
-          />
-        ) : (
-          <img
-            src={project.generatedImage}
-            alt={project.productName || "Community ad"}
-            loading="lazy"
-            onLoad={() => setLoaded(true)}
-            className={cn(
-              "max-h-full max-w-full object-contain object-center transition-opacity duration-300",
-              loaded ? "opacity-100" : "opacity-0",
-            )}
-          />
-        )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] bg-gradient-to-t from-black/85 via-black/35 to-transparent p-4 pt-10">
-          <p className="line-clamp-2 text-sm font-semibold text-white">{project.productName || "Untitled"}</p>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className="border-white/20 bg-black/30 font-mono text-[10px] text-white/90">
-              {project.aspectRatio}
+        {hasVideo && (
+          <div className="pointer-events-none absolute left-3 top-3 z-[4] flex max-w-[calc(100%-6.5rem)] flex-wrap items-center gap-1.5">
+            <Badge className="border-0 bg-brand/90 text-[10px] text-white shadow-sm">
+              <HugeiconsIcon icon={PlayIcon} size={10} aria-hidden />
+              Video
             </Badge>
-            {hasVideo && (
-              <Badge className="border-0 bg-brand/90 text-[10px] text-white">
-                <HugeiconsIcon icon={PlayIcon} size={10} aria-hidden />
-                Video
-              </Badge>
-            )}
           </div>
+        )}
+
+        <div
+          className={cn(
+            "relative flex items-center justify-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-white/10 bg-black/40",
+            aspectBoxClass(project.aspectRatio),
+          )}
+        >
+          {!loaded && <Skeleton className="absolute inset-0 z-[2] rounded-[var(--radius-md)]" />}
+
+          {hasVideo ? (
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              poster={project.generatedImage}
+              muted
+              loop
+              playsInline
+              preload="auto"
+              onLoadedMetadata={() => setLoaded(true)}
+              onLoadedData={() => setLoaded(true)}
+              className={cn(
+                "relative z-[1] h-full w-full object-cover object-center transition-opacity duration-300",
+                loaded ? "opacity-100" : "opacity-0",
+              )}
+            />
+          ) : (
+            <img
+              src={project.generatedImage}
+              alt={project.productName || "Community ad"}
+              loading="lazy"
+              decoding="async"
+              onLoad={() => setLoaded(true)}
+              className={cn(
+                "relative z-[1] h-full w-full object-cover object-center transition-opacity duration-300",
+                loaded ? "opacity-100" : "opacity-0",
+              )}
+            />
+          )}
         </div>
-        <div className="absolute right-3 top-3 z-[3] flex gap-1.5 opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+
+        <div className="absolute right-2.5 top-2.5 z-[4] flex gap-1.5 opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
           <Button
             framer={false}
             variant="secondary"
             size="icon-sm"
-            className="size-9 border-white/15 bg-black/50 backdrop-blur-md"
+            className="size-9 border-white/15 bg-black/55 backdrop-blur-md hover:bg-black/70"
             aria-label="Share"
             onClick={() => void shareProject(project)}
           >
@@ -123,11 +134,54 @@ function MasonryTile({ project }: { project: Project }) {
             asChild
             variant="secondary"
             size="icon-sm"
-            className="size-9 border-white/15 bg-black/50 backdrop-blur-md"
+            className="size-9 border-white/15 bg-black/55 backdrop-blur-md hover:bg-black/70"
           >
             <a href={mediaSrc} download target="_blank" rel="noreferrer" aria-label="Download">
               <HugeiconsIcon icon={Download01Icon} size={15} />
             </a>
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-auto flex min-w-0 flex-1 flex-col justify-between p-4">
+        <div>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h3 className="truncate text-[15px] font-semibold tracking-tight text-foreground">
+                {project.productName || project.name || "Untitled"}
+              </h3>
+              {project.createdAt && (
+                <p className="mt-0.5 text-xs text-muted-foreground">{formatDate(project.createdAt)}</p>
+              )}
+            </div>
+            <Badge variant="outline" className="shrink-0 font-mono text-[11px]">
+              {project.aspectRatio || "9:16"}
+            </Badge>
+          </div>
+
+          {(project.productDescription || project.userPrompt) && (
+            <p className="mt-2.5 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+              {project.productDescription || project.userPrompt}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-4 flex gap-2">
+          <Button asChild framer={false} variant="outline" size="sm" className="min-h-9 flex-1">
+            <a href={mediaSrc} download target="_blank" rel="noreferrer">
+              <HugeiconsIcon icon={Download01Icon} size={14} />
+              Download
+            </a>
+          </Button>
+          <Button
+            framer={false}
+            variant="outline"
+            size="sm"
+            className="min-h-9 flex-1"
+            onClick={() => void shareProject(project)}
+          >
+            <HugeiconsIcon icon={Share08Icon} size={14} />
+            Share
           </Button>
         </div>
       </div>
@@ -142,47 +196,24 @@ export type CommunityMasonryProps = {
 
 export default function CommunityMasonry({ projects, className }: CommunityMasonryProps) {
   const reduceMotion = useReducedMotion();
-  const columnCount = projects.length >= 8 ? 5 : projects.length >= 4 ? 4 : projects.length >= 2 ? 3 : 2;
-  const columns = useMasonryColumns(projects, columnCount);
-
-  const wall = (
-    <div className="inline-flex items-start gap-4 p-2 sm:gap-5 sm:p-4">
-      {columns.map((col, colIdx) => (
-        <div key={colIdx} className="flex w-[min(17.5rem,78vw)] shrink-0 flex-col gap-4 sm:w-72 sm:gap-5">
-          {col.map((project) => (
-            <MasonryTile key={project.id} project={project} />
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-
-  if (reduceMotion) {
-    return (
-      <div className={cn("overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:thin]", className)}>
-        {wall}
-      </div>
-    );
-  }
+  const enter = reduceMotion ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } } : studioReveal;
+  const stagger = reduceMotion ? studioStagger(0, 0) : studioStagger(0.03, 0.04);
 
   return (
-    <div className={cn("relative", className)}>
-      <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        Drag to explore the wall
-      </p>
-      <div className="relative h-[min(72vh,720px)] overflow-hidden rounded-2xl border border-white/10 bg-[#080c14]/80 shadow-inner">
-        <div className="monex-backdrop-grid pointer-events-none absolute inset-0 opacity-30" aria-hidden />
-        <motion.div
-          drag
-          dragConstraints={{ left: -1400, right: 48, top: -900, bottom: 48 }}
-          dragElastic={0.06}
-          dragTransition={{ bounceStiffness: 280, bounceDamping: 32 }}
-          whileDrag={{ cursor: "grabbing" }}
-          className="absolute left-0 top-0 cursor-grab touch-none select-none active:cursor-grabbing"
-        >
-          {wall}
+    <motion.div
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+      className={cn(
+        "grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+        className,
+      )}
+    >
+      {projects.map((project) => (
+        <motion.div key={project.id} variants={enter} className="flex min-w-0">
+          <CommunityTile project={project} />
         </motion.div>
-      </div>
-    </div>
+      ))}
+    </motion.div>
   );
 }
