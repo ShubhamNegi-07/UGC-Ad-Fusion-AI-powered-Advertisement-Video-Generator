@@ -47,7 +47,7 @@ export default function Plans() {
       </section>
 
       <div className="container-marketing pb-[var(--space-section)] pt-10 md:pt-12">
-        <div className="grid gap-5 lg:grid-cols-2 lg:items-stretch">
+        <div className="grid gap-5 md:grid-cols-2 md:items-stretch">
           <article className="relative flex flex-col rounded-[var(--radius-xl)] border-2 border-brand bg-card p-6 shadow-md">
             <Badge className="mb-4 w-fit border-0 bg-brand text-brand-foreground">Active</Badge>
             <h2 className="marketing-display text-2xl font-semibold tracking-tight text-foreground">Free</h2>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Image02Icon, Video02Icon } from "@hugeicons/core-free-icons";
+import { Image02Icon, Video02Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
 
@@ -42,7 +42,16 @@ export default function HomePricingSummary() {
           .
         </p>
         <Button asChild variant="outline" className="mt-6 w-auto">
-          <Link to="/plans">View plans</Link>
+          <Link to="/plans">
+            <span>View plans</span>
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              size={16}
+              strokeWidth={2}
+              aria-hidden
+              className="text-muted-foreground transition-transform duration-300 group-hover/button:translate-x-1 group-hover/button:text-white"
+            />
+          </Link>
         </Button>
       </div>
     </section>

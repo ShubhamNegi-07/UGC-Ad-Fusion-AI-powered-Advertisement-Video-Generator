@@ -1,10 +1,13 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Link } from "react-router-dom";
-
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { motion } from "@/components/ui/motion";
 
 import { Button } from "@/components/ui/button";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 import HeroVideo from "@/components/marketing/HeroVideo";
 
@@ -111,9 +114,16 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
             </ul>
 
             <Button asChild framer={false} variant="outline" size="default" className="mt-8 w-auto self-start">
-
-              <Link to={pillar.cta.to}>{pillar.cta.label}</Link>
-
+              <Link to={pillar.cta.to}>
+                <span>{pillar.cta.label}</span>
+                <HugeiconsIcon
+                  icon={ArrowRight01Icon}
+                  size={16}
+                  strokeWidth={2}
+                  aria-hidden
+                  className="text-muted-foreground transition-transform duration-300 group-hover/button:translate-x-1 group-hover/button:text-white"
+                />
+              </Link>
             </Button>
 
           </motion.div>
@@ -151,61 +161,42 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
 
 
 function StillShowcase() {
+  const [loaded, setLoaded] = useState(false);
 
   return (
-
     <MarketingShowcaseFrame
-
       className="w-full"
-
       compact
-
       studioBackdrop={false}
-
       title="Fused still on Result"
-
       description="Photoreal frame from your product + model uploads — review before you spend credits on video."
-
       footer={
-
         <p className="text-[11px] text-muted-foreground sm:text-xs">
-
           <Link to="/generate" className="font-medium text-brand hover:underline">
-
             Generate a still
-
           </Link>{" "}
-
           · 5 credits per run
-
         </p>
-
       }
-
     >
-
-      <img
-
-        src={assets.generated1}
-
-        alt="Sample fused still from the generator"
-
-        width={768}
-
-        height={1376}
-
-        className="mx-auto block h-auto w-full max-w-[17.5rem] rounded-[var(--radius-xl)] border border-border object-contain shadow-md sm:max-w-[18rem]"
-
-        loading="lazy"
-
-        decoding="async"
-
-      />
-
+      <div className="relative mx-auto w-full max-w-[17.5rem] overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-md sm:max-w-[18rem]">
+        {!loaded && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
+        <img
+          src={assets.generated1}
+          alt="Sample fused still from the generator"
+          width={768}
+          height={1376}
+          onLoad={() => setLoaded(true)}
+          className={cn(
+            "relative z-[1] block h-auto w-full object-contain transition-opacity duration-300",
+            loaded ? "opacity-100" : "opacity-0",
+          )}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
     </MarketingShowcaseFrame>
-
   );
-
 }
 
 
@@ -262,6 +253,28 @@ function VideoShowcase() {
 
 
 
+function ShareTile({ src }: { src: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="relative aspect-[9/16] w-full overflow-hidden rounded-[var(--radius-lg)] border border-border shadow-sm">
+      {!loaded && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
+      <img
+        src={src}
+        alt=""
+        width={768}
+        height={1376}
+        onLoad={() => setLoaded(true)}
+        className={cn(
+          "relative z-[1] h-full w-full object-cover transition-opacity duration-300",
+          loaded ? "opacity-100" : "opacity-0",
+        )}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  );
+}
+
 function ShareShowcase() {
 
   const tiles = [assets.generated2, assets.generated3, assets.generated4, assets.generated1];
@@ -310,25 +323,7 @@ function ShareShowcase() {
 
         {tiles.map((src) => (
 
-          <img
-
-            key={src}
-
-            src={src}
-
-            alt=""
-
-            width={768}
-
-            height={1376}
-
-            className="aspect-[9/16] w-full rounded-[var(--radius-lg)] border border-border object-cover shadow-sm"
-
-            loading="lazy"
-
-            decoding="async"
-
-          />
+          <ShareTile key={src} src={src} />
 
         ))}
 
