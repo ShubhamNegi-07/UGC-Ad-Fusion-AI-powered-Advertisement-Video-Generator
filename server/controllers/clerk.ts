@@ -9,37 +9,36 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
 
         //Getting Data from request
         const{ data, type} = evt;
+        const svixId = req.header('svix-id')?.trim();
+        const eventKey = svixId || (data?.id ? `${type}:${data.id}:${data?.status || ''}` : '');
+
+        if (eventKey) {
+            const alreadyProcessed = await prisma.processedWebhookEvent.findUnique({
+                where: { id: eventKey },
+            });
+            if (alreadyProcessed) {
+                return res.json({ message: "Webhook already processed : " + type });
+            }
+        }
 
         //Switch Cases for different Events
         switch (type){
             // Safe create + update
-            case "user.created": {
-                await prisma.user.create({
-                    data: {
-                        id: data.id,
-                        email: data?.email_addresses[0]?.email_address,
-                        name: data?.first_name + " " + data?.last_name,
-                        image: data?.image_url,
-                    }
-                })
-                break;
-            }
+            case "user.created":
+            case "user.updated": {
+                const email = data?.email_addresses?.[0]?.email_address || `${data.id}@users.local`;
+                const name = [data?.first_name, data?.last_name].filter(Boolean).join(" ") || email;
+                const image = data?.image_url || "";
 
-             case "user.updated": {
-                await prisma.user.update({
-                    where: {
-                        id: data.id
-                    },
-                    data: {
-                        email: data?.email_addresses[0]?.email_address,
-                        name: data?.first_name + " " + data?.last_name,
-                        image: data?.image_url,
-                    }
-                })
+                await prisma.user.upsert({
+                    where: { id: data.id },
+                    update: { email, name, image },
+                    create: { id: data.id, email, name, image },
+                });
                 break;
             }
             
-             case "user.deleted": {
+            case "user.deleted": {
                 await prisma.user.deleteMany({
                     where: {id: data.id}})
                 break;
@@ -56,14 +55,23 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
                     if(planId !== "pro" && planId !== "premium"){
                         return res.status(400).json({message: "Invalid plan"})
                     }
-                    console.log(planId)
+                    if (!clerkUserId || typeof clerkUserId !== "string") {
+                        return res.status(400).json({ message: "Missing payer user id" });
+                    }
 
-                    await prisma.user.updateMany({
-                        where: {id: clerkUserId,},
-                        data: {
-                            credits: {increment: credits[planId]}
-                        }
-                    })
+                    const paymentEventKey = eventKey || `payment:${data.id || clerkUserId}`;
+                    await prisma.$transaction(async (tx) => {
+                        await tx.processedWebhookEvent.create({
+                            data: { id: paymentEventKey, type },
+                        });
+                        await tx.user.updateMany({
+                            where: { id: clerkUserId },
+                            data: {
+                                credits: { increment: credits[planId] },
+                            },
+                        });
+                    });
+                    return res.json({ message: "Webhook Received : " + type });
                 }
                 break;
             }
@@ -72,12 +80,23 @@ const clerkWebhooks = async (req: Request, res: Response) =>{
                 break;
         }
 
+        if (eventKey) {
+            await prisma.processedWebhookEvent.upsert({
+                where: { id: eventKey },
+                update: {},
+                create: { id: eventKey, type },
+            });
+        }
+
         res.json({message: "Webhook Received : " + type})
 
     } catch (error: any) {
+        if (error?.code === 'P2002') {
+            return res.json({ message: "Webhook already processed" });
+        }
         console.error("WEBHOOK ERROR:", error);
         Sentry.captureException(error)
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ message: "Webhook processing failed" });
         
     }
 }

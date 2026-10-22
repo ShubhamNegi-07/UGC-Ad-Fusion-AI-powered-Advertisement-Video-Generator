@@ -49,3 +49,9 @@ model Project {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model ProcessedWebhookEvent {
+  id        String   @id
+  type      String
+  createdAt DateTime @default(now())
+}
+
