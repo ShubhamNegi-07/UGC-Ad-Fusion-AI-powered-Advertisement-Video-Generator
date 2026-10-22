@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as Sentry from "@sentry/node"
 import { prisma } from '../configs/prisma.js';
 import { ensureUser } from '../utils/ensureUser.js';
+import { isValidProjectId } from './projectController.js';
 
 //Get User Credits
 export const getUserCredits = async (req: Request, res: Response) => {
@@ -14,8 +15,9 @@ export const getUserCredits = async (req: Request, res: Response) => {
         res.json({credits: user.credits})
 
     } catch (error: any) {
+            console.error('[userController Error]', error);
             Sentry.captureException(error)
-            res.status(500).json({ message: error.message || error.message});           
+            res.status(500).json({ message: 'Internal server error' });           
     }
 }
 
@@ -28,11 +30,17 @@ export const getAllProjects = async (req: Request, res: Response) =>{
             where: {userId},
             orderBy: {createdAt: 'desc'}
         })
-        res.json({projects})
+        res.json({
+            projects: projects.map((item) => ({
+                ...item,
+                videoUrl: item.generatedVideo || '',
+            })),
+        })
 
     } catch (error: any) {
+            console.error('[userController Error]', error);
             Sentry.captureException(error)
-            res.status(500).json({ message: error.message || error.message});           
+            res.status(500).json({ message: 'Internal server error' });           
     }
 }
 
@@ -42,17 +50,26 @@ export const getProjectById = async (req: Request, res: Response) =>{
 
         const {userId} = req.auth();
         const {projectId} = req.params;
+        if (!isValidProjectId(projectId)) {
+            return res.status(400).json({ message: 'Invalid project id' });
+        }
 
         const project = await prisma.project.findFirst({
             where: {id: projectId, userId}
         })
         
         if (!project) { return res.status(404).json({message: 'Project not found' })}
-        res.json({project})
+        res.json({
+            project: {
+                ...project,
+                videoUrl: project.generatedVideo || '',
+            },
+        })
 
     } catch (error: any) {
+            console.error('[userController Error]', error);
             Sentry.captureException(error)
-            res.status(500).json({ message: error.message || error.message});           
+            res.status(500).json({ message: 'Internal server error' });           
     }
 }
 
@@ -62,6 +79,9 @@ export const toggleProjectPublic = async (req: Request, res: Response) =>{
 
         const {userId} = req.auth();
         const {projectId} = req.params;
+        if (!isValidProjectId(projectId)) {
+            return res.status(400).json({ message: 'Invalid project id' });
+        }
 
         const project = await prisma.project.findFirst({
             where: {id: projectId, userId}
@@ -84,7 +104,8 @@ export const toggleProjectPublic = async (req: Request, res: Response) =>{
         res.json({isPublished: nextPublished})
 
     } catch (error: any) {
+            console.error('[userController Error]', error);
             Sentry.captureException(error)
-            res.status(500).json({ message: error.message || error.message});           
+            res.status(500).json({ message: 'Internal server error' });           
     }
 }
