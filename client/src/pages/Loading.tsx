@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { SparklesIcon } from "@hugeicons/core-free-icons";
+import { PlusGridLoader } from "@/components/ui/plus-grid-loader";
 
 export default function Loading() {
   const navigate = useNavigate();
@@ -14,14 +12,7 @@ export default function Loading() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-5 px-4 text-center" role="status" aria-live="polite">
-      <motion.span
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="animate-pulse-ring flex size-16 items-center justify-center rounded-2xl border border-border bg-muted text-muted-foreground"
-      >
-        <HugeiconsIcon icon={SparklesIcon} size={26} strokeWidth={1.8} />
-      </motion.span>
+      <PlusGridLoader size="lg" />
       <div>
         <p className="font-medium">Finishing up…</p>
         <p className="mt-1 text-sm text-muted-foreground">You will be redirected in a moment.</p>

@@ -9,13 +9,14 @@ import SoftBackdrop from "@/components/SoftBackdrop";
 import ScrollRoot from "@/components/ScrollRoot";
 import PageTransition from "@/components/PageTransition";
 import Home from "@/pages/Home";
-import Loading from "@/pages/Loading";
-import Generator from "@/pages/Generator";
-import Result from "@/pages/Result";
-import MyGenerations from "@/pages/MyGenerations";
-import Community from "@/pages/Community";
+import { Skeleton } from "@/components/ui/skeleton";
 
+const Generator = lazy(() => import("@/pages/Generator"));
+const Result = lazy(() => import("@/pages/Result"));
+const MyGenerations = lazy(() => import("@/pages/MyGenerations"));
+const Community = lazy(() => import("@/pages/Community"));
 const Plans = lazy(() => import("@/pages/Plans"));
+const Loading = lazy(() => import("@/pages/Loading"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const DevStyleguide = import.meta.env.DEV ? lazy(() => import("@/pages/Styleguide")) : null;
 const DevStudioStates = import.meta.env.DEV ? lazy(() => import("@/pages/dev/StudioStates")) : null;
@@ -23,7 +24,19 @@ const DevStudioStates = import.meta.env.DEV ? lazy(() => import("@/pages/dev/Stu
 const studioRoutes = ["/generate", "/result", "/my-generations", "/community"];
 
 function RouteFallback() {
-  return <div className="min-h-[60vh] pt-nav" aria-busy="true" aria-label="Loading page" />;
+  return (
+    <div className="container-marketing min-h-[60vh] space-y-6 pb-16 pt-nav" aria-busy="true" aria-label="Loading page">
+      <div className="space-y-3">
+        <Skeleton className="h-5 w-24 rounded-full" />
+        <Skeleton className="h-9 w-72 max-w-full rounded-lg" />
+        <Skeleton className="h-4 w-96 max-w-full rounded-md" />
+      </div>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Skeleton className="h-72 w-full rounded-[var(--radius-xl)]" />
+        <Skeleton className="h-72 w-full rounded-[var(--radius-xl)]" />
+      </div>
+    </div>
+  );
 }
 
 function LazyPage({ children }: { children: ReactNode }) {
@@ -56,7 +69,7 @@ export default function App() {
               padding: "12px 16px",
               maxWidth: "420px",
               boxShadow: "var(--shadow-md)",
-              fontFamily: '"Geist", sans-serif',
+              fontFamily: '"Plus Jakarta Sans", sans-serif',
               fontSize: "13px",
               lineHeight: "1.45",
             },
@@ -85,12 +98,12 @@ export default function App() {
           <AnimatePresence mode="wait" initial={false}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-              <Route path="/generate" element={<PageTransition><Generator /></PageTransition>} />
-              <Route path="/result/:projectId" element={<PageTransition><Result /></PageTransition>} />
-              <Route path="/my-generations" element={<PageTransition><MyGenerations /></PageTransition>} />
-              <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
+              <Route path="/generate" element={<LazyPage><Generator /></LazyPage>} />
+              <Route path="/result/:projectId" element={<LazyPage><Result /></LazyPage>} />
+              <Route path="/my-generations" element={<LazyPage><MyGenerations /></LazyPage>} />
+              <Route path="/community" element={<LazyPage><Community /></LazyPage>} />
               <Route path="/plans" element={<LazyPage><Plans /></LazyPage>} />
-              <Route path="/loading" element={<PageTransition><Loading /></PageTransition>} />
+              <Route path="/loading" element={<LazyPage><Loading /></LazyPage>} />
               {import.meta.env.DEV && DevStyleguide && (
                 <Route
                   path="/dev/styleguide"
