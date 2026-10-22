@@ -9,8 +9,10 @@ import {
 import { assets, generatedImageMeta } from "@/assets/assets";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import HeroVideo from "@/components/marketing/HeroVideo";
 import { StudioMediaFrame } from "@/components/studio/StudioMediaFill";
+import { cn } from "@/lib/utils";
 
 /** No back-to-back duplicate stills (video posters already show those frames). */
 const tiles = [
@@ -64,6 +66,28 @@ function subscribeReducedMotion(onStoreChange: () => void) {
 
 function getReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function CarouselImage({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <>
+      {!loaded && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
+      <img
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={cn(
+          "relative z-[1] max-h-full max-w-full object-contain transition-opacity duration-300",
+          loaded ? "opacity-100" : "opacity-0",
+        )}
+      />
+    </>
+  );
 }
 
 export default function HeroOutputCarousel(_props?: { featuredPulse?: boolean }) {
@@ -186,16 +210,7 @@ export default function HeroOutputCarousel(_props?: { featuredPulse?: boolean })
                       priority={i === 0}
                     />
                   ) : (
-                    <img
-                      src={tile.src}
-                      alt={tile.label}
-                      width={w}
-                      height={h}
-                      className="max-h-full max-w-full object-contain"
-                      loading={i <= 2 ? "eager" : "lazy"}
-                      fetchPriority={i <= 1 ? "high" : "auto"}
-                      decoding="async"
-                    />
+                    <CarouselImage src={tile.src} alt={tile.label} width={w} height={h} />
                   )}
                 </StudioMediaFrame>
                 <figcaption className="absolute inset-x-0 top-0 flex justify-between gap-1 p-2">

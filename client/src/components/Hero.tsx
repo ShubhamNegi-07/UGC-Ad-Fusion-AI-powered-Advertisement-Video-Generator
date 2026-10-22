@@ -1,15 +1,41 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ImageUpload01Icon, SparklesIcon, Video02Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { assets } from "@/assets/assets";
 import HeroOutputCarousel from "@/components/marketing/HeroOutputCarousel";
+import { cn } from "@/lib/utils";
 
 const workflow = [
   { step: "Upload", desc: "Product + model", icon: ImageUpload01Icon },
   { step: "Still", desc: "Fused frame", icon: SparklesIcon },
   { step: "Video", desc: "Talking clip", icon: Video02Icon },
 ];
+
+function HeroThumb({ src, width, height, className }: { src: string; width: number; height: number; className?: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <figure className="relative size-14 overflow-hidden rounded-xl border border-white/15 bg-white/5 shadow-md">
+      {!loaded && <Skeleton className="absolute inset-0 z-0 rounded-none" />}
+      <img
+        src={src}
+        alt=""
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={cn(
+          "relative z-[1] h-full w-full object-cover transition-opacity duration-300",
+          loaded ? "opacity-100" : "opacity-0",
+          className,
+        )}
+      />
+    </figure>
+  );
+}
 
 export default function Hero() {
   return (
@@ -60,29 +86,11 @@ export default function Hero() {
           </div>
 
           <div className="mx-auto mt-8 flex max-w-md items-center justify-center gap-2">
-            <figure className="size-14 overflow-hidden rounded-xl border border-white/15 shadow-md">
-              <img
-                src={assets.product7}
-                alt=""
-                width={474}
-                height={474}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            </figure>
+            <HeroThumb src={assets.product7} width={474} height={474} />
             <span className="text-white/40" aria-hidden>
               +
             </span>
-            <figure className="size-14 overflow-hidden rounded-xl border border-white/15 shadow-md">
-              <img
-                src={assets.model1}
-                alt=""
-                width={470}
-                height={470}
-                className="h-full w-full object-cover object-top"
-                loading="lazy"
-              />
-            </figure>
+            <HeroThumb src={assets.model1} width={470} height={470} className="object-top" />
             <span className="text-white/40" aria-hidden>
               →
             </span>
