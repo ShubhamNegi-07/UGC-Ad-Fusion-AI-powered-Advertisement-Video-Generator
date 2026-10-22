@@ -11,7 +11,8 @@ NextFunction)=>{
         }
         next()
         } catch (error: any) {
+            console.error('[auth Error]', error);
             Sentry.captureException(error)
-            res.status(401).json({message: error.code || error.message})
+            res.status(401).json({message: 'Unauthorized'})
         }
     }
