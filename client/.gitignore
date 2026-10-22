@@ -25,3 +25,9 @@ dist-ssr
 
 # Keep environment variables out of version control
 .env
+.env.*
+!.env.example
+
+# Lighthouse and Gate2 verification artifacts
+lh-*.json
+gate2-*

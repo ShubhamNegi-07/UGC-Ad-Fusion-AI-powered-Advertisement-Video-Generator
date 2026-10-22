@@ -1,10 +1,41 @@
 import express from 'express';
-import { createProject, createVideo, deleteProject, getAllPublishedProjects } from '../controllers/projectController.js';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
+import { createProject, createVideo, deleteProject, getAllPublishedProjects, regenerateImage } from '../controllers/projectController.js';
 import { protect } from '../middlewares/auth.js';
-import upload from '../configs/multer.js';
+import { uploadProjectImages } from '../configs/multer.js';
 const projectRouter = express.Router();
-projectRouter.post('/create', upload.array('images', 2), protect, createProject);
-projectRouter.post('/video', protect, createVideo);
+const userOrIpKey = (req) => {
+    try {
+        const auth = typeof req.auth === 'function' ? req.auth() : undefined;
+        if (auth?.userId)
+            return `user:${auth.userId}`;
+    }
+    catch {
+        // Fallback to IP when auth context is unavailable
+    }
+    return ipKeyGenerator(req.ip || '127.0.0.1');
+};
+const createProjectLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 25,
+    skipFailedRequests: true,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    keyGenerator: userOrIpKey,
+    message: { message: 'Too many image generation requests. Please wait 15 minutes before trying again.' },
+});
+const createVideoLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 25,
+    skipFailedRequests: true,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    keyGenerator: userOrIpKey,
+    message: { message: 'Too many video generation requests. Please wait 15 minutes before trying again.' },
+});
+projectRouter.post('/create', protect, createProjectLimiter, uploadProjectImages, createProject);
+projectRouter.post('/regenerate-image', protect, createProjectLimiter, regenerateImage);
+projectRouter.post('/video', protect, createVideoLimiter, createVideo);
 projectRouter.get('/published', getAllPublishedProjects);
 projectRouter.delete('/:projectId', protect, deleteProject);
 export default projectRouter;

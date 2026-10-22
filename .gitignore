@@ -1,0 +1,11 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build & generated artifacts
+server/dist/
+client/dist/
+client/lh-*.json
+client/gate2-*
+*.tsbuildinfo

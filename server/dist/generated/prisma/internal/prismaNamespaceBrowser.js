@@ -40,7 +40,8 @@ export const JsonNull = runtime.JsonNull;
 export const AnyNull = runtime.AnyNull;
 export const ModelName = {
     User: 'User',
-    Project: 'Project'
+    Project: 'Project',
+    ProcessedWebhookEvent: 'ProcessedWebhookEvent'
 };
 /*
  * Enums
@@ -77,6 +78,11 @@ export const ProjectScalarFieldEnum = {
     error: 'error',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
+};
+export const ProcessedWebhookEventScalarFieldEnum = {
+    id: 'id',
+    type: 'type',
+    createdAt: 'createdAt'
 };
 export const SortOrder = {
     asc: 'asc',
