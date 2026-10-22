@@ -25,8 +25,8 @@
 [![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/)
 
 
-[![GitHub stars](https://img.shields.io/github/stars/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator?style=social)](https://github.com/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator)
-[![GitHub forks](https://img.shields.io/github/forks/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator?style=social)](https://github.com/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator)
+[![GitHub stars](https://img.shields.io/github/stars/ShubhamNegi-07/UGC.AI?style=social)](https://github.com/ShubhamNegi-07/UGC.AI)
+[![GitHub forks](https://img.shields.io/github/forks/ShubhamNegi-07/UGC.AI?style=social)](https://github.com/ShubhamNegi-07/UGC.AI)
 
 ![UGC.AI homepage](./docs/home.jpg)
 
@@ -204,10 +204,10 @@ There is **no root `npm install`**. The app is two packages: `client` (Vite on p
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator.git
+git clone https://github.com/ShubhamNegi-07/UGC.AI.git
 
 # 2. Navigate into the project
-cd UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator
+cd UGC.AI
 ```
 
 ### Configuration
@@ -304,7 +304,7 @@ git push origin feature/AmazingFeature
 # 5. Open a Pull Request
 ```
 
-Please open an [Issue](https://github.com/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator/issues) to discuss any major changes first.
+Please open an [Issue](https://github.com/ShubhamNegi-07/UGC.AI/issues) to discuss any major changes first.
 
 ---
 
@@ -315,7 +315,7 @@ If UGC.AI helped or inspired you:
 - ⭐ **Star** this repository
 - 🍴 **Fork** and build on top of it
 - 📣 **Share** it with someone who needs it
-- 🐛 **Report bugs** or suggest features via [Issues](https://github.com/ShubhamNegi-07/UGC-Ad-Fusion-AI-powered-Advertisement-Video-Generator/issues)
+- 🐛 **Report bugs** or suggest features via [Issues](https://github.com/ShubhamNegi-07/UGC.AI/issues)
 
 ---
 
