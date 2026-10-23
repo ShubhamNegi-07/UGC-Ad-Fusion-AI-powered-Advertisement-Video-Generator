@@ -45,6 +45,7 @@
 - [Tech Stack](#-tech-stack)
 - [System Architecture](#-system-architecture)
 - [Getting Started](#-getting-started)
+- [Deploy](#-deploy)
 - [Use Cases](#-use-cases)
 - [Roadmap](#-roadmap)
 - [Author](#-author)
@@ -244,6 +245,56 @@ npm run dev
 ```
 
 > The API runs at `http://localhost:5000`. The web app runs at `http://localhost:5173`.
+
+---
+
+## ☁️ Deploy
+
+The repo is two packages. Deploy **Render first** (you need the API URL for Vercel), then the **Vercel** site, then point **Clerk** at both live URLs.
+
+### 1. Render — `server`
+
+1. New → Web Service → this GitHub repo
+2. **Root Directory:** `server`
+3. **Build Command:** `npm install`
+4. **Start Command:** `npm start` (runs `prisma generate` via postinstall, then `prisma migrate deploy` + `tsx server.ts`)
+5. **Instance:** Node 20 (`.node-version` is already `20`)
+6. Environment variables (same names as `server/.env.example`):
+
+| Name | Example |
+|------|---------|
+| `NODE_ENV` | `production` |
+| `DATABASE_URL` | Neon connection string |
+| `CLERK_PUBLISHABLE_KEY` | `pk_…` |
+| `CLERK_SECRET_KEY` | `sk_…` |
+| `CLERK_WEBHOOK_SIGNING_SECRET` | `whsec_…` (after you create the webhook) |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Cloudinary dashboard |
+| `GEMINI_API_KEY` and/or `HF_TOKEN` | at least one |
+| `CORS_ORIGINS` | `https://your-app.vercel.app,https://*.vercel.app` |
+| `TRUST_PROXY_HOPS` | `1` (optional — production already defaults to 1) |
+
+Save the service URL, e.g. `https://ugc-ai-api.onrender.com`. Open `/` — you should see `Server is Live!`. The free instance sleeps after idle time; the first request can take ~30–50s.
+
+### 2. Vercel — `client`
+
+Root `vercel.json` already builds `client` and rewrites SPA routes. Import the same repo; you do **not** have to set a Root Directory.
+
+Environment variables (**Production**, then Redeploy — Vite bakes `VITE_*` in at build time):
+
+| Name | Value |
+|------|--------|
+| `VITE_CLERK_PUBLISHABLE_KEY` | same Clerk `pk_…` |
+| `VITE_BASEURL` | `https://ugc-ai-api.onrender.com` (no trailing slash) |
+
+### 3. Clerk dashboard
+
+After both URLs exist:
+
+- **Allowed origins / redirect URLs:** the Vercel origin (`https://your-app.vercel.app`)
+- **Webhooks → endpoint:** `https://ugc-ai-api.onrender.com/api/clerk` (not a Dev Tunnel)
+- Copy the endpoint **Signing Secret** into Render as `CLERK_WEBHOOK_SIGNING_SECRET`, then restart the API
+
+If you created the Vercel project after the first Render deploy, add `CORS_ORIGINS` and restart the Render service once.
 
 ---
 

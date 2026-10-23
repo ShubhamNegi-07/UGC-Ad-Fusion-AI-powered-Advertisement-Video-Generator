@@ -5,6 +5,7 @@
 
 # Build & generated artifacts
 server/dist/
+server/generated/
 client/dist/
 client/lh-*.json
 client/gate2-*

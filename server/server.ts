@@ -12,12 +12,16 @@ import projectRouter from "./routes/projectRoutes.js";
 
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number.parseInt(process.env.PORT || '5000', 10) || 5000;
+const isProd = process.env.NODE_ENV === 'production';
 
-// Local development default: false (no reverse proxy).
-// In production behind a reverse proxy (Render, Railway, Nginx), set TRUST_PROXY_HOPS=1 in .env.
+// Local default: no reverse proxy. Render / Vercel / Nginx sit in front in production.
 const trustProxyHops = Number.parseInt(process.env.TRUST_PROXY_HOPS || '', 10);
-app.set('trust proxy', Number.isInteger(trustProxyHops) && trustProxyHops > 0 ? trustProxyHops : false);
+if (Number.isInteger(trustProxyHops) && trustProxyHops > 0) {
+    app.set('trust proxy', trustProxyHops);
+} else {
+    app.set('trust proxy', isProd ? 1 : false);
+}
 
 const globalApiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -39,8 +43,22 @@ const envOrigins = (process.env.CORS_ORIGINS || '')
     .filter(Boolean);
 const allowedOrigins = new Set([
     ...envOrigins,
-    ...(process.env.NODE_ENV === 'production' && envOrigins.length > 0 ? [] : defaultDevOrigins),
+    ...(isProd && envOrigins.length > 0 ? [] : defaultDevOrigins),
 ]);
+
+if (isProd && envOrigins.length === 0) {
+    console.error('[CORS] Set CORS_ORIGINS to your Vercel origin, e.g. https://your-app.vercel.app');
+}
+
+function originAllowed(origin: string) {
+    if (allowedOrigins.has(origin)) return true;
+    for (const pattern of allowedOrigins) {
+        if (!pattern.includes('*')) continue;
+        const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace('\\*', '[^.]+');
+        if (new RegExp(`^${escaped}$`).test(origin)) return true;
+    }
+    return false;
+}
 
 //Middleware
 app.use(helmet({
@@ -49,7 +67,7 @@ app.use(helmet({
 
 const corsMiddleware = cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.has(origin)) {
+        if (!origin || originAllowed(origin)) {
             return callback(null, true);
         }
         return callback(new Error('Origin not allowed by CORS'));
@@ -93,8 +111,8 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     res.status(500).json({ message: 'Internal server error' });
 });
 
-const server = app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 server.requestTimeout = 310_000;

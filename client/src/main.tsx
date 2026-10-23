@@ -50,7 +50,8 @@ if (!PUBLISHABLE_KEY) {
           >
             client/.env
           </code>
-          , then restart the dev server or rebuild.
+          {" "}
+          (or in Vercel → Environment Variables), then restart the dev server or Redeploy.
         </p>
       </div>
     </div>,
