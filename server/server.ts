@@ -73,7 +73,7 @@ const corsMiddleware = cors({
         }
         return callback(new Error('Origin not allowed by CORS'));
     },
-    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'svix-id', 'svix-timestamp', 'svix-signature'],
 })
 
@@ -91,15 +91,17 @@ app.use((req, res, next) => {
 app.post('/api/clerk', express.raw({ type: () => true, limit: '64kb' }), clerkWebhooks)
 
 app.use(express.json({ limit: '100kb' }))
+
+// Public health check — keep before Clerk so monitors (UptimeRobot HEAD/GET) get 200.
+app.route('/')
+    .get((_req: Request, res: Response) => {
+        res.status(200).json({ status: 'ok', message: 'Server is running' });
+    })
+    .head((_req: Request, res: Response) => {
+        res.status(200).end();
+    });
+
 app.use(clerkMiddleware())
-
-app.get('/', (req: Request, res: Response) => {
-    res.send('Server is Live!');
-});
-
-app.head('/', (_req: Request, res: Response) => {
-    res.status(200).end();
-});
 
 app.use('/api/user', globalApiLimiter, userRouter)
 app.use('/api/project', globalApiLimiter, projectRouter)
