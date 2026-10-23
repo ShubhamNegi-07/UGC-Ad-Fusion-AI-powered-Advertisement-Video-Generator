@@ -7,6 +7,7 @@ import { promisify } from 'node:util';
 import ffmpegStatic from 'ffmpeg-static';
 import { describeReferencesWithGemini, generateAdVideoWithGemini, generateCombinedImageWithGemini, getGeminiKey, hasGeminiKey } from './gemini.js';
 import { generateCombinedImageWithHf, getHfToken, hasHfToken } from './huggingface.js';
+import { CLIENT_MESSAGES, HttpError } from '../utils/errors.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -18,9 +19,8 @@ export function assertGenerationKey() {
     if (geminiKey) return geminiKey;
     const hfToken = getHfToken();
     if (hfToken) return hfToken;
-    throw new Error(
-        'Add GEMINI_API_KEY or HF_TOKEN to server/.env. Gemini: https://aistudio.google.com/apikey',
-    );
+    console.error('[assertGenerationKey] GEMINI_API_KEY and HF_TOKEN are both missing');
+    throw new HttpError(503, CLIENT_MESSAGES.AI_BUSY);
 }
 
 export async function generateCombinedImage(options: {
@@ -84,15 +84,10 @@ export async function generateCombinedImage(options: {
         } catch (hfError) {
             lastError = hfError instanceof Error ? hfError : new Error(String(hfError));
             console.warn('[generateCombinedImage] Hugging Face image failed:', lastError.message);
-            if (/no remaining credits|Purchase pre-paid credits/i.test(lastError.message)) {
-                throw new Error(
-                    'Hugging Face image credits are empty. Gemini image is also unavailable, so the still could not be created. Try Generate again in a minute.',
-                );
-            }
         }
     }
 
-    throw lastError || new Error('Image generation failed. Please try again.');
+    throw lastError || new HttpError(503, CLIENT_MESSAGES.AI_BUSY);
 }
 
 async function synthesizeFallbackAdVideo(options: {

@@ -62,9 +62,9 @@ export function uploadProjectImages(req: Request, res: Response, next: NextFunct
             if (err.code === 'LIMIT_FILE_SIZE') {
                 return res.status(413).json({ message: 'Each uploaded image must be 10 MB or smaller.' });
             }
-            return res.status(400).json({ message: `Upload error: ${err.message}` });
+            return res.status(400).json({ message: 'Upload failed. Use a JPG, PNG, or WEBP image under 10 MB.' });
         }
-        return res.status(400).json({ message: err?.message || 'Invalid image upload.' });
+        return res.status(400).json({ message: 'Upload failed. Use a JPG, PNG, or WEBP image under 10 MB.' });
     });
 }
 

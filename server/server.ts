@@ -1,5 +1,5 @@
 import "./configs/instrument.mjs"
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import cors from'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
@@ -9,6 +9,7 @@ import clerkWebhooks from './controllers/clerk.js';
 import * as Sentry from "@sentry/node"
 import userRouter from "./routes/userRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
@@ -96,20 +97,17 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Server is Live!');
 });
 
+app.head('/', (_req: Request, res: Response) => {
+    res.status(200).end();
+});
+
 app.use('/api/user', globalApiLimiter, userRouter)
 app.use('/api/project', globalApiLimiter, projectRouter)
 
 // The error handler must be registered before any other error middleware and after all controllers
 Sentry.setupExpressErrorHandler(app);
 
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    console.error('[Unhandled Server Error]', err);
-    if (res.headersSent) return;
-    if (err?.message === 'Origin not allowed by CORS') {
-        return res.status(403).json({ message: 'Forbidden origin' });
-    }
-    res.status(500).json({ message: 'Internal server error' });
-});
+app.use(errorHandler);
 
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);

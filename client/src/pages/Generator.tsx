@@ -85,11 +85,11 @@ export default function Generator() {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 180000,
       }).catch((error) => {
-        toast.error(errorMessage(error, "Generation failed"));
+        toast.error(errorMessage(error));
       });
     } catch (error) {
       setIsGenerating(false);
-      toast.error(errorMessage(error, "Generation failed"));
+      toast.error(errorMessage(error));
     }
   };
 

@@ -1,23 +1,21 @@
 import { Request, Response } from 'express';
-import * as Sentry from "@sentry/node"
 import { prisma } from '../configs/prisma.js';
 import { ensureUser } from '../utils/ensureUser.js';
 import { isValidProjectId } from './projectController.js';
+import { sanitizeStoredMessage, sendError } from '../utils/errors.js';
 
 //Get User Credits
 export const getUserCredits = async (req: Request, res: Response) => {
     try{
 
         const {userId} = req.auth();
-        if(!userId) {return res.status(401).json({message: 'Unauthorized'})}
+        if(!userId) {return res.status(401).json({message: 'Please sign in again to continue.'})}
 
         const user = await ensureUser(userId)
         res.json({credits: user.credits})
 
-    } catch (error: any) {
-            console.error('[userController Error]', error);
-            Sentry.captureException(error)
-            res.status(500).json({ message: 'Internal server error' });           
+    } catch (error: unknown) {
+        return sendError(res, error, '[userController Error]');
     }
 }
 
@@ -33,15 +31,14 @@ export const getAllProjects = async (req: Request, res: Response) =>{
         res.json({
             projects: projects.map((item) => ({
                 ...item,
+                error: sanitizeStoredMessage(item.error),
                 videoUrl: item.generatedVideo || '',
                 uploadedImages: [],
             })),
         })
 
-    } catch (error: any) {
-            console.error('[userController Error]', error);
-            Sentry.captureException(error)
-            res.status(500).json({ message: 'Internal server error' });           
+    } catch (error: unknown) {
+        return sendError(res, error, '[userController Error]');
     }
 }
 
@@ -63,15 +60,14 @@ export const getProjectById = async (req: Request, res: Response) =>{
         res.json({
             project: {
                 ...project,
+                error: sanitizeStoredMessage(project.error),
                 videoUrl: project.generatedVideo || '',
                 uploadedImages: [],
             },
         })
 
-    } catch (error: any) {
-            console.error('[userController Error]', error);
-            Sentry.captureException(error)
-            res.status(500).json({ message: 'Internal server error' });           
+    } catch (error: unknown) {
+        return sendError(res, error, '[userController Error]');
     }
 }
 
@@ -130,9 +126,7 @@ export const toggleProjectPublic = async (req: Request, res: Response) =>{
         }
         res.json({ publishedImage, publishedVideo, isPublished })
 
-    } catch (error: any) {
-            console.error('[userController Error]', error);
-            Sentry.captureException(error)
-            res.status(500).json({ message: 'Internal server error' });           
+    } catch (error: unknown) {
+        return sendError(res, error, '[userController Error]');
     }
 }

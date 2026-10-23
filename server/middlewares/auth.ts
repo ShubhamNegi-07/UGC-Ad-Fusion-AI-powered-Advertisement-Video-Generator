@@ -7,12 +7,12 @@ NextFunction)=>{
         const {userId} = req.auth()
 
         if(!userId) {
-            return res.status(401).json({message: 'Unauthorized'})
+            return res.status(401).json({ message: 'Please sign in again to continue.' })
         }
         next()
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('[auth Error]', error);
             Sentry.captureException(error)
-            res.status(401).json({message: 'Unauthorized'})
+            res.status(401).json({ message: 'Please sign in again to continue.' })
         }
     }

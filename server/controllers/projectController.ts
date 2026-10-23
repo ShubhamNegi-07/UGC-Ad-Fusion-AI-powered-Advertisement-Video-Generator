@@ -1,5 +1,4 @@
 import {Request, Response } from 'express'
-import * as Sentry from "@sentry/node";
 import axios from 'axios';
 import { prisma } from '../configs/prisma.js';
 import fs from 'fs';
@@ -8,6 +7,7 @@ import { assertGenerationKey, DUAL_IMAGE_BLENDING_PROMPT, generateAdVideo, gener
 import { toDataUrl, uploadPublicMedia } from '../services/media.js';
 import { ensureUser } from '../utils/ensureUser.js';
 import { deductCredits, refundCredits } from '../utils/credits.js';
+import { HttpError, clientErrorMessage, sendError } from '../utils/errors.js';
 
 const clipPrompt = (text: string, max = 1800) => {
     const clean = text.replace(/\s+/g, ' ').trim();
@@ -24,14 +24,6 @@ const publicAuthorName = (name?: string) => {
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ALLOWED_ASPECT_RATIOS = new Set(['9:16', '16:9', '1:1']);
 const DAILY_GENERATION_CAP = Number.parseInt(process.env.DAILY_GENERATION_CAP || '15', 10) || 15;
-
-class HttpError extends Error {
-    status: number;
-    constructor(status: number, message: string) {
-        super(message);
-        this.status = status;
-    }
-}
 
 export const isValidProjectId = (value: unknown): value is string =>
     typeof value === 'string' && UUID_REGEX.test(value.trim());
@@ -127,29 +119,18 @@ export const createProject = async (req:Request, res: Response) => {
         tempProjectId = project.id;
         res.json({ projectId: project.id, message: 'Creating your still image' });
 
-    } catch (error:any) {
-        if (error instanceof HttpError) {
-            return res.status(error.status).json({ message: error.message });
-        }
-        const rawMessage = error?.message || 'Image generation failed';
-        const clientMessage = /HF_TOKEN|Hugging Face|Inference permission|credits|quota|Gemini/i.test(rawMessage)
-            ? rawMessage
-            : 'Image generation failed. Please try again.';
-        if(tempProjectId){
-            // update project status and error message
+    } catch (error: unknown) {
+        const clientMessage = clientErrorMessage(error);
+        if (tempProjectId) {
             await prisma.project.updateMany({
-                where: {id: tempProjectId, userId},
-                data: {isGenerating: false, error: clientMessage}
-            })
+                where: { id: tempProjectId, userId },
+                data: { isGenerating: false, error: clientMessage },
+            });
         }
-        if(isCreditDeducted){
-            await refundCredits(prisma, userId, 5)
+        if (isCreditDeducted) {
+            await refundCredits(prisma, userId, 5);
         }
-        console.error('[createProject Error]', rawMessage, error);
-        Sentry.captureException(error);
-        if (!res.headersSent) {
-            res.status(500).json({ message: clientMessage });
-        }
+        return sendError(res, error, '[createProject Error]');
     }
 }
 
@@ -205,11 +186,8 @@ async function runStillGeneration(options: {
             },
         });
     } catch (genError: unknown) {
-        const rawMessage = genError instanceof Error ? genError.message : 'Image generation failed';
-        const clientMessage = /HF_TOKEN|Hugging Face|Inference permission|credits|quota|Gemini/i.test(rawMessage)
-            ? rawMessage
-            : 'Image generation failed. Please try again.';
-        console.error('[startImageGeneration background]', rawMessage, genError);
+        const clientMessage = clientErrorMessage(genError);
+        console.error('[startImageGeneration background]', genError);
         await prisma.project.updateMany({
             where: { id: options.projectId, userId: options.userId },
             data: { isGenerating: false, error: clientMessage },
@@ -263,15 +241,7 @@ export const startImageGeneration = async (req: Request, res: Response) => {
             aspectRatio: project.aspectRatio || '9:16',
         });
     } catch (error: unknown) {
-        const rawMessage = error instanceof Error ? error.message : 'Image generation failed';
-        const clientMessage = /HF_TOKEN|Hugging Face|Inference permission|credits|quota|Gemini/i.test(rawMessage)
-            ? rawMessage
-            : 'Image generation failed. Please try again.';
-        console.error('[startImageGeneration]', rawMessage, error);
-        Sentry.captureException(error);
-        if (!res.headersSent) {
-            res.status(500).json({ message: clientMessage });
-        }
+        sendError(res, error, '[startImageGeneration]');
     } finally {
         for (const file of images) {
             if (file?.path && fs.existsSync(file.path)) {
@@ -388,15 +358,8 @@ export const regenerateImage = async (req: Request, res: Response) => {
             generatedImage,
             project: serializedProject,
         });
-    } catch (error: any) {
-        if (error instanceof HttpError) {
-            return res.status(error.status).json({ message: error.message });
-        }
-        const rawMessage = error?.message || 'Image regeneration failed';
-        const clientMessage = /HF_TOKEN|Hugging Face|Inference permission|credits|quota|Gemini/i.test(rawMessage)
-            ? rawMessage
-            : 'Image regeneration failed. Your credits were refunded.';
-
+    } catch (error: unknown) {
+        const clientMessage = clientErrorMessage(error);
         try {
             await prisma.project.updateMany({
                 where: { id: projectId, userId },
@@ -414,11 +377,7 @@ export const regenerateImage = async (req: Request, res: Response) => {
             }
         }
 
-        console.error('[regenerateImage Error]', rawMessage, error);
-        Sentry.captureException(error);
-        if (!res.headersSent) {
-            res.status(500).json({ message: clientMessage });
-        }
+        return sendError(res, error, '[regenerateImage Error]');
     }
 };
 
@@ -524,35 +483,26 @@ export const createVideo = async (req:Request, res: Response) => {
             project: serializedProject,
         })
 
-    } catch (error:any) {
-        if (error instanceof HttpError) {
-            return res.status(error.status).json({ message: error.message });
-        }
-        const rawMessage = error?.message || 'Video generation failed';
-        const clientMessage = 'Video generation failed. Your credits were refunded.';
-
+    } catch (error: unknown) {
+        const clientMessage = clientErrorMessage(error);
         try {
             await prisma.project.updateMany({
-                where: {id: projectId, userId},
-                data: {isGenerating: false, error: clientMessage}
-            })
+                where: { id: projectId, userId },
+                data: { isGenerating: false, error: clientMessage },
+            });
         } catch (updateError) {
             console.error('[createVideo] failed to persist error', updateError);
         }
 
-        if(isCreditDeducted){
+        if (isCreditDeducted) {
             try {
-                await refundCredits(prisma, userId, 10)
+                await refundCredits(prisma, userId, 10);
             } catch (refundError) {
                 console.error('[createVideo] failed to refund credits', refundError);
             }
         }
 
-        console.error('[createVideo Error]', rawMessage, error);
-        Sentry.captureException(error);
-        if (!res.headersSent) {
-            res.status(500).json({ message: clientMessage });
-        }
+        return sendError(res, error, '[createVideo Error]');
     }
 }
 
@@ -629,10 +579,8 @@ export const getAllPublishedProjects = async (req:Request, res: Response) => {
         })
         res.json({projects})
 
-    } catch (error:any) {
-        console.error('[getAllPublishedProjects Error]', error);
-        Sentry.captureException(error);
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: unknown) {
+        return sendError(res, error, '[getAllPublishedProjects Error]');
     }
 }
 
@@ -671,11 +619,7 @@ export const downloadPublishedMedia = async (req: Request, res: Response) => {
         res.setHeader('Content-Disposition', 'attachment');
         upstream.data.pipe(res);
     } catch (error) {
-        console.error('[downloadPublishedMedia]', error);
-        Sentry.captureException(error);
-        if (!res.headersSent) {
-            res.status(502).json({ message: 'Could not download this file' });
-        }
+        return sendError(res, error, '[downloadPublishedMedia]');
     }
 }
 
@@ -696,9 +640,7 @@ export const deleteProject = async (req:Request, res: Response) => {
         }
         res.json({ message: 'Project deleted' });
 
-    } catch (error:any) {
-        console.error('[deleteProject Error]', error);
-        Sentry.captureException(error);
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: unknown) {
+        return sendError(res, error, '[deleteProject Error]');
     }
 }

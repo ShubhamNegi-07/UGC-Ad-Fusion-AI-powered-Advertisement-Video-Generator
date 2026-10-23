@@ -44,7 +44,7 @@ import { useVisualViewportInset } from "@/hooks/useVisualViewportInset";
 
 import { downloadMediaFile } from "@/lib/download";
 import { isStillPublished, isVideoPublished, type PublishMedia } from "@/lib/publish";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, safeUserMessage } from "@/lib/utils";
 
 
 
@@ -223,7 +223,7 @@ function ResultActionsAside({
             hasImage={hasImage}
             isGenerating={isGenerating}
             disabled={anyBusy}
-            projectError={project.error}
+            projectError={safeUserMessage(project.error, "")}
             onGenerateVideo={onGenerateVideo}
           />
         </div>
@@ -504,7 +504,7 @@ function ResultMediaPanel({
             <span className="flex size-12 items-center justify-center rounded-lg border border-border bg-muted/60">
               <HugeiconsIcon icon={Image02Icon} size={22} aria-hidden />
             </span>
-            {project.error || "No media yet"}
+            {safeUserMessage(project.error, "") || "No media yet"}
           </div>
         )
       ) : (
@@ -825,7 +825,7 @@ export default function ResultStudioView({
             hasImage={hasImage}
             isGenerating={isGenerating}
             disabled={isRegeneratingImage}
-            projectError={project.error}
+            projectError={safeUserMessage(project.error, "")}
             onGenerateVideo={onGenerateVideo}
             compact
           />

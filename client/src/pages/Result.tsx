@@ -18,7 +18,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon } from "@/icons";
 import { applyPublishFlags, type PublishMedia } from "@/lib/publish";
 import { readCachedProject, writeCachedProject } from "@/lib/studio-cache";
-import { errorMessage } from "@/lib/utils";
+import { GENERIC_ERROR_MESSAGE, errorMessage, safeUserMessage } from "@/lib/utils";
 
 export default function Result() {
   const { projectId } = useParams();
@@ -57,6 +57,7 @@ export default function Result() {
             ...raw,
             generatedVideo: resolvedVideo,
             videoUrl: resolvedVideo || undefined,
+            error: raw.error ? safeUserMessage(raw.error) : "",
           };
           setProject(next);
           writeCachedProject(next);
@@ -66,7 +67,7 @@ export default function Result() {
           }
           if (!next.isGenerating && next.error && !next.generatedImage && !errorToasted.current) {
             errorToasted.current = true;
-            toast.error(next.error);
+            toast.error(safeUserMessage(next.error));
           }
         }
       } catch (error) {
@@ -106,10 +107,7 @@ export default function Result() {
       setMediaReady(true);
       toast.success(data.message || "Video generated");
     } catch (error) {
-      const message = errorMessage(error, "Video generation failed");
-      if (!/pollen|top-up/i.test(message)) {
-        toast.error(message, { duration: 7000 });
-      }
+      toast.error(errorMessage(error, GENERIC_ERROR_MESSAGE), { duration: 7000 });
       await fetchProject({ silent: true });
     } finally {
       setIsGenerating(false);
@@ -145,8 +143,7 @@ export default function Result() {
       setMediaReady(true);
       toast.success(data.message || "Image regenerated");
     } catch (error) {
-      const message = errorMessage(error, "Image regeneration failed");
-      toast.error(message, { duration: 6000 });
+      toast.error(errorMessage(error, GENERIC_ERROR_MESSAGE), { duration: 6000 });
       await fetchProject({ silent: true });
     } finally {
       setIsRegeneratingImage(false);
